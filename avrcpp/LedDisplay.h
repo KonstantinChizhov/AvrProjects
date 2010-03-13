@@ -1,5 +1,6 @@
 #ifndef LED_HPP
 #define LED_HPP
+#include "util.h"
 
 template<
 	class A, 
@@ -81,7 +82,7 @@ public:
 	}
 };
 
-template<class SEGMENTS, class COMMONS, class MAP_TABLE>
+template<class SEGMENTS, class COMMONS, class MAP_TABLE=LedBcdMapTable>
 class LedDisplay
 {
 public:
@@ -92,10 +93,11 @@ public:
 
 	void Set(uint16_t value)
 	{
-		for(uint8_t i=0; i<NumDidgits; i++)
+		for(uint8_t i = 0; i < NumDidgits; i++)
 		{
-			_bcdValue[i] = value % 10;
-			value /= 10;
+			div_t res = div(value, 10);
+			_value[i] = res.rem;
+			value = res.quot;
 			if(value==0)return;
 		}
 	}

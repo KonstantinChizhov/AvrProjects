@@ -69,10 +69,47 @@ inline uint8_t ilog10 (T x)
     return i;
 }
 
+inline uint16_t div5(uint16_t num, uint16_t &rem)
+{
+    uint16_t q = num*0x6667ul >> 16;
+    q >>= 1;
+    rem = num - q*5;
+    return q;
+}
 
+inline uint16_t div10(uint16_t num, uint16_t &rem)
+{
+    uint16_t q = num*0x6667ul >> 16;
+    q >>= 2;
+    rem = num - q*10;
+    return q;
+}
+
+inline uint32_t div10(uint32_t num, uint32_t &rem)
+{
+    uint32_t q = num*0x66666667ul >> 32;
+    q >>= 2;
+    rem = num - q*10;
+    return q;
+}
+
+template<class DATA_SOURCE>
+class WaitAdapter :public DATA_SOURCE
+{
+public:
+	void Putch(uint8_t c)
+	{
+		while(!DATA_SOURCE::Putch(c));
+	}
+
+	void Getch(uint8_t &c)
+	{
+		while(!DATA_SOURCE::Getch(c));
+	}
+};
 
 template<class DATA_SOURCE, uint8_t fieldSize=8>
-class TextFormater :DATA_SOURCE
+class TextFormater :public DATA_SOURCE
 {
 public:
 
@@ -212,6 +249,22 @@ public:
 		while(c!='\n' && c!=0);
 		buffer[pos]=0;
 	} 
+
+	TextFormater<DATA_SOURCE>& operator>> (unsigned &value)
+	{
+		char buffer[7];
+		Gets(buffer, sizeof(buffer));
+		value = atoi(buffer);
+		return *this;
+	}
+
+	TextFormater<DATA_SOURCE>& operator>> (unsigned long &value)
+	{
+		char buffer[11];
+		Gets(buffer, sizeof(buffer));
+		value = atol(buffer);
+		return *this;
+	}
 
 	template<class T>
 	void Write(T value)
