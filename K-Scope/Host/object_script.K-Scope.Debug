@@ -1,0 +1,14 @@
+INPUT(
+./debug/main.o
+./debug/dialog.o
+./debug/mytransform.o
+./debug/k_scope.o
+./debug/graph.o
+./debug/gr_data.o
+./debug/opendevice.o
+./debug/exception.o
+./debug/devicebase.o
+./debug/demodevice.o
+./debug/moc_dialog.o
+./debug/moc_graph.o
+);

@@ -2,3 +2,5 @@ lost+found/
 *.keep
 *.keep.*
 default
+debug
+release

@@ -1,0 +1,14 @@
+INPUT(
+./release/main.o
+./release/dialog.o
+./release/mytransform.o
+./release/k_scope.o
+./release/graph.o
+./release/gr_data.o
+./release/opendevice.o
+./release/exception.o
+./release/devicebase.o
+./release/demodevice.o
+./release/moc_dialog.o
+./release/moc_graph.o
+);
