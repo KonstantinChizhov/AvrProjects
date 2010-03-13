@@ -1,6 +1,9 @@
-#include <avr/io.h>
-//#include "dispatcher.h"
+//#include <avr/io.h>
+#include "dispatcher.h"
+#include "usart.h"
+#include "adc.h"
 #include "HD44780.h"
+#include "stepper.h"
 
 
 Lcd

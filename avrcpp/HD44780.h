@@ -1,7 +1,7 @@
 #ifndef HD44780_HPP
 #define HD44780_HPP
 
-#include "util.h"
+#include "ports.h"
 #include <util/delay.h>
 
 class LcdBase

@@ -2,7 +2,6 @@
 #define ADC_HPP
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include "util.h"
 
 
 enum Vref{External=0, VCC=1, Int2_56=3};

@@ -1,8 +1,7 @@
 #pragma once
 #ifndef STEP_MOTOR_HPP
 #define STEP_MOTOR_HPP
-#include "util.h"
-#include <util/delay.h>
+
 
 template <class DATA_PIN, class CLK_PIN, class SET_PIN, class ENABLE_PIN>
 class LB1946

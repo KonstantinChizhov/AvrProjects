@@ -1,7 +1,5 @@
 #ifndef LED_HPP
 #define LED_HPP
-#include <avr/io.h>
-#include "util.h"
 
 template<
 	class A, 
