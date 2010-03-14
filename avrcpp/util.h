@@ -87,7 +87,7 @@ inline uint16_t div10(uint16_t num, uint16_t &rem)
 
 inline uint32_t div10(uint32_t num, uint32_t &rem)
 {
-    uint32_t q = num*0x66666667ul >> 32;
+    uint32_t q = num*0x66666667ull >> 32;
     q >>= 2;
     rem = num - q*10;
     return q;

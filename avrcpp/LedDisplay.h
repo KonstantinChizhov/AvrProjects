@@ -30,6 +30,57 @@ private:
 	A a; B b; C c; D d; E e; F f; G g; DP dp;
 };
 
+template<
+	class A, 
+	class B, 
+	class C, 
+	class D, 
+	class E, 
+	class F,
+	class G,
+	class DP
+	>
+class SegmentsInv
+{
+public:
+	void Write(uint8_t value)
+	{
+		value=~value;
+		a.Set(value & 1);
+		b.Set(value & 2);
+		c.Set(value & 4);
+		d.Set(value & 8);
+		e.Set(value & 16);
+		f.Set(value & 32);
+		g.Set(value & 64);
+		dp.Set(value & 128);
+	}
+private:
+	A a; B b; C c; D d; E e; F f; G g; DP dp;
+};
+
+template<class PORT>
+class PortSegments
+{
+public:
+	void Write(uint8_t value)
+	{
+		PORT::dir() = 0xff;
+		PORT::Write(value);
+	}
+};
+
+template<class PORT>
+class PortSegmentsInv
+{
+public:
+	void Write(uint8_t value)
+	{
+		PORT::dir() = 0xff;
+		PORT::Write(~value);
+	}
+};
+
 template<class PORT, uint8_t NUM_DIDGITS>
 class CommonsPortH // active level - hi
 {
@@ -73,16 +124,16 @@ public:
 };
 
 
-class LedBcdMapTable
+class LedMapTable
 {
 public:
 	uint8_t Map(uint8_t bcd)
 	{
-		return "\0x3f\0x06\0x5b\0x4f\0x66\0x6d\0x7d\0x7\0x7f\0x6f\0x40\0x40\0x40\0x40\0x40\0x40"[bcd];
+		return pgm_read_byte(PSTR("\x3f\x06\x5b\x4f\x66\x6d\x7d\x7\x7f\x6f\x77\x7c\x39\x5e\x79\x71")+bcd);
 	}
 };
 
-template<class SEGMENTS, class COMMONS, class MAP_TABLE=LedBcdMapTable>
+template<class SEGMENTS, class COMMONS, class MAP_TABLE=LedMapTable>
 class LedDisplay
 {
 public:
@@ -91,14 +142,59 @@ public:
 		position = 0;
 	}
 
-	void Set(uint16_t value)
+	void WriteDec(uint16_t value)
 	{
 		for(uint8_t i = 0; i < NumDidgits; i++)
 		{
 			div_t res = div(value, 10);
-			_value[i] = res.rem;
+			_value[NumDidgits-i-1] = _table.Map(res.rem);
 			value = res.quot;
-			if(value==0)return;
+			if(value==0 && res.rem==0)
+			{
+				_value[NumDidgits-i-1] = 0;
+			}
+		}
+	}
+
+	void WriteDec(uint32_t value)
+	{
+		for(uint8_t i = 0; i < NumDidgits; i++)
+		{
+			ldiv_t res = ldiv(value, 10);
+			_value[NumDidgits-i-1] = _table.Map(res.rem);
+			value = res.quot;
+			if(value==0 && res.rem==0)
+			{
+				_value[NumDidgits-i-1] = 0;
+			}
+		}
+	}
+
+	void WriteHex(uint16_t value)
+	{
+		for(uint8_t i = 0; i < NumDidgits; i++)
+		{
+			uint8_t rem = value & 0x0f;
+			_value[NumDidgits-i-1] = _table.Map(rem);
+			value >>= 4;
+			if(value==0 && rem==0)
+			{
+				_value[NumDidgits-i-1] = 0;
+			}	
+		}
+	}
+
+	void WriteHex(uint32_t value)
+	{
+		for(uint8_t i = 0; i < NumDidgits; i++)
+		{
+			uint8_t rem = value & 0x0f;
+			_value[NumDidgits-i-1] = _table.Map(rem);
+			value >>= 4;
+			if(value==0 && rem==0)
+			{
+				_value[NumDidgits-i-1] = 0;
+			}	
 		}
 	}
 
