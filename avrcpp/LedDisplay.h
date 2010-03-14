@@ -142,7 +142,7 @@ public:
 		position = 0;
 	}
 
-	void WriteDec(uint16_t value)
+	void WriteDec2(uint16_t value)
 	{
 		for(uint8_t i = 0; i < NumDidgits; i++)
 		{
@@ -156,7 +156,22 @@ public:
 		}
 	}
 
-	void WriteDec(uint32_t value)
+	void WriteDec(int16_t value)
+	{
+		int16_t i= 0, sign;
+	    if ((sign = value) < 0)  
+	        value = -value;      
+		div_t res;
+	    do {
+			res = div(value, 10);
+	        _value[NumDidgits - 1 - i++] = _table.Map(res.rem);
+			if(i>=NumDidgits)return;
+	    } while ((value = res.quot) > 0);
+	    if (sign < 0)
+	        _value[i++] = 0x40;
+	}
+
+/*	void WriteDec(uint32_t value)
 	{
 		for(uint8_t i = 0; i < NumDidgits; i++)
 		{
@@ -168,7 +183,7 @@ public:
 				_value[NumDidgits-i-1] = 0;
 			}
 		}
-	}
+	}*/
 
 	void WriteHex(uint16_t value)
 	{

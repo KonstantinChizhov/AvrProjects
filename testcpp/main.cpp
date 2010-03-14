@@ -1,7 +1,7 @@
 //#include <avr/io.h>
 #include "dispatcher.h"
 #include "usart.h"
-//#include "adc.h"
+#include "adc.h"
 //#include "HD44780.h"
 //#include "stepper.h"
 #include "LedDisplay.h"
@@ -26,7 +26,7 @@ LedDisplay<PortSegmentsInv<Portb>, CommonsPortL<Portc, 4> > led;
 unsigned count=0;
 void f()
 {
-	led.WriteDec(count++);
+	led.WriteDec(Adc::ReadSingle());
 	//Portb::data() = 0xff;
 	//pin.Togle();
 	Dispatcher::SetTimer(f, 50);
@@ -44,6 +44,11 @@ int main()
  	//Usart::Init(115200);
 	//TextFormater<WaitAdapter<Usart> > usart;
 	//Usart usart;
+	Adc::SetClockDivider(Dev32);
+	Adc::SetChannel(0);
+	Adc::SetVref(VCC);
+
+
 	Dispatcher::Init();
 	//pin.SetDirWrite();
 	Portb::dir() = 0xff;

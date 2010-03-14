@@ -22,7 +22,7 @@ public:
 		ADMUX |= (ref << REFS0);
 	}
 
-	static void SetClockDivider(uint8_t channel)
+	static void SetChannel(uint8_t channel)
 	{
 		ADMUX |= (channel & 0x1f) << MUX0;
 	}
@@ -42,7 +42,7 @@ public:
 		ADCSRA |= _BV(ADC_FREE_RUN) | _BV(ADIE) | _BV(ADSC) | _BV(ADEN);
 	}
 
-	static int ReadSingle()
+	static uint16_t ReadSingle()
 	{
 		ADCSRA |= _BV(ADSC) | _BV(ADEN);
 		while (ADCSRA & _BV(ADSC));
