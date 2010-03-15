@@ -42,7 +42,7 @@ public:
 		ADCSRA |= _BV(ADC_FREE_RUN) | _BV(ADIE) | _BV(ADSC) | _BV(ADEN);
 	}
 
-	static uint16_t ReadSingle()
+	static int16_t ReadSingle()
 	{
 		ADCSRA |= _BV(ADSC) | _BV(ADEN);
 		while (ADCSRA & _BV(ADSC));

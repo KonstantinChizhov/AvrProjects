@@ -2,13 +2,13 @@
 #include "dispatcher.h"
 #include "usart.h"
 #include "adc.h"
-//#include "HD44780.h"
+#include "HD44780.h"
 //#include "stepper.h"
 #include "LedDisplay.h"
 #include "util.h"
 #include "ports.h"
 
-/*Lcd
+Lcd
 <
 	TPin<Porta, 6>,
 	TPin<Porta, 5>,
@@ -18,7 +18,7 @@
 	TPin<Porta, 1>,
 	TPin<Porta, 0>
 > lcd;
-*/
+
 
 //TPin<Portb, 0> pin;
 

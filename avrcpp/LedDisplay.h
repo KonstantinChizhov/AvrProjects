@@ -131,6 +131,10 @@ public:
 	{
 		return pgm_read_byte(PSTR("\x3f\x06\x5b\x4f\x66\x6d\x7d\x7\x7f\x6f\x77\x7c\x39\x5e\x79\x71")+bcd);
 	}
+
+	uint8_t Minus(){return 0x40;}
+	uint8_t Empty(){return 0x0;}
+	 
 };
 
 template<class SEGMENTS, class COMMONS, class MAP_TABLE=LedMapTable>
@@ -142,48 +146,47 @@ public:
 		position = 0;
 	}
 
-	void WriteDec2(uint16_t value)
-	{
-		for(uint8_t i = 0; i < NumDidgits; i++)
-		{
-			div_t res = div(value, 10);
-			_value[NumDidgits-i-1] = _table.Map(res.rem);
-			value = res.quot;
-			if(value==0 && res.rem==0)
-			{
-				_value[NumDidgits-i-1] = 0;
-			}
-		}
-	}
-
 	void WriteDec(int16_t value)
 	{
-		int16_t i= 0, sign;
-	    if ((sign = value) < 0)  
-	        value = -value;      
+		int16_t i= 0; 
+		uint8_t minus=0;
+	    if (value < 0)  
+		{
+	        value = -value;
+			minus = 1;
+		}
 		div_t res;
 	    do {
 			res = div(value, 10);
 	        _value[NumDidgits - 1 - i++] = _table.Map(res.rem);
 			if(i>=NumDidgits)return;
 	    } while ((value = res.quot) > 0);
-	    if (sign < 0)
-	        _value[i++] = 0x40;
+	    if (minus)
+	        _value[i++] = _table.Minus();
+		while(i++ < NumDidgits)
+			_value[NumDidgits - 1 - i] = _table.Empty();
 	}
 
-/*	void WriteDec(uint32_t value)
+	void WriteDec(int32_t value)
 	{
-		for(uint8_t i = 0; i < NumDidgits; i++)
+		int16_t i= 0; 
+		uint8_t minus=0;
+	    if (value < 0)  
 		{
-			ldiv_t res = ldiv(value, 10);
-			_value[NumDidgits-i-1] = _table.Map(res.rem);
-			value = res.quot;
-			if(value==0 && res.rem==0)
-			{
-				_value[NumDidgits-i-1] = 0;
-			}
+	        value = -value;
+			minus = 1;
 		}
-	}*/
+		div_t res;
+	    do {
+			res = div(value, 10);
+	        _value[NumDidgits - 1 - i++] = _table.Map(res.rem);
+			if(i>=NumDidgits)return;
+	    } while ((value = res.quot) > 0);
+	    if (minus)
+	        _value[i++] = _table.Minus();
+		while(i++ < NumDidgits)
+			_value[NumDidgits - 1 - i] = _table.Empty();
+	}
 
 	void WriteHex(uint16_t value)
 	{
