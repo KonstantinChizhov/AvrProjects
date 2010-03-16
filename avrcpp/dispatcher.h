@@ -1,6 +1,7 @@
 #include <avr/io.h>
 #include "containers.h"
 #include <avr/interrupt.h>
+#include "util.h"
 
 #define TASKS_LENGTH 8
 #define TIMERS_LENGTH 5
@@ -30,7 +31,6 @@ public:
 		TCNT0 = TIMER_START;
 		TCCR0 = (0<<CS02) | (1<<CS01) | (1<<CS00);
 		TIMSK |= (1<<TOIE0);
-		sei();
 	}
 
 	static uint16_t Ticks()
@@ -40,49 +40,44 @@ public:
 
 	static void SetTask(task_t task) //__attribute__ ((noinline))
 	{
-		//uint8_t statusCopy = SREG;
-		//cli();
-		_tasks.Write(task);
-		//SREG = statusCopy;
+		ATOMIC{	_tasks.Write(task);}
 	}
 
 	static void SetTimer(task_t task, uint16_t period) __attribute__ ((noinline))
 	{
-		uint8_t i_idle=0;
-		cli();
-		uint8_t statusCopy = SREG;
-		for(uint8_t i=0; i<_timers.Size(); i++)
+		uint8_t i_idle=_timers.Size()-1;
+		ATOMIC
 		{
-			if(_timers[i].task == 0)
+			for(uint8_t i=0; i<_timers.Size(); i++)
 			{
-				i_idle = i;
+				if(_timers[i].task == 0)
+				{
+					i_idle = i;
+				}
+				if(_timers[i].task == task)
+				{
+					_timers[i].period = period;
+					return;
+				}
 			}
-			if(_timers[i].task == task)
-			{
-				_timers[i].period = period;
-				SREG = statusCopy;
-				return;
-			}
+			_timers[i_idle].task = task;
+			_timers[i_idle].period = period;
 		}
-		_timers[i_idle].task = task;
-		_timers[i_idle].period = period;
-		SREG = statusCopy;
 	}
 
 	static void StopTimer(task_t task)
 	{
-		cli();
-		uint8_t statusCopy = SREG;
-		for(uint8_t i=0; i<_timers.Size(); i++)
+		ATOMIC
 		{
-			if(_timers[i].task == task)
+			for(uint8_t i=0; i<_timers.Size(); i++)
 			{
-				_timers[i].task = 0;
-				SREG = statusCopy;
-				return;
+				if(_timers[i].task == task)
+				{
+					_timers[i].task = 0;
+					return;
+				}
 			}
 		}
-		SREG = statusCopy;
 	}
 
 	static void Poll()
