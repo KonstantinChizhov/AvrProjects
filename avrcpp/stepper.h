@@ -1,7 +1,7 @@
 #pragma once
 #ifndef STEP_MOTOR_HPP
 #define STEP_MOTOR_HPP
-
+#include <avr/pgmspace.h>
 
 template <class DATA_PIN, class CLK_PIN, class SET_PIN, class ENABLE_PIN>
 class LB1946Base
@@ -95,77 +95,44 @@ class LB1946 :public LB1946Base<DATA_PIN, CLK_PIN, SET_PIN, ENABLE_PIN>
 {
 public:
 	typedef LB1946Base<DATA_PIN, CLK_PIN, SET_PIN, ENABLE_PIN> Base;
-
 	LB1946()
 	{
-		_phase = 1;
+		_phase = 0;
 	}
 
 	static void HalfStepFwd()
 	{
-		uint8_t a = 0, b = 0;
-		switch(_phase++)
-		{
-			case 0:
-				a = 0x3f; b = 0;
-			break;
-			case 1:
-				a = 0x1f; b = 0x1f;
-			break;
-			case 2:
-				a = 0; b = 0x3f;
-			break;
-			case 3:
-				a = 0x1e; b = 0x1f;
-			break;
-			case 4:
-				a = 0x3e; b = 0;
-			break;
-			case 5:
-				a = 0x1e; b = 0x1e;
-			break;
-			case 6:
-				a = 0; b = 0x3e;
-			break;	
-			case 7:
-				a = 0x1f; b = 0x1e;
-			_phase = 0;
-			break;	
-		}
-		Base::Write(a, b);
+		_phase = (_phase + 1) & 0x7;
+		WriteOutput();
 	}
 
 	static void HalfStepBack()
 	{
-		uint8_t a = 0, b = 0;
-		switch(_phase--)
-		{
-			case 0:
-				a = 0x3f; b = 0;
-				_phase = 7;
-			break;
-			case 1:
-				a = 0x1f; b = 0x1f;
-			break;
-			case 2:
-				a = 0; b = 0x3f;
-			break;
-			case 3:
-				a = 0x1e; b = 0x1f;
-			break;
-			case 4:
-				a = 0x3e; b = 0;
-			break;
-			case 5:
-				a = 0x1e; b = 0x1e;
-			break;
-			case 6:
-				a = 0; b = 0x3e;
-			break;	
-			case 7:
-				a = 0x1f; b = 0x1e;
-			break;		
-		}
+		_phase = (_phase - 1) & 0x7;
+		WriteOutput();
+	}
+
+	static void StepBack()
+	{
+		_phase = (_phase - 2) & 0x6;
+		WriteOutput();
+	}
+
+	static void StepFwd()
+	{
+		_phase = (_phase + 2) & 0x6;
+		WriteOutput();
+	}
+
+protected:
+	static void WriteOutput()
+	{
+		static uint8_t aTable[] PROGMEM = {0x3f, 	0x0f, 0, 	0x0e, 0x3e, 0x0e, 0, 	0x0f};
+		static uint8_t bTable[] PROGMEM = {0, 		0x0f, 0x3f, 0x0f, 0, 	0x0e, 0x3e, 0x0e};
+
+		uint8_t a = pgm_read_byte(&(aTable[_phase]));
+		uint8_t b = pgm_read_byte(&(bTable[_phase]));
+
 		Base::Write(a, b);
 	}
 	static uint8_t _phase;

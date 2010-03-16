@@ -3,12 +3,12 @@
 #include "usart.h"
 #include "adc.h"
 #include "HD44780.h"
-//#include "stepper.h"
+#include "stepper.h"
 #include "LedDisplay.h"
 #include "util.h"
 #include "ports.h"
 
-Lcd
+/*Lcd
 <
 	TPin<Porta, 6>,
 	TPin<Porta, 5>,
@@ -18,15 +18,24 @@ Lcd
 	TPin<Porta, 1>,
 	TPin<Porta, 0>
 > lcd;
-
+*/
 
 //TPin<Portb, 0> pin;
 
+LB1946
+<
+	TPin<Portc, 6>,//deta
+	TPin<Portc, 7>,//clk
+	TPin<Portc, 5>,//set
+	TPin<Portc, 4>//enable
+> mot;
+
+
 LedDisplay<PortSegmentsInv<Portb>, CommonsPortL<Portc, 4> > led;
-unsigned count=0;
+
 void f()
 {
-	led.WriteDec(Adc::ReadSingle());
+	led.WriteDec(Adc::ReadSingle()-512);
 	//Portb::data() = 0xff;
 	//pin.Togle();
 	Dispatcher::SetTimer(f, 50);
@@ -35,7 +44,11 @@ void f()
 void f2()
 {
 	led.Update();
-	Dispatcher::SetTimer(f2, 3);
+	if(Adc::ReadSingle() > 512)
+		mot.HalfStepFwd();
+	else
+		mot.StepFwd();
+	Dispatcher::SetTimer(f2, 1);
 }
 
 int main()

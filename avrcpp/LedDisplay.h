@@ -162,12 +162,12 @@ public:
 			if(i>=NumDidgits)return;
 	    } while ((value = res.quot) > 0);
 	    if (minus)
-	        _value[i++] = _table.Minus();
-		while(i++ < NumDidgits)
-			_value[NumDidgits - 1 - i] = _table.Empty();
+	        _value[NumDidgits - 1 - i++] = _table.Minus();
+		while(i < NumDidgits)
+			_value[NumDidgits - 1 - i++] = _table.Empty();
 	}
 
-	void WriteDec(int32_t value)
+	/*void WriteDec(int32_t value)
 	{
 		int16_t i= 0; 
 		uint8_t minus=0;
@@ -186,7 +186,7 @@ public:
 	        _value[i++] = _table.Minus();
 		while(i++ < NumDidgits)
 			_value[NumDidgits - 1 - i] = _table.Empty();
-	}
+	}*/
 
 	void WriteHex(uint16_t value)
 	{
