@@ -4,56 +4,12 @@
 
 
 template <class DATA_PIN, class CLK_PIN, class SET_PIN, class ENABLE_PIN>
-class LB1946
+class LB1946Base
 {
 public:
-	LB1946()
+	LB1946Base()
 	{
 		Init();
-	}
-
-	static void StepFwd()
-	{
-		uint8_t a = 0, b = 0;
-		switch(_phase++)
-		{
-			case 0:
-				a = 0x3f; b = 0;
-			break;
-			case 1:
-				a = 0; b = 0x3f;
-			break;
-			case 2:
-				a = 0x3e; b = 0;
-			break;
-			case 3:
-				a = 0; b = 0x3e;
-			_phase = 0;
-			break;		
-		}
-		Write(a, b);
-	}
-
-	static void StepBack()
-	{
-		uint8_t a = 0, b = 0;
-		switch(_phase--)
-		{
-			case 0:
-				a = 0x3f; b = 0;
-				_phase = 3;
-			break;
-			case 1:
-				a = 0; b = 0x3f;
-			break;
-			case 2:
-				a = 0x3e; b = 0;
-			break;
-			case 3:
-				a = 0; b = 0x3e;
-			break;		
-		}
-		Write(a, b);
 	}
 
 	// writes data to LB1946 motor driver
@@ -95,7 +51,6 @@ protected:
 
 	static void Init()
 	{
-		_phase = 1;
 		_enable.Clear();
 	
 		_data.SetDirWrite();
@@ -116,7 +71,6 @@ protected:
 		}
 	}
 
-	static uint8_t _phase;
 	static DATA_PIN _data;
 	static CLK_PIN _clk;
 	static SET_PIN _set;
@@ -124,20 +78,101 @@ protected:
 };
 
 	template <class DATA_PIN, class CLK_PIN, class SET_PIN, class ENABLE_PIN>
+	DATA_PIN LB1946Base<DATA_PIN, CLK_PIN, SET_PIN, ENABLE_PIN>::_data;
+
+	template <class DATA_PIN, class CLK_PIN, class SET_PIN, class ENABLE_PIN>
+	CLK_PIN LB1946Base<DATA_PIN, CLK_PIN, SET_PIN, ENABLE_PIN>::_clk;
+
+	template <class DATA_PIN, class CLK_PIN, class SET_PIN, class ENABLE_PIN>
+	SET_PIN LB1946Base<DATA_PIN, CLK_PIN, SET_PIN, ENABLE_PIN>::_set;
+
+	template <class DATA_PIN, class CLK_PIN, class SET_PIN, class ENABLE_PIN>
+	ENABLE_PIN LB1946Base<DATA_PIN, CLK_PIN, SET_PIN, ENABLE_PIN>::_enable;
+
+
+template <class DATA_PIN, class CLK_PIN, class SET_PIN, class ENABLE_PIN>
+class LB1946 :public LB1946Base<DATA_PIN, CLK_PIN, SET_PIN, ENABLE_PIN>
+{
+public:
+	typedef LB1946Base<DATA_PIN, CLK_PIN, SET_PIN, ENABLE_PIN> Base;
+
+	LB1946()
+	{
+		_phase = 1;
+	}
+
+	static void HalfStepFwd()
+	{
+		uint8_t a = 0, b = 0;
+		switch(_phase++)
+		{
+			case 0:
+				a = 0x3f; b = 0;
+			break;
+			case 1:
+				a = 0x1f; b = 0x1f;
+			break;
+			case 2:
+				a = 0; b = 0x3f;
+			break;
+			case 3:
+				a = 0x1e; b = 0x1f;
+			break;
+			case 4:
+				a = 0x3e; b = 0;
+			break;
+			case 5:
+				a = 0x1e; b = 0x1e;
+			break;
+			case 6:
+				a = 0; b = 0x3e;
+			break;	
+			case 7:
+				a = 0x1f; b = 0x1e;
+			_phase = 0;
+			break;	
+		}
+		Base::Write(a, b);
+	}
+
+	static void HalfStepBack()
+	{
+		uint8_t a = 0, b = 0;
+		switch(_phase--)
+		{
+			case 0:
+				a = 0x3f; b = 0;
+				_phase = 7;
+			break;
+			case 1:
+				a = 0x1f; b = 0x1f;
+			break;
+			case 2:
+				a = 0; b = 0x3f;
+			break;
+			case 3:
+				a = 0x1e; b = 0x1f;
+			break;
+			case 4:
+				a = 0x3e; b = 0;
+			break;
+			case 5:
+				a = 0x1e; b = 0x1e;
+			break;
+			case 6:
+				a = 0; b = 0x3e;
+			break;	
+			case 7:
+				a = 0x1f; b = 0x1e;
+			break;		
+		}
+		Base::Write(a, b);
+	}
+	static uint8_t _phase;
+};
+
+template <class DATA_PIN, class CLK_PIN, class SET_PIN, class ENABLE_PIN>
 	uint8_t LB1946<DATA_PIN, CLK_PIN, SET_PIN, ENABLE_PIN>::_phase;
-
-	template <class DATA_PIN, class CLK_PIN, class SET_PIN, class ENABLE_PIN>
-	DATA_PIN LB1946<DATA_PIN, CLK_PIN, SET_PIN, ENABLE_PIN>::_data;
-
-	template <class DATA_PIN, class CLK_PIN, class SET_PIN, class ENABLE_PIN>
-	CLK_PIN LB1946<DATA_PIN, CLK_PIN, SET_PIN, ENABLE_PIN>::_clk;
-
-	template <class DATA_PIN, class CLK_PIN, class SET_PIN, class ENABLE_PIN>
-	SET_PIN LB1946<DATA_PIN, CLK_PIN, SET_PIN, ENABLE_PIN>::_set;
-
-	template <class DATA_PIN, class CLK_PIN, class SET_PIN, class ENABLE_PIN>
-	ENABLE_PIN LB1946<DATA_PIN, CLK_PIN, SET_PIN, ENABLE_PIN>::_enable;
-
 
 
 #endif
