@@ -71,12 +71,6 @@ public:
 		return _rx.Read(c);
 	}
 
-	template<class T>
-	static void Write(T value)
-	{
-		Write(&value, sizeof(T));
-	}
-
 	inline static void USART_UDRE_Handler();
 	inline static void USART_RXC_Handler();
 protected:
