@@ -96,10 +96,6 @@ class LB1946 :public LB1946Base<DATA_PIN, CLK_PIN, SET_PIN, ENABLE_PIN>
 {
 public:
 	typedef LB1946Base<DATA_PIN, CLK_PIN, SET_PIN, ENABLE_PIN> Base;
-	LB1946()
-	{
-		_phase = 0;
-	}
 
 	static void HalfStepFwd()
 	{
@@ -140,7 +136,7 @@ protected:
 };
 
 template <class DATA_PIN, class CLK_PIN, class SET_PIN, class ENABLE_PIN>
-	uint8_t LB1946<DATA_PIN, CLK_PIN, SET_PIN, ENABLE_PIN>::_phase;
+	uint8_t LB1946<DATA_PIN, CLK_PIN, SET_PIN, ENABLE_PIN>::_phase=0;
 
 
 
@@ -175,6 +171,12 @@ public:
 
 	static void Enable()
 	{
+		e1.SetDirWrite();
+		e2.SetDirWrite();
+		in1.SetDirWrite();
+		in2.SetDirWrite();
+		in3.SetDirWrite();
+		in4.SetDirWrite();
 		e1.Set();
 		e2.Set();
 	}
@@ -217,6 +219,6 @@ protected:
 };
 
 template<class IN1, class IN2, class E1, class IN3, class IN4, class E2>
-	uint8_t SimpleStepper<IN1, IN2, E1, IN3, IN4,  E2>::_phase;
+	uint8_t SimpleStepper<IN1, IN2, E1, IN3, IN4,  E2>::_phase=0;
 
 #endif
