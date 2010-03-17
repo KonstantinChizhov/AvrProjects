@@ -3,6 +3,7 @@
 
 #include "ports.h"
 #include <util/delay.h>
+#include "static_assert.h"
 
 class LcdBase
 {
@@ -14,8 +15,93 @@ class LcdBase
 	}
 };
 
-template<class RS, class RW, class E, class D4, class D5, class D6, class D7, uint8_t LINE_WIDTH=8, uint8_t LINES=2>
-class Lcd: LcdBase
+template<class D4, class D5, class D6, class D7>
+class PinsLcdDataBus
+{
+
+protected:
+	PinsLcdDataBus(){}
+
+	void SetDataRead()
+	{
+		d4.SetDirRead();
+		d5.SetDirRead();
+		d6.SetDirRead();
+		d7.SetDirRead();
+	}
+
+	void SetDataWrite()
+	{
+		d4.SetDirWrite();
+		d5.SetDirWrite();
+		d6.SetDirWrite();
+		d7.SetDirWrite();
+	}
+
+	void Write4(uint8_t c) //4 msb
+	{
+		d4.Set(c&16);
+		d5.Set(c&32);
+		d6.Set(c&64);
+		d7.Set(c&128);
+	}
+
+	uint8_t Read4()
+	{
+		uint8_t res = 0;
+		if(d4.IsSet())
+			res|=(1);
+		if(d5.IsSet())
+			res|=(1<<1);
+		if(d6.IsSet())
+			res|=(1<<2);
+		if(d7.IsSet())
+			res|=(1<<3);
+		return res;
+	}
+
+	D4 d4;
+	D5 d5;
+	D6 d6;
+	D7 d7;
+};
+
+template<class PORT, uint8_t DATA_BUS_OFFSET>
+class PortLcdDataBus
+{
+
+protected:
+	
+	BOOST_STATIC_ASSERT(DATA_BUS_OFFSET < 5);
+
+	enum{PortMask = 0x0f << DATA_BUS_OFFSET};
+
+	PortLcdDataBus(){}
+
+	void SetDataRead()
+	{
+		PORT::dir() &= (uint8_t)~PortMask;
+	}
+
+	void SetDataWrite()
+	{
+		PORT::dir() |= (uint8_t)PortMask;
+	}
+
+	void Write4(uint8_t c) //4 msb
+	{
+		PORT::data() = (PORT::data() & (uint8_t)~PortMask) | (c >> (4-DATA_BUS_OFFSET));
+	}
+
+	uint8_t Read4()
+	{
+		return (PORT::pin() & PortMask) >> DATA_BUS_OFFSET;
+	}
+};
+
+
+template<class RS, class RW, class E, class DATA_BUS, uint8_t LINE_WIDTH=8, uint8_t LINES=2>
+class Lcd: public LcdBase, DATA_BUS
 {
 public:
 	uint8_t LineWidth()
@@ -33,15 +119,15 @@ public:
 		e.SetDirWrite();
 		rw.SetDirWrite();
 		rs.SetDirWrite();
-		SetDataWrite();
+		DATA_BUS::SetDataWrite();
 		rw.Clear();
 		rs.Clear();
-		Write4(0x30); 
+		DATA_BUS::Write4(0x30); 
 		Strobe();
 		Strobe();
 		Strobe();
 		_delay_ms(60);
-		Write4(0x20); // set 4 bit mode 
+		DATA_BUS::Write4(0x20); // set 4 bit mode 
 		Strobe();
 		Write(0x28); // 4 bit mode, 1/16 duty, 5x8 font 
 	
@@ -112,76 +198,36 @@ protected:
 		Delay();
 	}
 
-	void SetDataRead()
-	{
-		d4.SetDirRead();
-		d5.SetDirRead();
-		d6.SetDirRead();
-		d7.SetDirRead();
-	}
-
-	void SetDataWrite()
-	{
-		d4.SetDirWrite();
-		d5.SetDirWrite();
-		d6.SetDirWrite();
-		d7.SetDirWrite();
-	}
-
 	void Write(uint8_t c)//__attribute__ ((noinline))
 	{
 		rw.Clear();
-		SetDataWrite();
-		Write4(c);
+		DATA_BUS::SetDataWrite();
+		DATA_BUS::Write4(c);
 		Strobe();
-		Write4(c<<4); 
+		DATA_BUS::Write4(c<<4); 
 		Strobe();
-	}
-
-	void Write4(uint8_t c) //4 msb
-	{
-		d4.Set(c&16);
-		d5.Set(c&32);
-		d6.Set(c&64);
-		d7.Set(c&128);
 	}
 
 	uint8_t Read() //__attribute__ ((noinline))
 	{
 		rw.Set();
-		uint8_t res = Read4() << 4;
-		Delay();
-		res |= Read4();
-		rw.Clear();
-		return res;
-	}
-
-	uint8_t Read4()
-	{
-		SetDataRead();
+		DATA_BUS::SetDataRead();
 		e.Set();
-		Delay();
-		uint8_t res = 0;
-		if(d4.IsSet())
-			res|=(1);
-		if(d5.IsSet())
-			res|=(1<<1);
-		if(d6.IsSet())
-			res|=(1<<2);
-		if(d7.IsSet())
-			res|=(1<<3);
-
+		//Delay();
+		uint8_t res = DATA_BUS::Read4() << 4;
 		e.Clear();
+		Delay();
+		e.Set();
+		res |= DATA_BUS::Read4();
+		e.Clear();
+		rw.Clear();
 		return res;
 	}
 
 	E e;
 	RW rw;
 	RS rs;
-	D4 d4;
-	D5 d5;
-	D6 d6;
-	D7 d7;
+
 };
 
 

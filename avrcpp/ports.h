@@ -3,6 +3,7 @@
 #ifndef PORTS_HPP
 #define PORTS_HPP
 #include <avr/io.h>
+#include "static_assert.h"
 
 #define MAKE_PORT(portName, className) \
 	struct className{\
@@ -114,6 +115,7 @@ private:
 template<class PORT, uint8_t PIN>
 class TPin
 {
+	BOOST_STATIC_ASSERT(PIN < 8);
 public:
 	void Set()const
 	{

@@ -8,17 +8,32 @@
 #include "util.h"
 #include "ports.h"
 
-/*Lcd
+/*
+Lcd
 <
 	TPin<Porta, 6>,
 	TPin<Porta, 5>,
 	TPin<Porta, 4>,
-	TPin<Porta, 3>,
-	TPin<Porta, 2>,
-	TPin<Porta, 1>,
-	TPin<Porta, 0>
+	PinsLcdDataBus
+	<
+		TPin<Porta, 3>,
+		TPin<Porta, 2>,
+		TPin<Porta, 1>,
+		TPin<Porta, 0>
+	>
 > lcd;
 */
+
+Lcd
+<
+	TPin<Porta, 6>,
+	TPin<Porta, 5>,
+	TPin<Porta, 4>,
+	PortLcdDataBus
+	<
+		Porta, 0
+	>
+> lcd;
 
 //TPin<Portb, 0> pin;
 
@@ -53,7 +68,7 @@ void f2()
 
 int main()
 {
- //	lcd.Puts("1234567890abcdef", 16);
+ 	lcd.Puts("1234567890abcdef", 16);
  	//Usart::Init(115200);
 	//TextFormater<WaitAdapter<Usart> > usart;
 	//Usart usart;
