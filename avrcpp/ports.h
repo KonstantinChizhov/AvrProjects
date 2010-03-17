@@ -152,6 +152,16 @@ public:
 		return PORT::pin() & (uint8_t)(1 << PIN);
 	}	
 	
+
+	void WaiteForSet()
+	{
+		while(IsSet()==0){}
+	}
+
+	void WaiteForClear()
+	{
+		while(IsSet()){}
+	}
 }; 
 
 template<class HI, class LOW>
