@@ -3,6 +3,7 @@
 #define STEP_MOTOR_HPP
 #include <avr/pgmspace.h>
 
+
 template <class DATA_PIN, class CLK_PIN, class SET_PIN, class ENABLE_PIN>
 class LB1946Base
 {
@@ -103,29 +104,29 @@ public:
 	static void HalfStepFwd()
 	{
 		_phase = (_phase + 1) & 0x7;
-		WriteOutput();
+		SetOutput();
 	}
 
 	static void HalfStepBack()
 	{
 		_phase = (_phase - 1) & 0x7;
-		WriteOutput();
+		SetOutput();
 	}
 
 	static void StepBack()
 	{
 		_phase = (_phase - 2) & 0x6;
-		WriteOutput();
+		SetOutput();
 	}
 
 	static void StepFwd()
 	{
 		_phase = (_phase + 2) & 0x6;
-		WriteOutput();
+		SetOutput();
 	}
 
 protected:
-	static void WriteOutput()
+	static void SetOutput()
 	{
 		static uint8_t aTable[] PROGMEM = {0x3f, 	0x0f, 0, 	0x0e, 0x3e, 0x0e, 0, 	0x0f};
 		static uint8_t bTable[] PROGMEM = {0, 		0x0f, 0x3f, 0x0f, 0, 	0x0e, 0x3e, 0x0e};
@@ -141,5 +142,81 @@ protected:
 template <class DATA_PIN, class CLK_PIN, class SET_PIN, class ENABLE_PIN>
 	uint8_t LB1946<DATA_PIN, CLK_PIN, SET_PIN, ENABLE_PIN>::_phase;
 
+
+
+template<class IN1, class IN2, class E1, class IN3, class IN4, class E2>
+class SimpleStepper //L293 driver, for example.
+{
+public:
+
+	static void HalfStepFwd()
+	{
+		_phase = (_phase + 1) & 0x7;
+		SetOutput();
+	}
+
+	static void HalfStepBack()
+	{
+		_phase = (_phase - 1) & 0x7;
+		SetOutput();
+	}
+
+	static void StepBack()
+	{
+		_phase = (_phase - 2) & 0x6;
+		SetOutput();
+	}
+
+	static void StepFwd()
+	{
+		_phase = (_phase + 2) & 0x6;
+		SetOutput();
+	}
+
+	static void Enable()
+	{
+		e1.Set();
+		e2.Set();
+	}
+
+	static void Disable()
+	{
+		e1.Clear();
+		e2.Clear();
+	}
+
+protected:
+	void SetOutput()
+	{
+		switch(_phase)
+		{
+			case 0: case 1:
+				in1.Set(); in2.Clear(); in3.Clear(); in4.Clear();
+			break;
+
+			case 2: case 3:
+				in1.Clear(); in2.Clear(); in3.Set(); in4.Clear();
+			break;
+
+			case 4: case 5:
+				in1.Clear(); in2.Set(); in3.Clear(); in4.Clear();
+			break;
+
+			case 6: case 6:
+				in1.Clear(); in2.Clear(); in3.Clear(); in4.Set();
+			break;
+		}
+	}
+	static IN1 in1;
+	static IN2 in2;
+	static E1 e1;
+	static IN3 in3;
+	static IN4 in4;
+	static E2 e2;
+	static uint8_t _phase;
+};
+
+template<class IN1, class IN2, class E1, class IN3, class IN4, class E2>
+	uint8_t SimpleStepper<IN1, IN2, E1, IN3, IN4,  E2>::_phase;
 
 #endif
