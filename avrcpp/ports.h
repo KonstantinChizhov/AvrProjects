@@ -117,50 +117,49 @@ class TPin
 {
 	BOOST_STATIC_ASSERT(PIN < 8);
 public:
-	void Set()const
+	static void Set()
 	{
 		PORT::data() |= (1 << PIN);
 	}
 
-	void Set(uint8_t val)const
+	static void Set(uint8_t val)
 	{
 		if(val)
 			Set();
 		else Clear();
 	}
 
-	void Clear()const
+	static void Clear()
 	{
 		PORT::data() &= (uint8_t)~(1 << PIN);
 	}
 
-	void Togle()const
+	static void Togle()
 	{
 		PORT::data() ^= (1 << PIN);
 	}
 
-	void SetDirRead()const
+	static void SetDirRead()
 	{
 		PORT::dir() &= (uint8_t)~(1 << PIN);
 	}
 
-	void SetDirWrite()const
+	static void SetDirWrite()
 	{
 		PORT::dir() |= (1 << PIN);
 	}
 
-	uint8_t IsSet()const
+	static uint8_t IsSet()
 	{
 		return PORT::pin() & (uint8_t)(1 << PIN);
 	}	
 	
-
-	void WaiteForSet()
+	static void WaiteForSet()
 	{
 		while(IsSet()==0){}
 	}
 
-	void WaiteForClear()
+	static void WaiteForClear()
 	{
 		while(IsSet()){}
 	}

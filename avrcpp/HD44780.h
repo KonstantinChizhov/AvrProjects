@@ -22,49 +22,46 @@ class PinsLcdDataBus
 protected:
 	PinsLcdDataBus(){}
 
-	void SetDataRead()
+	static void SetDataRead()
 	{
-		d4.SetDirRead();
-		d5.SetDirRead();
-		d6.SetDirRead();
-		d7.SetDirRead();
+		D4::SetDirRead();
+		D5::SetDirRead();
+		D6::SetDirRead();
+		D7::SetDirRead();
 	}
 
-	void SetDataWrite()
+	static void SetDataWrite()
 	{
-		d4.SetDirWrite();
-		d5.SetDirWrite();
-		d6.SetDirWrite();
-		d7.SetDirWrite();
+		D4::SetDirWrite();
+		D5::SetDirWrite();
+		D6::SetDirWrite();
+		D7::SetDirWrite();
 	}
 
-	void Write4(uint8_t c) //4 msb
+	static void Write4(uint8_t c) //4 msb
 	{
-		d4.Set(c&16);
-		d5.Set(c&32);
-		d6.Set(c&64);
-		d7.Set(c&128);
+		D4::Set(c&16);
+		D5::Set(c&32);
+		D6::Set(c&64);
+		D7::Set(c&128);
 	}
 
-	uint8_t Read4()
+	static uint8_t Read4()
 	{
 		uint8_t res = 0;
-		if(d4.IsSet())
+		if(D4::IsSet())
 			res|=(1);
-		if(d5.IsSet())
+		if(D5::IsSet())
 			res|=(1<<1);
-		if(d6.IsSet())
+		if(D6::IsSet())
 			res|=(1<<2);
-		if(d7.IsSet())
+		if(D7::IsSet())
 			res|=(1<<3);
 		return res;
 	}
-
-	D4 d4;
-	D5 d5;
-	D6 d6;
-	D7 d7;
 };
+
+
 
 template<class PORT, uint8_t DATA_BUS_OFFSET>
 class PortLcdDataBus
@@ -78,22 +75,22 @@ protected:
 
 	PortLcdDataBus(){}
 
-	void SetDataRead()
+	static void SetDataRead()
 	{
 		PORT::dir() &= (uint8_t)~PortMask;
 	}
 
-	void SetDataWrite()
+	static void SetDataWrite()
 	{
 		PORT::dir() |= (uint8_t)PortMask;
 	}
 
-	void Write4(uint8_t c) //4 msb
+	static void Write4(uint8_t c) //4 msb
 	{
 		PORT::data() = (PORT::data() & (uint8_t)~PortMask) | (c >> (4-DATA_BUS_OFFSET));
 	}
 
-	uint8_t Read4()
+	static uint8_t Read4()
 	{
 		return (PORT::pin() & PortMask) >> DATA_BUS_OFFSET;
 	}
@@ -104,24 +101,24 @@ template<class RS, class RW, class E, class DATA_BUS, uint8_t LINE_WIDTH=8, uint
 class Lcd: public LcdBase, DATA_BUS
 {
 public:
-	uint8_t LineWidth()
+	static uint8_t LineWidth()
 	{
 		return LINE_WIDTH;
 	}
 
-	uint8_t Lines()
+	static uint8_t Lines()
 	{
 		return LINES;
 	}
 
-	Lcd()
+	static void Init()
 	{
-		e.SetDirWrite();
-		rw.SetDirWrite();
-		rs.SetDirWrite();
+		E::SetDirWrite();
+		RW::SetDirWrite();
+		RS::SetDirWrite();
 		DATA_BUS::SetDataWrite();
-		rw.Clear();
-		rs.Clear();
+		RW::Clear();
+		RS::Clear();
 		DATA_BUS::Write4(0x30); 
 		Strobe();
 		Strobe();
@@ -136,71 +133,76 @@ public:
 		Write(0x06); // entry mode 
 	}
 
-	void Clear(void)
+	Lcd()
+	{
+		Init();
+	}
+
+	static void Clear(void)
 	{
 		while(Busy());
-		rs.Clear();
+		RS::Clear();
 		Write(0x01); 
 		while(Busy());
 		Write(0x02);
 	}
 
-	void Goto(uint8_t pos)
+	static void Goto(uint8_t pos)
 	{
 		while(Busy());
-		rs.Clear();
+		RS::Clear();
 		Write(0x80+pos);
 	}
 
-	void Goto(uint8_t x, uint8_t y)
+	static void Goto(uint8_t x, uint8_t y)
 	{
 		while(Busy());
-		rs.Clear();
+		RS::Clear();
 		if(y == 1)
 			x += 0x40;
 		Write(0x80+x);
 	}
 
-	void Home(void)
+	static void Home(void)
 	{
 		while(Busy());
-		rs.Clear();
+		RS::Clear();
 		Write(0x02);
 	}
 
-	void Puts(const char *s, uint8_t len)
+	static void Puts(const char *s, uint8_t len)
 	{
 		while(Busy());
-		rs.Set(); // write characters 
+		RS::Set(); // write characters 
 		while(len-- && *s){
 			Write(*s++);
 		} 
 	}
 
-	void Putch(char c)
+	static void Putch(char c)
 	{
-		rs.Set();
+		RS::Set();
 		Write(c);
 	}
 
-	bool Busy()
+	static bool Busy()
 	{
-		rs.Clear();
+		RS::Clear();
 		return Read() & 0x80;
 	}
 	
 protected:
-	void Strobe()//__attribute__ ((noinline))
+	static void Strobe()//__attribute__ ((noinline))
 	{
-		e.Set();
+		E::Set();
 		Delay();
-		e.Clear();
+		E::Clear();
 		Delay();
 	}
 
-	void Write(uint8_t c)//__attribute__ ((noinline))
+	static void Write(uint8_t c)//__attribute__ ((noinline))
 	{
-		rw.Clear();
+		RW::Clear();
 		DATA_BUS::SetDataWrite();
 		DATA_BUS::Write4(c);
 		Strobe();
@@ -208,26 +210,21 @@ protected:
 		Strobe();
 	}
 
-	uint8_t Read() //__attribute__ ((noinline))
+	static uint8_t Read() //__attribute__ ((noinline))
 	{
-		rw.Set();
+		RW::Set();
 		DATA_BUS::SetDataRead();
-		e.Set();
+		E::Set();
 		//Delay();
 		uint8_t res = DATA_BUS::Read4() << 4;
-		e.Clear();
+		E::Clear();
 		Delay();
-		e.Set();
+		E::Set();
 		res |= DATA_BUS::Read4();
-		e.Clear();
-		rw.Clear();
+		E::Clear();
+		RW::Clear();
 		return res;
 	}
-
-	E e;
-	RW rw;
-	RS rs;
-
 };
 
 
