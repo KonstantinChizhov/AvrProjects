@@ -23,27 +23,27 @@ public:
 	
 	static void Write(uint8_t a, uint8_t b)
 	{
-		_clk.Clear();
-		_set.Clear();
+		CLK_PIN::Clear();
+		SET_PIN::Clear();
 		_delay_us(1);
 
 		Write6(a);
 		Write6(b);
 		
-		_set.Set();
+		SET_PIN::Set();
 		_delay_us(5);
-		_set.Clear();
+		SET_PIN::Clear();
 		_delay_us(_tD);
 	}
 
 	static void Enable()
 	{
-		_enable.Set();
+		ENABLE_PIN::Set();
 	}
 
 	static void Disable()
 	{
-		_enable.Clear();
+		ENABLE_PIN::Clear();
 	}
 
 protected:
@@ -52,43 +52,26 @@ protected:
 
 	static void Init()
 	{
-		_enable.Clear();
+		ENABLE_PIN::Clear();
 	
-		_data.SetDirWrite();
-		_set.SetDirWrite();
-		_enable.SetDirWrite();
-		_clk.SetDirWrite();
+		DATA_PIN::SetDirWrite();
+		SET_PIN::SetDirWrite();
+		ENABLE_PIN::SetDirWrite();
+		CLK_PIN::SetDirWrite();
 	}
 
 	static void Write6(uint8_t v)
 	{
 		for(uint8_t i=0; i < 6; ++i, v <<= 1)
 		{
-			_data.Set((v & 0x20) != 0);
-			_clk.Set();
+			DATA_PIN::Set((v & 0x20) != 0);
+			CLK_PIN::Set();
 			_delay_us(_tD);
-			_clk.Clear();
+			CLK_PIN::Clear();
 			_delay_us(_tD);
 		}
 	}
-
-	static DATA_PIN _data;
-	static CLK_PIN _clk;
-	static SET_PIN _set;
-	static ENABLE_PIN _enable;
 };
-
-	template <class DATA_PIN, class CLK_PIN, class SET_PIN, class ENABLE_PIN>
-	DATA_PIN LB1946Base<DATA_PIN, CLK_PIN, SET_PIN, ENABLE_PIN>::_data;
-
-	template <class DATA_PIN, class CLK_PIN, class SET_PIN, class ENABLE_PIN>
-	CLK_PIN LB1946Base<DATA_PIN, CLK_PIN, SET_PIN, ENABLE_PIN>::_clk;
-
-	template <class DATA_PIN, class CLK_PIN, class SET_PIN, class ENABLE_PIN>
-	SET_PIN LB1946Base<DATA_PIN, CLK_PIN, SET_PIN, ENABLE_PIN>::_set;
-
-	template <class DATA_PIN, class CLK_PIN, class SET_PIN, class ENABLE_PIN>
-	ENABLE_PIN LB1946Base<DATA_PIN, CLK_PIN, SET_PIN, ENABLE_PIN>::_enable;
 
 
 template <class DATA_PIN, class CLK_PIN, class SET_PIN, class ENABLE_PIN>
@@ -141,7 +124,7 @@ template <class DATA_PIN, class CLK_PIN, class SET_PIN, class ENABLE_PIN>
 
 
 template<class IN1, class IN2, class E1, class IN3, class IN4, class E2>
-class SimpleStepper //L293 driver, for example.
+class SimpleStepper //L293 driver, for example::
 {
 public:
 
@@ -171,50 +154,45 @@ public:
 
 	static void Enable()
 	{
-		e1.SetDirWrite();
-		e2.SetDirWrite();
-		in1.SetDirWrite();
-		in2.SetDirWrite();
-		in3.SetDirWrite();
-		in4.SetDirWrite();
-		e1.Set();
-		e2.Set();
+		E1::SetDirWrite();
+		E2::SetDirWrite();
+		IN1::SetDirWrite();
+		IN2::SetDirWrite();
+		IN3::SetDirWrite();
+		IN4::SetDirWrite();
+		E1::Set();
+		E2::Set();
 	}
 
 	static void Disable()
 	{
-		e1.Clear();
-		e2.Clear();
+		E1::Clear();
+		E2::Clear();
 	}
 
 protected:
-	void SetOutput()
+	static void SetOutput()
 	{
 		switch(_phase)
 		{
 			case 0: case 1:
-				in1.Set(); in2.Clear(); in3.Clear(); in4.Clear();
+				IN1::Set(); IN2::Clear(); IN3::Clear(); IN4::Clear();
 			break;
 
 			case 2: case 3:
-				in1.Clear(); in2.Clear(); in3.Set(); in4.Clear();
+				IN1::Clear(); IN2::Clear(); IN3::Set(); IN4::Clear();
 			break;
 
 			case 4: case 5:
-				in1.Clear(); in2.Set(); in3.Clear(); in4.Clear();
+				IN1::Clear(); IN2::Set(); IN3::Clear(); IN4::Clear();
 			break;
 
 			case 6: case 6:
-				in1.Clear(); in2.Clear(); in3.Clear(); in4.Set();
+				IN1::Clear(); IN2::Clear(); IN3::Clear(); IN4::Set();
 			break;
 		}
 	}
-	static IN1 in1;
-	static IN2 in2;
-	static E1 e1;
-	static IN3 in3;
-	static IN4 in4;
-	static E2 e2;
+
 	static uint8_t _phase;
 };
 
