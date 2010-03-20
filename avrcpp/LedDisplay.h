@@ -86,18 +86,11 @@ class CommonsPortH // active level - hi
 {
 	BOOST_STATIC_ASSERT(NUM_DIDGITS<=8);
 public:
-	CommonsPortH()
-	{
-		PORT::dir() |= (uint8_t)(PortMask);
-	}
-
-	~CommonsPortH()
-	{
-		PORT::dir() &= (uint8_t)(~PortMask);
-	}
+	
 	enum{NumDidgits = NUM_DIDGITS, PortMask = Pow<2, NUM_DIDGITS>::value - 1};
 	void Set(uint8_t n)
 	{
+		PORT::dir() |= (uint8_t)(PortMask);
 		PORT::data() = (PORT::data() & (uint8_t)(~PortMask)) | (uint8_t)(1 << n);
 	}
 };
@@ -107,18 +100,10 @@ class CommonsPortL // active level - low
 {
 	BOOST_STATIC_ASSERT(NUM_DIDGITS<=8);
 public:
-	CommonsPortL()
-	{
-		PORT::dir() |= (uint8_t)(PortMask);
-	}
-
-	~CommonsPortL()
-	{
-		PORT::dir() &= (uint8_t)(~PortMask);
-	}
 	enum{NumDidgits = NUM_DIDGITS, PortMask = Pow<2, NUM_DIDGITS>::value - 1};
 	void Set(uint8_t n)
 	{
+		PORT::dir() |= (uint8_t)(PortMask);
 		PORT::data() = (PORT::data() & (uint8_t)(~PortMask)) | (uint8_t)~(1 << n);
 	}
 };

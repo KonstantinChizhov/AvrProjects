@@ -1,11 +1,11 @@
 //#include <avr/io.h>
 #include "dispatcher.h"
-#include "usart.h"
-#include "adc.h"
-#include "HD44780.h"
+//#include "usart.h"
+//#include "adc.h"
+//#include "HD44780.h"
 #include "stepper.h"
 #include "LedDisplay.h"
-#include "util.h"
+//#include "util.h"
 #include "ports.h"
 
 /*
@@ -23,7 +23,7 @@ Lcd
 	>
 > lcd;
 */
-
+/*
 Lcd
 <
 	TPin<Porta, 6>,
@@ -34,9 +34,9 @@ Lcd
 		Porta, 0
 	>
 > lcd;
-
+*/
 //TPin<Portb, 0> pin;
-
+/*
 LB1946
 <
 	TPin<Portc, 6>,//deta
@@ -44,57 +44,67 @@ LB1946
 	TPin<Portc, 5>,//set
 	TPin<Portc, 4>//enable
 > mot;
-
+*/
 
 LedDisplay<PortSegmentsInv<Portb>, CommonsPortL<Portc, 4> > led;
 
+int16_t count=0;
+uint8_t dir=1;
+const int maxCnt = 250;
+
+SimpleStepper
+<
+	TPin<Portc, 4>,//in1
+	TPin<Portc, 5>,//in2
+	TPin<Portd, 7>,//e1
+	TPin<Portc, 6>,//in3
+	TPin<Portc, 7>,//in4
+	TPin<Portd, 6>//e2
+> mot;
+
 void f()
 {
-	led.WriteDec(Adc::ReadSingle()-512);
-	//Portb::data() = 0xff;
-	//pin.Togle();
+	led.WriteDec(count);
+	
 	Dispatcher::SetTimer(f, 50);
 }
 
 void f2()
 {
 	led.Update();
-	if(Adc::ReadSingle() > 512)
-		mot.HalfStepFwd();
-	else
+	if(dir)
+	{
+		if(++count>=maxCnt)
+		{
+			dir=0;
+		}
 		mot.StepFwd();
-	Dispatcher::SetTimer(f2, 1);
+	}
+	else
+	{
+		if(--count<=0)
+		{
+			dir=1;
+		}
+		mot.StepBack();
+	}
+	Dispatcher::SetTimer(f2, 2);
 }
+
 
 int main()
 {
- 	lcd.Puts("1234567890abcdef", 16);
- 	//Usart::Init(115200);
-	//TextFormater<WaitAdapter<Usart> > usart;
-	//Usart usart;
-	Adc::SetClockDivider(Dev32);
-	Adc::SetChannel(0);
-	Adc::SetVref(VCC);
-
-
-	Dispatcher::Init();
-	//pin.SetDirWrite();
-	Portb::dir() = 0xff;
-
+ 	Dispatcher::Init();
 	sei();
-	uint32_t i;
-	uint32_t r;
-	
+	mot.Enable();
+
 	f();
-f2();
+	f2();
 	while(1)
 	{	
-		//usart.Getch(c);
-		//usart.Putch(c);
-		//usart >> i;
 		Dispatcher::Poll();
-			//usart << div10(i, r) << "\t" << r << "\r\n";
-
 	}
 
 }
+
+

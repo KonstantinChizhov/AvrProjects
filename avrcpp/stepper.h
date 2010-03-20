@@ -2,7 +2,7 @@
 #ifndef STEP_MOTOR_HPP
 #define STEP_MOTOR_HPP
 #include <avr/pgmspace.h>
-
+#include <util/delay.h>
 
 template <class DATA_PIN, class CLK_PIN, class SET_PIN, class ENABLE_PIN>
 class LB1946Base
@@ -124,7 +124,7 @@ template <class DATA_PIN, class CLK_PIN, class SET_PIN, class ENABLE_PIN>
 
 
 template<class IN1, class IN2, class E1, class IN3, class IN4, class E2>
-class SimpleStepper //L293 driver, for example::
+class SimpleStepper //L293 driver, for example
 {
 public:
 
@@ -187,7 +187,7 @@ protected:
 				IN1::Clear(); IN2::Set(); IN3::Clear(); IN4::Clear();
 			break;
 
-			case 6: case 6:
+			case 6: case 7:
 				IN1::Clear(); IN2::Clear(); IN3::Clear(); IN4::Set();
 			break;
 		}
