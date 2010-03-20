@@ -5,7 +5,7 @@
 #include <avr/io.h>
 #include "static_assert.h"
 
-#define MAKE_PORT(portName, className) \
+#define MAKE_PORT(portName, ddrName, pinName, className) \
 	struct className{\
 		static volatile uint8_t &data()\
 		{\
@@ -13,11 +13,11 @@
 		}\
 		static volatile uint8_t &dir()\
 		{\
-			return *(&portName - 1);\
+			return ddrName;\
 		}\
 		static volatile uint8_t &pin()\
 		{\
-			return *(&portName - 2);\
+			return pinName;\
 		}\
 		static void Write(uint8_t value)\
 		{\
@@ -30,32 +30,36 @@
 	};
 
 #ifdef PORTA
-MAKE_PORT(PORTA, Porta)
+MAKE_PORT(PORTA, DDRA, PINA, Porta)
 #endif
 
 
 #ifdef PORTB
-MAKE_PORT(PORTB, Portb)
+MAKE_PORT(PORTB, DDRB, PINB, Portb)
 #endif
 
 
 #ifdef PORTC
-MAKE_PORT(PORTC, Portc)
+MAKE_PORT(PORTC, DDRC, PINC, Portc)
 #endif
 
 
 #ifdef PORTD
-MAKE_PORT(PORTD, Portd)
+MAKE_PORT(PORTD, DDRD, PIND, Portd)
 #endif
 
 
 #ifdef PORTE
-MAKE_PORT(PORTE, Porte)
+MAKE_PORT(PORTE, DDRE, PINE, Porte)
 #endif
 
 
 #ifdef PORTF
-MAKE_PORT(PORTF, Portf)
+MAKE_PORT(PORTF, DDRF, PINF, Portf)
+#endif
+
+#ifdef PORTG
+MAKE_PORT(PORTG, DDRG, PING, Portg)
 #endif
 
 
@@ -117,50 +121,50 @@ class TPin
 {
 	BOOST_STATIC_ASSERT(PIN < 8);
 public:
-	void Set()const
+	static void Set()
 	{
 		PORT::data() |= (1 << PIN);
 	}
 
-	void Set(uint8_t val)const
+	static void Set(uint8_t val)
 	{
 		if(val)
 			Set();
 		else Clear();
 	}
 
-	void Clear()const
+	static void Clear()
 	{
 		PORT::data() &= (uint8_t)~(1 << PIN);
 	}
 
-	void Togle()const
+	static void Togle()
 	{
 		PORT::data() ^= (1 << PIN);
 	}
 
-	void SetDirRead()const
+	static void SetDirRead()
 	{
 		PORT::dir() &= (uint8_t)~(1 << PIN);
 	}
 
-	void SetDirWrite()const
+	static void SetDirWrite()
 	{
 		PORT::dir() |= (1 << PIN);
 	}
 
-	uint8_t IsSet()const
+	static uint8_t IsSet()
 	{
 		return PORT::pin() & (uint8_t)(1 << PIN);
 	}	
 	
 
-	void WaiteForSet()
+	static void WaiteForSet()
 	{
 		while(IsSet()==0){}
 	}
 
-	void WaiteForClear()
+	static void WaiteForClear()
 	{
 		while(IsSet()){}
 	}
