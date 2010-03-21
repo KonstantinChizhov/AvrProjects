@@ -4,3 +4,4 @@ lost+found/
 default
 debug
 release
+*.aws

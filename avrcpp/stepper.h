@@ -122,33 +122,107 @@ template <class DATA_PIN, class CLK_PIN, class SET_PIN, class ENABLE_PIN>
 	uint8_t LB1946<DATA_PIN, CLK_PIN, SET_PIN, ENABLE_PIN>::_phase=0;
 
 
+template<class IN1, class IN2, class IN3, class IN4>
+class StepperPerPinOutput
+{
+	public:
+	static void OutputEnable()
+	{
+		IN1::SetDirWrite();
+		IN2::SetDirWrite();
+		IN3::SetDirWrite();
+		IN4::SetDirWrite();
+	}
 
-template<class IN1, class IN2, class E1, class IN3, class IN4, class E2>
+	static void Write(uint8_t phase)
+	{
+		switch(phase)
+		{
+			case 0:
+				IN1::Set(); IN2::Clear(); IN3::Clear(); IN4::Clear();
+			break;
+
+			case 1:
+				IN1::Clear(); IN2::Clear(); IN3::Set(); IN4::Clear();
+			break;
+
+			case 2:
+				IN1::Clear(); IN2::Set(); IN3::Clear(); IN4::Clear();
+			break;
+
+			case 3:
+				IN1::Clear(); IN2::Clear(); IN3::Clear(); IN4::Set();
+			break;
+		}
+	}
+};
+
+template<class PORT, uint8_t IN1, uint8_t IN2, uint8_t IN3, uint8_t IN4>
+class StepperPerPortOutput
+{
+	enum {PORT_MASK = (1<<IN1) | (1<<IN2) | (1<<IN3) | (1<<IN4)};
+
+	enum {PH1 = (1<<IN1) | (0<<IN2) | (0<<IN3) | (0<<IN4)};
+	enum {PH2 = (0<<IN1) | (0<<IN2) | (1<<IN3) | (0<<IN4)};
+	enum {PH3 = (0<<IN1) | (1<<IN2) | (0<<IN3) | (0<<IN4)};
+	enum {PH4 = (0<<IN1) | (0<<IN2) | (0<<IN3) | (1<<IN4)};
+
+	public:
+	static void OutputEnable()
+	{
+		PORT::dir() |= PORT_MASK;
+	}
+
+	static void Write(uint8_t phase)
+	{
+		uint8_t value;
+		switch(phase)
+		{
+			case 0:
+				value = PH1;
+			break;
+
+			case 1:
+				value = PH2;
+			break;
+
+			case 2:
+				value = PH3;
+			break;
+
+			case 3:
+				value = PH4;
+			break;
+		}
+		PORT::data() = (PORT::data() & (uint8_t)~PORT_MASK) | value;
+	}
+};
+
+
+template<class OUTPUTS, class E1, class E2>
 class SimpleStepper //L293 driver, for example
 {
 public:
 
 	static void HalfStepFwd()
 	{
-		_phase = (_phase + 1) & 0x7;
-		SetOutput();
+		StepFwd();//TODO implement
 	}
 
 	static void HalfStepBack()
 	{
-		_phase = (_phase - 1) & 0x7;
-		SetOutput();
+		StepBack();//TODO implement
 	}
 
 	static void StepBack()
 	{
-		_phase = (_phase - 2) & 0x6;
+		_phase = (_phase - 1) & 0x3;
 		SetOutput();
 	}
 
 	static void StepFwd()
 	{
-		_phase = (_phase + 2) & 0x6;
+		_phase = (_phase + 1) & 0x3;
 		SetOutput();
 	}
 
@@ -156,10 +230,7 @@ public:
 	{
 		E1::SetDirWrite();
 		E2::SetDirWrite();
-		IN1::SetDirWrite();
-		IN2::SetDirWrite();
-		IN3::SetDirWrite();
-		IN4::SetDirWrite();
+		OUTPUTS::OutputEnable();
 		E1::Set();
 		E2::Set();
 	}
@@ -173,30 +244,13 @@ public:
 protected:
 	static void SetOutput()
 	{
-		switch(_phase)
-		{
-			case 0: case 1:
-				IN1::Set(); IN2::Clear(); IN3::Clear(); IN4::Clear();
-			break;
-
-			case 2: case 3:
-				IN1::Clear(); IN2::Clear(); IN3::Set(); IN4::Clear();
-			break;
-
-			case 4: case 5:
-				IN1::Clear(); IN2::Set(); IN3::Clear(); IN4::Clear();
-			break;
-
-			case 6: case 7:
-				IN1::Clear(); IN2::Clear(); IN3::Clear(); IN4::Set();
-			break;
-		}
+		OUTPUTS::Write(_phase);
 	}
 
 	static uint8_t _phase;
 };
 
-template<class IN1, class IN2, class E1, class IN3, class IN4, class E2>
-	uint8_t SimpleStepper<IN1, IN2, E1, IN3, IN4,  E2>::_phase=0;
+template<class OUTPUTS, class E1, class E2>
+	uint8_t SimpleStepper<OUTPUTS, E1, E2>::_phase=0;
 
 #endif
