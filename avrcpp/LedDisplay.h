@@ -1,7 +1,7 @@
 #ifndef LED_HPP
 #define LED_HPP
 #include "util.h"
-
+#include "static_assert.h"
 template<
 	class A, 
 	class B, 
