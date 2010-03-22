@@ -63,58 +63,6 @@ MAKE_PORT(PORTG, DDRG, PING, Portg)
 #endif
 
 
-class Pin
-{
-public:
-	Pin(volatile unsigned char &port, uint8_t pin)
-	:_port(port)
-	{
-		_pin = pin; 
-	}
-
-	void Set()const
-	{
-		_port |= (1 << _pin);
-	}
-
-	void Set(uint8_t val)const
-	{
-		if(val)
-			Set();
-		else Clear();
-	}
-
-	void Clear()const
-	{
-		_port &= (uint8_t)~(1 << _pin);
-	}
-
-	void Togle()const
-	{
-		_port ^= (1 << _pin);
-	}
-
-	void SetDirWrite()const
-	{
-		*(&_port - 1) |= (1 << _pin);
-	}
-
-	void SetDirRead()const
-	{
-		*(&_port - 1) &= (uint8_t)~(1 << _pin);
-	}
-
-	uint8_t IsSet()const
-	{
-		return (*(&_port - 2)) & (uint8_t)(1 << _pin);
-	}
-
-private:
-	volatile unsigned char &_port; 
-	uint8_t _pin;
-}; 
-
-
 
 template<class PORT, uint8_t PIN>
 class TPin
