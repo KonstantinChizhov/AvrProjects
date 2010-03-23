@@ -252,30 +252,46 @@ typedef TPin<Portg, 6> Pg6;
 typedef TPin<Portg, 7> Pg7;
 #endif
 
-
-template<class P1, class P2>
-class PinSet2
+template<class TPIN, uint8_t POSITION>
+struct PW
 {
-	enum{PORT_MASK = (1 << P1::Number) | (1 << P2::Number)};// in case of per port output
-public:
-	void Write(uint8_t value)
-	{
-		if(P1::Port::Id == P2::Port::Id)// per port output
-		{
-			uint8_t port_value;
-
-			if(value&1) port_value |= (1 << P1::Number);
-			if(value&2) port_value |= (1 << P2::Number);
-
-			P1::Port::data() = (P1::Port::data() & (uint8_t)~PORT_MASK) | value;
-		}
-		else//per pin output
-		{
-			P1::Set(value&1);
-			P1::Set(value&2);
-		}
-	}
+	typedef TPIN Pin;
+	enum{Position = POSITION};
 };
+
+//T is to be PinWrapper
+
+template<class T, class U>
+class PinList
+{
+public:
+	typedef T Head;
+    typedef U Tail;
+	enum{MASK = (1 << Head::Pin::Number) | Tail::MASK};
+
+
+/*	void UpendValue(uint8_t value, uint8_t &port_value)
+	{
+		if(value&1) port_value |= (1 << Head::Number);
+		PinList<Tail::Head, Tail::Tail>
+	}*/
+};
+
+struct NullPin
+{
+	enum{MASK=0};
+};
+
+#define PINLIST_1(T1) PinList<T1, NullPin>
+#define PINLIST_2(T1, T2) PinList<T1, PINLIST_1(T2)>
+#define PINLIST_3(T1, T2, T3) PinList<T1,  PINLIST_2(T2, T3)>
+#define PINLIST_4(T1, T2, T3, T4) PinList<T1, PINLIST_3(T2, T3, T4)>
+#define PINLIST_5(T1, T2, T3, T4, T5) PinList<T1, PINLIST_4(T2, T3, T4, T5)>
+#define PINLIST_6(T1, T2, T3, T4, T5, T6) PinList<T1, PINLIST_5(T2, T3, T4, T5, T6)>
+#define PINLIST_7(T1, T2, T3, T4, T5, T6, T7) PinList<T1, PINLIST_6(T2, T3, T4, T5, T6, T7)>
+#define PINLIST_8(T1, T2, T3, T4, T5, T6, T7, T8) PinList<T1, PINLIST_7(T2, T3, T4, T5, T6, T7, T8)>
+#define PINLIST_9(T1, T2, T3, T4, T5, T6, T7, T8, T9) PinList<T1, PINLIST_8(T2, T3, T4, T5, T6, T7, T8, T9)>
+#define PINLIST_10(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10) PinList<T1, PINLIST_9(T2, T3, T4, T5, T6, T7, T8, T9, T10)>
 
 template<class HI, class LOW>
 class PowerDriver

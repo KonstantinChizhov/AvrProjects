@@ -7,14 +7,16 @@
 //#include "LedDisplay.h"
 //#include "util.h"
 #include "ports.h"
-#include "TypeList.h"
 
-PinSet2<Pa1, Pa4> set;
 
 int main()
 {
- 	TYPELIST_4(Pa1, Pa2, Pa3, Pa4) a;
- 	set.Write(3);
+ 
+	uint8_t v = PinList<PW<Pa0,0>, 
+					PinList<PW<Pa1,1>, NullPin> >::MASK;// , , PW<Pa3,2>, PW<Pa4,3>;
+
+PORTB=v;
+
 	while(1)
 	{	
 	
