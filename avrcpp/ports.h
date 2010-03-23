@@ -4,6 +4,7 @@
 #define PORTS_HPP
 #include <avr/io.h>
 #include "static_assert.h"
+#include "Typelist.h"
 
 #define MAKE_PORT(portName, ddrName, pinName, className, ID) \
 	struct className{\
@@ -252,46 +253,130 @@ typedef TPin<Portg, 6> Pg6;
 typedef TPin<Portg, 7> Pg7;
 #endif
 
+
+using namespace Loki;
+using namespace Loki::TL;
+
 template<class TPIN, uint8_t POSITION>
-struct PW
+struct PW	//Pin wrapper
 {
 	typedef TPIN Pin;
 	enum{Position = POSITION};
 };
 
-//T is to be PinWrapper
 
-template<class T, class U>
-class PinList
+ 		template <class TList> struct GetPorts;
+        
+        template <> struct GetPorts<NullType>
+        {
+            typedef NullType Result;
+        };
+
+        template <class Head, class Tail>
+        struct GetPorts< Typelist<Head, Tail> >
+        {
+        private:
+			typedef typename Head::Pin::Port Port;
+            typedef typename GetPorts<Tail>::Result L1;
+        public:
+            typedef Typelist<Port, L1> Result;
+        };
+
+
+
+ 		template <class TList, class T> struct GetPinsWithPort;
+
+        template <class T>
+        struct GetPinsWithPort<NullType, T>
+        {
+            typedef NullType Result;
+        };
+
+        template <class T, class Tail, uint8_t N, uint8_t M>
+        struct GetPinsWithPort<Typelist<PW<TPin<T, N>, M>, Tail>, T>
+        {
+            // Go all the way down the list removing the type
+           typedef Typelist<PW<TPin<T, N>, M>, 
+                    typename GetPinsWithPort<Tail, T>::Result>
+                Result;
+        };
+
+        template <class Head, class Tail, class T>
+        struct GetPinsWithPort<Typelist<Head, Tail>, T>
+        {
+            // Go all the way down the list removing the type
+			 typedef typename GetPinsWithPort<Tail, T>::Result Result;
+        };
+
+
+		template <class TList> struct GetMask;
+        template <> struct GetMask<NullType>
+        {
+            enum{value = 0};
+        };
+        template <class Head, class Tail>
+        struct GetMask< Typelist<Head, Tail> >
+        {
+			enum{value = (1 << Head::Pin::Number) | GetMask<Tail>::value};
+        };
+		
+	
+
+		template <class TList> struct PinWriteIterator;
+        template <> struct PinWriteIterator<NullType>
+        {
+           static void UppendValue(uint8_t value, uint8_t &result)
+		   {   }
+        };
+        template <class Head, class Tail>
+        struct PinWriteIterator< Typelist<Head, Tail> >
+        {
+			static inline void UppendValue(uint8_t value, uint8_t &result)
+			{
+				if(value & (1 << Head::Position))
+					result |= (1 << Head::Pin::Number);
+				PinWriteIterator<Tail>::UppendValue(value, result);
+			}
+        };
+
+
+		template <class PortList, class PinList> struct PortWriteIterator;
+        template <class PinList> struct PortWriteIterator<NullType, PinList>
+        {
+           static void Write(uint8_t value)
+		   {   }
+        };
+
+        template <class Head, class Tail, class PinList>
+        struct PortWriteIterator< Typelist<Head, Tail>, PinList>
+        {
+			typedef typename GetPinsWithPort<PinList, Head>::Result Pins;
+			enum{Mask = GetMask<Pins>::value};
+
+			static void Write(uint8_t value)
+			{   
+				if(Length<Pins>::value == 1)
+					Pins::Head::Pin::Set(value & Pins::Head::Position);
+
+				uint8_t result=0;
+				PinWriteIterator<Pins>::UppendValue(value, result);
+				Head::data() =  (Head::data() & ~Mask) | result ;
+				PortWriteIterator<Tail, PinList>::Write(value);
+			}
+        };
+
+	
+
+template<class PINS>
+struct PinList
 {
-public:
-	typedef T Head;
-    typedef U Tail;
-	enum{MASK = (1 << Head::Pin::Number) | Tail::MASK};
-
-
-/*	void UpendValue(uint8_t value, uint8_t &port_value)
+	typedef typename GetPorts<PINS>::Result PinsToPorts;
+	typedef typename NoDuplicates<PinsToPorts>::Result Ports; 
+	static void Write(uint8_t value)
 	{
-		if(value&1) port_value |= (1 << Head::Number);
-		PinList<Tail::Head, Tail::Tail>
-	}*/
+		PortWriteIterator<Ports, PINS>::Write(value);
+	}
 };
-
-struct NullPin
-{
-	enum{MASK=0};
-};
-
-#define PINLIST_1(T1) PinList<T1, NullPin>
-#define PINLIST_2(T1, T2) PinList<T1, PINLIST_1(T2)>
-#define PINLIST_3(T1, T2, T3) PinList<T1,  PINLIST_2(T2, T3)>
-#define PINLIST_4(T1, T2, T3, T4) PinList<T1, PINLIST_3(T2, T3, T4)>
-#define PINLIST_5(T1, T2, T3, T4, T5) PinList<T1, PINLIST_4(T2, T3, T4, T5)>
-#define PINLIST_6(T1, T2, T3, T4, T5, T6) PinList<T1, PINLIST_5(T2, T3, T4, T5, T6)>
-#define PINLIST_7(T1, T2, T3, T4, T5, T6, T7) PinList<T1, PINLIST_6(T2, T3, T4, T5, T6, T7)>
-#define PINLIST_8(T1, T2, T3, T4, T5, T6, T7, T8) PinList<T1, PINLIST_7(T2, T3, T4, T5, T6, T7, T8)>
-#define PINLIST_9(T1, T2, T3, T4, T5, T6, T7, T8, T9) PinList<T1, PINLIST_8(T2, T3, T4, T5, T6, T7, T8, T9)>
-#define PINLIST_10(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10) PinList<T1, PINLIST_9(T2, T3, T4, T5, T6, T7, T8, T9, T10)>
 
 template<class HI, class LOW>
 class PowerDriver

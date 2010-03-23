@@ -12,11 +12,10 @@
 int main()
 {
  
-	uint8_t v = PinList<PW<Pa0,0>, 
-					PinList<PW<Pa1,1>, NullPin> >::MASK;// , , PW<Pa3,2>, PW<Pa4,3>;
+	//typedef MakeTypelist<PW<Pa0,0>, PW<Pa7,1>, PW<Pa5,2>, PW<Pa2, 3>, PW<Pc3,4>, PW<Pc1,5>, PW<Pc2,6>, PW<Pd5, 7> >::Result pins;
+	typedef MakeTypelist<PW<Pa0,0>, PW<Pa1,1>, PW<Pa2,2>, PW<Pa3, 3>, PW<Pa4,4>, PW<Pa5,5>, PW<Pa6,6>, PW<Pa7, 7> >::Result pins;
 
-PORTB=v;
-
+	PinList<pins>::Write(PORTB);
 	while(1)
 	{	
 	
