@@ -11,11 +11,10 @@
 
 int main()
 {
- 
-	//typedef MakeTypelist<PW<Pa0,0>, PW<Pa7,1>, PW<Pa5,2>, PW<Pa2, 3>, PW<Pc3,4>, PW<Pc1,5>, PW<Pc2,6>, PW<Pd5, 7> >::Result pins;
-	typedef MakeTypelist<PW<Pa0,0>, PW<Pa1,1>, PW<Pa2,2>, PW<Pa3, 3>, PW<Pa4,4>, PW<Pa5,5>, PW<Pa6,6>, PW<Pa7, 7> >::Result pins;
+ 	typedef PinList<Pa0, Pa1, Pa2, Pa3, Pb5, Pb4, Pb2> pins;
 
-	PinList<pins>::Write(PORTB);
+	pins::Write(PORTC);
+
 	while(1)
 	{	
 	

@@ -4,7 +4,6 @@
 #define PORTS_HPP
 #include <avr/io.h>
 #include "static_assert.h"
-#include "Typelist.h"
 
 #define MAKE_PORT(portName, ddrName, pinName, className, ID) \
 	struct className{\
@@ -254,8 +253,101 @@ typedef TPin<Portg, 7> Pg7;
 #endif
 
 
-using namespace Loki;
-using namespace Loki::TL;
+class NullType{};
+
+////////////////////////////////////////////////////////////////////////////////
+// class template Typelist
+// The building block of typelists of any length
+// Use it through the LOKI_TYPELIST_NN macros
+// Defines nested types:
+//     Head (first element, a non-typelist type by convention)
+//     Tail (second element, can be another typelist)
+////////////////////////////////////////////////////////////////////////////////
+
+    template <class T, class U>
+    struct Typelist
+    {
+       typedef T Head;
+       typedef U Tail;
+    };
+
+////////////////////////////////////////////////////////////////////////////////
+// class template Length
+// Computes the length of a typelist
+// Invocation (TList is a typelist):
+// Length<TList>::value
+// returns a compile-time constant containing the length of TList, not counting
+//     the end terminator (which by convention is NullType)
+////////////////////////////////////////////////////////////////////////////////
+
+        template <class TList> struct Length;
+        template <> struct Length<NullType>
+        {
+            enum { value = 0 };
+        };
+        
+        template <class T, class U>
+        struct Length< Typelist<T, U> >
+        {
+            enum { value = 1 + Length<U>::value };
+        };
+////////////////////////////////////////////////////////////////////////////////
+// class template Erase
+// Erases the first occurence, if any, of a type in a typelist
+// Invocation (TList is a typelist and T is a type):
+// Erase<TList, T>::Result
+// returns a typelist that is TList without the first occurence of T
+////////////////////////////////////////////////////////////////////////////////
+
+        template <class TList, class T> struct Erase;
+        
+        template <class T>                         // Specialization 1
+        struct Erase<NullType, T>
+        {
+            typedef NullType Result;
+        };
+
+        template <class T, class Tail>             // Specialization 2
+        struct Erase<Typelist<T, Tail>, T>
+        {
+            typedef Tail Result;
+        };
+
+        template <class Head, class Tail, class T> // Specialization 3
+        struct Erase<Typelist<Head, Tail>, T>
+        {
+            typedef Typelist<Head, 
+                    typename Erase<Tail, T>::Result>
+                Result;
+        };
+////////////////////////////////////////////////////////////////////////////////
+// class template NoDuplicates
+// Removes all duplicate types in a typelist
+// Invocation (TList is a typelist):
+// NoDuplicates<TList, T>::Result
+////////////////////////////////////////////////////////////////////////////////
+
+        template <class TList> struct NoDuplicates;
+        
+        template <> struct NoDuplicates<NullType>
+        {
+            typedef NullType Result;
+        };
+
+        template <class Head, class Tail>
+        struct NoDuplicates< Typelist<Head, Tail> >
+        {
+        private:
+            typedef typename NoDuplicates<Tail>::Result L1;
+            typedef typename Erase<L1, Head>::Result L2;
+        public:
+            typedef Typelist<Head, L2> Result;
+        };
+
+////////////////////////////////////////////////////////////////////////////////
+// class template PW
+// Holds a Pin class and its bit position in value to read/write
+////////////////////////////////////////////////////////////////////////////////
 
 template<class TPIN, uint8_t POSITION>
 struct PW	//Pin wrapper
@@ -264,9 +356,13 @@ struct PW	//Pin wrapper
 	enum{Position = POSITION};
 };
 
+////////////////////////////////////////////////////////////////////////////////
+// class template GetPorts
+// Converts list of Pin types to Port types
+////////////////////////////////////////////////////////////////////////////////
 
  		template <class TList> struct GetPorts;
-        
+       
         template <> struct GetPorts<NullType>
         {
             typedef NullType Result;
@@ -282,7 +378,10 @@ struct PW	//Pin wrapper
             typedef Typelist<Port, L1> Result;
         };
 
-
+////////////////////////////////////////////////////////////////////////////////
+// class template GetPinsWithPort
+// Selects pins types form pin list which have givven port
+////////////////////////////////////////////////////////////////////////////////
 
  		template <class TList, class T> struct GetPinsWithPort;
 
@@ -308,6 +407,10 @@ struct PW	//Pin wrapper
 			 typedef typename GetPinsWithPort<Tail, T>::Result Result;
         };
 
+////////////////////////////////////////////////////////////////////////////////
+// class template GetMask
+// Computes bit mask for pin list
+////////////////////////////////////////////////////////////////////////////////
 
 		template <class TList> struct GetMask;
         template <> struct GetMask<NullType>
@@ -320,7 +423,10 @@ struct PW	//Pin wrapper
 			enum{value = (1 << Head::Pin::Number) | GetMask<Tail>::value};
         };
 		
-	
+////////////////////////////////////////////////////////////////////////////////
+// class template PinWriteIterator
+// Iterates througth pin list to compute value to write to their port
+////////////////////////////////////////////////////////////////////////////////
 
 		template <class TList> struct PinWriteIterator;
         template <> struct PinWriteIterator<NullType>
@@ -331,14 +437,22 @@ struct PW	//Pin wrapper
         template <class Head, class Tail>
         struct PinWriteIterator< Typelist<Head, Tail> >
         {
-			static inline void UppendValue(uint8_t value, uint8_t &result)
+			template<class DATA_T>
+			static inline void UppendValue(DATA_T value, uint8_t &result)
 			{
-				if(value & (1 << Head::Position))
+				if(Head::Position == Head::Pin::Number)
+					result |= value & (1 << Head::Position);
+				else if(value & (1 << Head::Position))
 					result |= (1 << Head::Pin::Number);
+
 				PinWriteIterator<Tail>::UppendValue(value, result);
 			}
         };
 
+////////////////////////////////////////////////////////////////////////////////
+// class template PortWriteIterator
+// Iterates througth port list and write value to them
+////////////////////////////////////////////////////////////////////////////////
 
 		template <class PortList, class PinList> struct PortWriteIterator;
         template <class PinList> struct PortWriteIterator<NullType, PinList>
@@ -352,8 +466,9 @@ struct PW	//Pin wrapper
         {
 			typedef typename GetPinsWithPort<PinList, Head>::Result Pins;
 			enum{Mask = GetMask<Pins>::value};
-
-			static void Write(uint8_t value)
+			
+			template<class DATA_T>
+			static void Write(DATA_T value)
 			{   
 				if(Length<Pins>::value == 1)
 					Pins::Head::Pin::Set(value & Pins::Head::Position);
@@ -365,48 +480,93 @@ struct PW	//Pin wrapper
 			}
         };
 
-	
+////////////////////////////////////////////////////////////////////////////////
+// class template PinSet
+// 
+////////////////////////////////////////////////////////////////////////////////
 
-template<class PINS>
-struct PinList
-{
-	typedef typename GetPorts<PINS>::Result PinsToPorts;
-	typedef typename NoDuplicates<PinsToPorts>::Result Ports; 
-	static void Write(uint8_t value)
-	{
-		PortWriteIterator<Ports, PINS>::Write(value);
-	}
-};
+		template<class PINS>
+		struct PinSet
+		{
+		private:
+			typedef typename GetPorts<PINS>::Result PinsToPorts;
+			typedef typename NoDuplicates<PinsToPorts>::Result Ports; 
+		public:
+			template<class DATA_T>
+			static void Write(DATA_T value)
+			{
+				PortWriteIterator<Ports, PINS>::Write(value);
+			}
+		};
 
-template<class HI, class LOW>
-class PowerDriver
-{
-public:
-	PowerDriver()
-	{
-		hi.SetDirWrite();
-		low.SetDirWrite();
-	}
-	void SetHight()
-	{
-		hi.Set();
-		low.Set();
-	}
+////////////////////////////////////////////////////////////////////////////////
+// class template MakePinList
+// 
+////////////////////////////////////////////////////////////////////////////////
 
-	void SetLow()
-	{
-		low.Clear();
-		hi.Clear();
-	}
+		template
+        <	
+			int Position,
+            typename T1  = NullType, typename T2  = NullType, typename T3  = NullType,
+            typename T4  = NullType, typename T5  = NullType, typename T6  = NullType,
+            typename T7  = NullType, typename T8  = NullType, typename T9  = NullType,
+            typename T10 = NullType, typename T11 = NullType, typename T12 = NullType,
+            typename T13 = NullType, typename T14 = NullType, typename T15 = NullType,
+            typename T16 = NullType, typename T17 = NullType
+        > 
+        struct MakePinList
+        {
+        private:
+            typedef typename MakePinList
+            <
+				Position + 1,
+                T2 , T3 , T4 , 
+                T5 , T6 , T7 , 
+                T8 , T9 , T10, 
+                T11, T12, T13,
+                T14, T15, T16, 
+                T17
+            >
+            ::Result TailResult;
+			enum{PositionInList = Position};
+        public:
+            typedef Typelist< PW<T1, PositionInList>, TailResult> Result;
 
-	void Free()
-	{
-		low.Clear();
-		hi.Set();
-	}
-HI hi;
-LOW low;
-};
+        };
+
+        template<int Position>
+        struct MakePinList<Position>
+        {
+            typedef NullType Result;
+        };
+
+////////////////////////////////////////////////////////////////////////////////
+// class template PinList
+// 
+////////////////////////////////////////////////////////////////////////////////
+
+		template
+        <	
+            typename T1  = NullType, typename T2  = NullType, typename T3  = NullType,
+            typename T4  = NullType, typename T5  = NullType, typename T6  = NullType,
+            typename T7  = NullType, typename T8  = NullType, typename T9  = NullType,
+            typename T10 = NullType, typename T11 = NullType, typename T12 = NullType,
+            typename T13 = NullType, typename T14 = NullType, typename T15 = NullType,
+            typename T16 = NullType, typename T17 = NullType
+        > 
+        struct PinList: public PinSet
+			<
+				typename MakePinList
+				<	0,	T1,
+					T2 , T3 , T4 , 
+                	T5 , T6 , T7 , 
+                	T8 , T9 , T10, 
+                	T11, T12, T13,
+                	T14, T15, T16, 
+                	T17
+				>::Result
+			>
+        {	};
 
 
 #endif
