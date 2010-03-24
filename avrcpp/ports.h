@@ -252,7 +252,7 @@ typedef TPin<Portg, 6> Pg6;
 typedef TPin<Portg, 7> Pg7;
 #endif
 
-
+// class template NullType - marks the end of type list
 class NullType{};
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -440,7 +440,7 @@ struct PW	//Pin wrapper
 			template<class DATA_T>
 			static inline void UppendValue(DATA_T value, uint8_t &result)
 			{
-				if(Head::Position == Head::Pin::Number)
+				if((int)Head::Position == (int)Head::Pin::Number)
 					result |= value & (1 << Head::Position);
 				else if(value & (1 << Head::Position))
 					result |= (1 << Head::Pin::Number);
