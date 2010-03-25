@@ -93,6 +93,31 @@ void WriteTests()
 	FullPortConstValueRndOrder();
 }
 
+void FullPortRndOrderRead()
+{
+ 	typedef PinList<Pa1, Pa0, Pa4, Pa6, Pa3, Pa2, Pa7, Pa5> pins;
+	uint8_t value;
+	pins::Read(value);
+	PORTC = value;
+}
+
+void FullPortOrderRead()
+{
+ 	typedef PinList<Pa0, Pa1, Pa2, Pa3, Pa4, Pa5, Pa6, Pa7> pins;
+	uint8_t value;
+	pins::Read(value);
+	PORTC = value;
+}
+
+
+void RndOrderRead()
+{
+ 	typedef PinList<Pa1, Pa3, Pb2, Pc3, Pd4, Pa5, Pb6, Pc7> pins;
+	uint8_t value;
+	pins::Read(value);
+	PORTC = value;
+}
+
 int main()
 {
 	WriteTests();
