@@ -138,6 +138,13 @@ public:
 		else Clear();
 	}
 
+	static void SetDir(uint8_t val)
+	{
+		if(val)
+			SetDirWrite();
+		else SetDirRead();
+	}
+
 	static void Clear()
 	{
 		PORT::data() &= (uint8_t)~(1 << PIN);
@@ -497,7 +504,7 @@ struct PW	//Pin wrapper
 			{   
 				if(Length<Pins>::value == 1)
 					Pins::Head::Pin::Set(value & (1 << Pins::Head::Position));
-				else if(Length<Pins>::value == Head::Width)
+				else if((int)Length<Pins>::value == (int)Head::Width)
 				{
 					uint8_t result=0;
 					PinWriteIterator<Pins>::UppendValue(value, result);
@@ -511,10 +518,31 @@ struct PW	//Pin wrapper
 				}
 				PortWriteIterator<Tail, PinList>::Write(value);
 			}
+
+			template<class DATA_T>
+			static void DdrWrite(DATA_T value)
+			{   
+				if(Length<Pins>::value == 1)
+					Pins::Head::Pin::SetDir(value & (1 << Pins::Head::Position));
+				else if((int)Length<Pins>::value == (int)Head::Width)
+				{
+					uint8_t result=0;
+					PinWriteIterator<Pins>::UppendValue(value, result);
+					Head::dir() = result;
+				}
+				else
+				{
+					uint8_t result=0;
+					PinWriteIterator<Pins>::UppendValue(value, result);
+					Head::dir() =  (Head::dir() & ~Mask) | result ;
+				}
+				PortWriteIterator<Tail, PinList>::Write(value);
+			}
 			
 			template<class DATA_T>
 			static void Read(DATA_T &value)
 			{   
+				value = DATA_T(0);
 				if(Length<Pins>::value == 1)
 				{
 					if(Pins::Head::Pin::IsSet())
@@ -522,7 +550,7 @@ struct PW	//Pin wrapper
 				}
 				else
 				{
-					uint8_t portValue=Head::data();
+					uint8_t portValue=Head::pin();
 					PinWriteIterator<Pins>::UppendReadValue(value, portValue);
 				}
 	
@@ -554,6 +582,13 @@ struct PW	//Pin wrapper
 			{
 				PortWriteIterator<Ports, PINS>::Read(value);
 			}
+
+			template<class DATA_T>
+			static void DdrWrite(DATA_T value)
+			{
+				PortWriteIterator<Ports, PINS>::DdrWrite(value);
+			}
+
 		};
 
 ////////////////////////////////////////////////////////////////////////////////
