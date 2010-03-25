@@ -5,18 +5,19 @@
 #include "containers.h"
 #include <avr/interrupt.h>
 
-#ifndef RX_BUFFER_SIZE
-#define RX_BUFFER_SIZE 8
-#endif
-
-#ifndef TX_BUFFER_SIZE
-#define TX_BUFFER_SIZE 8
-#endif
-
-class Usart
+struct UsartTraits
 {
-public:
-	static void Init(unsigned long baund)
+	uint8_t Read()
+	{
+		return _UDR_;
+	}
+
+	void Write(uint8_t value)
+	{
+		_UDR_ = value;
+	}
+
+	void SetBaundRate(uint32_t baund)
 	{
 		unsigned int ubrr = (F_CPU/16/baund-1);
 		unsigned int ubrr2x 	(F_CPU/8/baund-1);
@@ -39,28 +40,48 @@ public:
 		unsigned int ubrrToUse;
 		if(err1 > err2)
 		{
-			ucsra = (1 << U2X);
+			_UCSRA_ = (1 << U2X);
 			ubrrToUse = ubrr2x;
 		}
 		else
 		{
-			ucsra = 0x00;
+			_UCSRA_ = 0x00;
 			ubrrToUse = ubrr;
 		}
-		UCSRB = 0x00; 
-		UCSRC = (1 << URSEL) | (1 << UCSZ1) | (1 << UCSZ0);
-		UCSRB = (1 << RXCIE) | (1 << TXCIE) | (1 << UDRIE) | (1 << RXEN) | (1 << TXEN);
-		UBRRL=(ubrrToUse);
-		UBRRH=(ubrrToUse)>>8;
-		UCSRA = ucsra;
+		_UBRRL_=(ubrrToUse);
+		_UBRRH_=(ubrrToUse)>>8;
+	}
+
+	void EnableTxRx()
+	{
+		_UCSRB_ = 0x00; 
+		_UCSRC_ = (1 << URSEL) | (1 << UCSZ1) | (1 << UCSZ0);
+		_UCSRB_ = (1 << RXCIE) | (0 << TXCIE) | (1 << UDRIE) | (1 << RXEN) | (1 << TXEN);
+	}
+
+	bool CanWriteData()
+	{
+		return _UCSRA_ & (1<<UDRE);
+	}
+
+};
+
+template<int TxSize, int RxSize, class Traits>
+class Usart
+{
+public:
+	static void Init(unsigned long baund)
+	{
+		Traits::SetBaundRate();
+		Traits::EnableTxRx();
 	}
 
 	static uint8_t Putch(uint8_t c)__attribute__ ((noinline))
 	{
 		if(_tx.IsEmpty())
 		{
-			while( !( UCSRA & (1<<UDRE)) );
-			UDR = c;
+			while(!Traits::CanWriteData());
+			Traits::Write(c);
 			return 1;
 		}else 
 		return _tx.Write(c);
@@ -71,31 +92,32 @@ public:
 		return _rx.Read(c);
 	}
 
-	inline static void USART_UDRE_Handler();
-	inline static void USART_RXC_Handler();
+	inline void USART_UDRE_Handler()
+	{
+		uint8_t c;
+		if(Usart::_tx.Read(c))
+			Traits::Write(c);
+	}
+
+	inline void USART_RXC_Handler()
+	{
+		if(!Usart::_rx.Write(Traits::Read()))//buffer overlow
+		{
+			//TODO: error handling
+			Usart::_rx.Clear();
+		}	
+	}
+
 protected:
-	static Queue<RX_BUFFER_SIZE> _rx;
-	static Queue<TX_BUFFER_SIZE> _tx;
+	static Queue<RxSize> _rx;
+	static Queue<TxSize> _tx;
 };
 
-Queue<RX_BUFFER_SIZE> Usart::_rx;
-Queue<TX_BUFFER_SIZE> Usart::_tx;
+template<class Traits, int TxSize, int RxSize>
+Queue<RxSize> Usart<Traits, TxSize, RxSize>::_rx;
+template<class Traits, int TxSize, int RxSize>
+Queue<TxSize> Usart<Traits, TxSize, RxSize>::_tx;
 
-inline void Usart::USART_UDRE_Handler()
-{
-	uint8_t c;
-	if(Usart::_tx.Read(c))
-		UDR = c;	
-}
-
-inline void Usart::USART_RXC_Handler()
-{
-	if(!Usart::_rx.Write(UDR))//buffer overlow
-	{
-		//TODO: error handling
-		Usart::_rx.Clear();
-	}	
-}
 
 EMPTY_INTERRUPT(USART_TXC_vect)
 
