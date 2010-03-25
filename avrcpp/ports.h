@@ -431,8 +431,14 @@ struct PW	//Pin wrapper
 		template <class TList> struct PinWriteIterator;
         template <> struct PinWriteIterator<NullType>
         {
-           static void UppendValue(uint8_t value, uint8_t &result)
-		   {   }
+			template<class DATA_T>
+			static void UppendValue(DATA_T value, uint8_t &result)
+			{   }
+
+			template<class DATA_T>
+			static inline void UppendReadValue(DATA_T &value, uint8_t portValue)
+			{	}
+
         };
         template <class Head, class Tail>
         struct PinWriteIterator< Typelist<Head, Tail> >
@@ -442,10 +448,24 @@ struct PW	//Pin wrapper
 			{
 				if((int)Head::Position == (int)Head::Pin::Number)
 					result |= value & (1 << Head::Position);
-				else if(value & (1 << Head::Position))
-					result |= (1 << Head::Pin::Number);
+				else 
+					if(value & (1 << Head::Position))
+						result |= (1 << Head::Pin::Number);
 
 				PinWriteIterator<Tail>::UppendValue(value, result);
+			}
+
+			template<class DATA_T>
+			static inline void UppendReadValue(DATA_T &value, uint8_t portValue)
+			{
+				if((int)Head::Position == (int)Head::Pin::Number)
+					value |= portValue & (1 << Head::Position);
+
+				else 
+					if(portValue & (1 << Head::Pin::Number))
+						value |= (1 << Head::Position);
+
+				PinWriteIterator<Tail>::UppendReadValue(value, portValue);
 			}
         };
 
@@ -457,8 +477,13 @@ struct PW	//Pin wrapper
 		template <class PortList, class PinList> struct PortWriteIterator;
         template <class PinList> struct PortWriteIterator<NullType, PinList>
         {
-           static void Write(uint8_t value)
-		   {   }
+			template<class DATA_T>
+			static void Write(DATA_T value)
+			{   }
+
+			template<class DATA_T>
+			static void Read(DATA_T &value)
+			{   }
         };
 
         template <class Head, class Tail, class PinList>
@@ -471,13 +496,39 @@ struct PW	//Pin wrapper
 			static void Write(DATA_T value)
 			{   
 				if(Length<Pins>::value == 1)
-					Pins::Head::Pin::Set(value & Pins::Head::Position);
-
-				uint8_t result=0;
-				PinWriteIterator<Pins>::UppendValue(value, result);
-				Head::data() =  (Head::data() & ~Mask) | result ;
+					Pins::Head::Pin::Set(value & (1 << Pins::Head::Position));
+				else if(Length<Pins>::value == Head::Width)
+				{
+					uint8_t result=0;
+					PinWriteIterator<Pins>::UppendValue(value, result);
+					Head::data() = result;
+				}
+				else
+				{
+					uint8_t result=0;
+					PinWriteIterator<Pins>::UppendValue(value, result);
+					Head::data() =  (Head::data() & ~Mask) | result ;
+				}
 				PortWriteIterator<Tail, PinList>::Write(value);
 			}
+			
+			template<class DATA_T>
+			static void Read(DATA_T &value)
+			{   
+				if(Length<Pins>::value == 1)
+				{
+					if(Pins::Head::Pin::IsSet())
+						value |= 1<<Pins::Head::Position;
+				}
+				else
+				{
+					uint8_t portValue=Head::data();
+					PinWriteIterator<Pins>::UppendReadValue(value, portValue);
+				}
+	
+				PortWriteIterator<Tail, PinList>::Read(value);
+			}
+
         };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -496,6 +547,12 @@ struct PW	//Pin wrapper
 			static void Write(DATA_T value)
 			{
 				PortWriteIterator<Ports, PINS>::Write(value);
+			}
+
+			template<class DATA_T>
+			static void Read(DATA_T &value)
+			{
+				PortWriteIterator<Ports, PINS>::Read(value);
 			}
 		};
 
