@@ -5,11 +5,26 @@
 
 #include "static_assert.h"
 
+template<bool Short> struct SelectSizeT;
 
-template<int SIZE, class DATA_T=unsigned char, class INDEX_T=unsigned char>
+template<> 
+struct SelectSizeT<false>
+{
+	typedef unsigned int Result;
+};
+
+template<> 
+struct SelectSizeT<true>
+{
+	typedef unsigned char Result;
+};
+
+
+template<int SIZE, class DATA_T=unsigned char>
 class RingBuffer
 {
 protected:
+	typedef typename SelectSizeT<SIZE < 255>::Result INDEX_T;
 	RingBuffer()
 	{
 		Clear();
@@ -77,44 +92,55 @@ protected:
 };
 
 
-template<int SIZE, class DATA_T=unsigned char, class INDEX_T=unsigned char>
-class Queue :public RingBuffer<SIZE, DATA_T, INDEX_T>
+template<int SIZE, class DATA_T=unsigned char>
+class Queue :public RingBuffer<SIZE, DATA_T>
 {
+	using typename RingBuffer<SIZE, DATA_T>::INDEX_T;
+	using RingBuffer<SIZE, DATA_T>::IsFull;
+	using RingBuffer<SIZE, DATA_T>::Write;
+	using RingBuffer<SIZE, DATA_T>::IsEmpty;
+	using RingBuffer<SIZE, DATA_T>::Read;
+
 public:
 	bool Write(DATA_T c)
 	{
-		if(RingBuffer<SIZE, DATA_T, INDEX_T>::IsFull())
+		if(IsFull())
 			return 0;
-		RingBuffer<SIZE, DATA_T, INDEX_T>::Write(c);
+		Write(c);
 		return 1;
 	}
 
 	bool Read(DATA_T &c)
 	{
-		if(RingBuffer<SIZE, DATA_T, INDEX_T>::IsEmpty())
+		if(IsEmpty())
 			return 0;
-		c=RingBuffer<SIZE, DATA_T, INDEX_T>::Read();
+		c=Read();
 		return 1;
 	}
 };
 
-template<int SIZE, class DATA_T=unsigned char, class INDEX_T=unsigned char>
-class WrappingQueue :public RingBuffer<SIZE, DATA_T, INDEX_T>
+template<int SIZE, class DATA_T=unsigned char>
+class WrappingQueue :public RingBuffer<SIZE, DATA_T>
 {
+	using typename RingBuffer<SIZE, DATA_T>::INDEX_T;
+	using RingBuffer<SIZE, DATA_T>::IsFull;
+	using RingBuffer<SIZE, DATA_T>::Write;
+	using RingBuffer<SIZE, DATA_T>::IsEmpty;
+	using RingBuffer<SIZE, DATA_T>::Read;
 public:
 	bool Write(DATA_T c)
 	{
-		if(RingBuffer<SIZE, DATA_T, INDEX_T>::IsFull())
-			RingBuffer<SIZE, DATA_T, INDEX_T>::_readCount++;
-		RingBuffer<SIZE, DATA_T, INDEX_T>::Write(c);
+		if(IsFull())
+			RingBuffer<SIZE, DATA_T>::_readCount++;
+		Write(c);
 		return 1;
 	}
 
 	bool Read(DATA_T &c)
 	{
-		if(RingBuffer<SIZE, DATA_T, INDEX_T>::IsEmpty())
+		if(IsEmpty())
 			return 0;
-		c=RingBuffer<SIZE, DATA_T, INDEX_T>::Read();
+		c=Read();
 		return 1;
 	}
 };
