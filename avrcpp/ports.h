@@ -5,6 +5,8 @@
 #include <avr/io.h>
 #include "static_assert.h"
 
+// TODO: think about XMega support. DIRSET/DIRCLR/OUTSET/OUTCLR/OUTCLR and other registers
+
 #define MAKE_PORT(portName, ddrName, pinName, className, ID) \
 	struct className{\
 		typedef uint8_t DataT;\
@@ -134,7 +136,8 @@ private:
 }; 
 
 
-
+// this class represents one pin in a IO port.
+// It is fully static.
 template<class PORT, uint8_t PIN>
 class TPin
 {
@@ -198,7 +201,7 @@ public:
 		while(IsSet()){}
 	}
 }; 
-
+//Short pin definations 
 #ifdef PORTA
 typedef TPin<Porta, 0> Pa0;
 typedef TPin<Porta, 1> Pa1;
@@ -275,6 +278,9 @@ typedef TPin<Portg, 5> Pg5;
 typedef TPin<Portg, 6> Pg6;
 typedef TPin<Portg, 7> Pg7;
 #endif
+
+// TypeList and corresponding stuff are borrowed from Loki library
+// http://sourceforge.net/projects/loki-lib/
 
 // class template NullType - marks the end of type list
 class NullType{};
@@ -369,16 +375,16 @@ class NullType{};
         };
 
 ////////////////////////////////////////////////////////////////////////////////
-// class template PW
+// class template PW. Pin wrapper
 // Holds a Pin class and its bit position in value to read/write
 ////////////////////////////////////////////////////////////////////////////////
 
-template<class TPIN, uint8_t POSITION>
-struct PW	//Pin wrapper
-{
-	typedef TPIN Pin;
-	enum{Position = POSITION};
-};
+		template<class TPIN, uint8_t POSITION>
+		struct PW	//Pin wrapper
+		{
+			typedef TPIN Pin;
+			enum{Position = POSITION};
+		};
 
 ////////////////////////////////////////////////////////////////////////////////
 // class template GetPorts
@@ -405,6 +411,8 @@ struct PW	//Pin wrapper
 ////////////////////////////////////////////////////////////////////////////////
 // class template GetPinsWithPort
 // Selects pins types form pin list which have givven port
+// Assume that TList is type list of PW (pin wrapper) types.
+// T - port type to select by.
 ////////////////////////////////////////////////////////////////////////////////
 
  		template <class TList, class T> struct GetPinsWithPort;
@@ -434,6 +442,7 @@ struct PW	//Pin wrapper
 ////////////////////////////////////////////////////////////////////////////////
 // class template GetMask
 // Computes bit mask for pin list
+// Assume that TList is type list of PW (pin wrapper) types.
 ////////////////////////////////////////////////////////////////////////////////
 
 		template <class TList> struct GetMask;
@@ -450,6 +459,7 @@ struct PW	//Pin wrapper
 ////////////////////////////////////////////////////////////////////////////////
 // class template PinWriteIterator
 // Iterates througth pin list to compute value to write to their port
+// Assume that TList is type list of PW (pin wrapper) types.
 ////////////////////////////////////////////////////////////////////////////////
 
 		template <class TList> struct PinWriteIterator;
@@ -496,6 +506,8 @@ struct PW	//Pin wrapper
 ////////////////////////////////////////////////////////////////////////////////
 // class template PortWriteIterator
 // Iterates througth port list and write value to them
+// Assume that PinList is type list of PW (pin wrapper) types.
+// And PortList is type list of port types.
 ////////////////////////////////////////////////////////////////////////////////
 
 		template <class PortList, class PinList> struct PortWriteIterator;
@@ -667,7 +679,9 @@ struct PW	//Pin wrapper
 
 ////////////////////////////////////////////////////////////////////////////////
 // class template PinSet
-// 
+// Holds implimentation of pin list manipulations.
+// Pins from list are grouped by their port and group read/write operation is 
+// performed on each port.
 ////////////////////////////////////////////////////////////////////////////////
 
 		template<class PINS>
@@ -722,7 +736,8 @@ struct PW	//Pin wrapper
 
 ////////////////////////////////////////////////////////////////////////////////
 // class template MakePinList
-// 
+// This class is used to generate PinList and associate each pin in the list with
+// its bit position in value to be Write to and Read from pin list.
 ////////////////////////////////////////////////////////////////////////////////
 
 		template
@@ -763,7 +778,13 @@ struct PW	//Pin wrapper
 
 ////////////////////////////////////////////////////////////////////////////////
 // class template PinList
-// 
+// Represents generic set of IO pins htet could be used like a separete port.
+// It can be composed from any number of pins from 1 to 16 from any IO port present in selected device
+// (the last T17 type in PinList is a end of list marker).
+// It can be used like this:
+//		typedef PinList<Pa0, Pa1, Pa2, Pa3, Pb5, Pb4, Pb2> pins;
+//		pins::Write(someValue);
+
 ////////////////////////////////////////////////////////////////////////////////
 
 		template
