@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading ui file 'dialog.ui'
 **
-** Created: Tue 15. Sep 20:30:03 2009
+** Created: Sun 4. Apr 15:29:17 2010
 **      by: Qt User Interface Compiler version 4.5.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
@@ -62,6 +62,7 @@ public:
     QLabel *label;
     QLabel *label_3;
     QLabel *label_4;
+    QCheckBox *Dif;
     QFrame *frame;
     QGridLayout *gridLayout_3;
     QGridLayout *gridLayout_2;
@@ -265,6 +266,11 @@ public:
 
         gridLayout->addWidget(label_4, 3, 0, 1, 1);
 
+        Dif = new QCheckBox(frame_2);
+        Dif->setObjectName(QString::fromUtf8("Dif"));
+
+        gridLayout->addWidget(Dif, 0, 0, 1, 1);
+
 
         horizontalLayout->addWidget(frame_2);
 
@@ -419,6 +425,7 @@ public:
         label->setText(QApplication::translate("DialogClass", "Gane", 0, QApplication::UnicodeUTF8));
         label_3->setText(QApplication::translate("DialogClass", "YOffset", 0, QApplication::UnicodeUTF8));
         label_4->setText(QApplication::translate("DialogClass", "mV/div", 0, QApplication::UnicodeUTF8));
+        Dif->setText(QApplication::translate("DialogClass", "Dif", 0, QApplication::UnicodeUTF8));
         label_5->setText(QApplication::translate("DialogClass", "AdcSpeed", 0, QApplication::UnicodeUTF8));
         label_6->setText(QApplication::translate("DialogClass", "XScale", 0, QApplication::UnicodeUTF8));
         label_7->setText(QApplication::translate("DialogClass", "XOffset", 0, QApplication::UnicodeUTF8));

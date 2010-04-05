@@ -12,13 +12,14 @@ Dialog::Dialog(QWidget *parent)
 {
     ui->setupUi(this);
 
-    for(int i=0; i<4; i++)
+    for(int i=0; i<5; i++)
         _chanels.append(&ui->Display->CreateNewCurve(MyGraph::LEFT));
 
     _chanels[0]->setPen(QPen(Qt::green));
     _chanels[1]->setPen(QPen(Qt::red));
     _chanels[2]->setPen(QPen(Qt::blue));
     _chanels[3]->setPen(QPen(Qt::yellow));
+    _chanels[4]->setPen(QPen(Qt::yellow, 2.0));
     _device = new K_Scope();
 }
 
@@ -126,6 +127,16 @@ void Dialog::timerEvent(QTimerEvent *event)
                 _device->GetScopeData(data, data2, data3, data4);
             }
 
+            QVector<double> dif;
+            if(ui->Dif->checkState() == Qt::Checked && count>=2)
+            {
+                dif.resize(data.size());
+                for(int i=0; i<data.size(); i++)
+                {
+                    dif[i] = data[i]-data2[i]+2.5;
+                }
+            }
+
             double vref=5.0;
             if(ui->VrefList->currentIndex()==0)
             {
@@ -147,7 +158,7 @@ void Dialog::timerEvent(QTimerEvent *event)
             _chanels[1]->SetData(data2);
             _chanels[2]->SetData(data3);
             _chanels[3]->SetData(data4);
-
+            _chanels[4]->SetData(dif);
             ui->Display->update();
         }
     }
