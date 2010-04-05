@@ -691,6 +691,8 @@ class NullType{};
 			typedef typename GetPorts<PINS>::Result PinsToPorts;
 			typedef typename NoDuplicates<PinsToPorts>::Result Ports; 
 		public:
+			enum{Length = Length<PINS>::value};
+
 			template<class DATA_T>
 			static void Write(DATA_T value)
 			{
