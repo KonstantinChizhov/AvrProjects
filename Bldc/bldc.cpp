@@ -2,141 +2,129 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include "ports.h"
+#include "comparator.h"
+#include "timer.h"
 
-typedef PinList<Pa0, Pa1, Pa2, Pa3, Pa4, Pa5> ControlPins;
-typedef PinList<Pb0, Pb1, Pb2> SersorPins;
-
+typedef PinList<Pa0, Pa1, Pa2, Pb0, Pb1, Pb2> ControlPins;
+typedef PinList<Pa4, Pa5, Pa7> SersorPins;
+typedef Pa3 boostPin;
 
 template<class ControlPins, class SensorPins, bool HiInverted=false>
 class Bldc{
 public:
-	enum{Ph1Hi = (1 << 0), Ph1Low = (1 << 1), Ph2Hi = (1 << 2), Ph2Low = (1 << 3), Ph3Hi = (1 << 4), Ph3Low = (1 << 5)};
+	enum{
+		
+		Ph1Low = 	(1 << 0),
+		Ph2Low = 	(1 << 1),
+		Ph3Low = 	(1 << 2),
+		Ph1Hi = 	(1 << 3), 
+		Ph2Hi = 	(1 << 4), 
+		Ph3Hi = 	(1 << 5)
+	};
 	
-	Bldc()
+	static void Init()
 	{
-		ControlPins::DirSet(0xff);
-		SensorPins::DirClear(0xff);
+		ControlPins::DdrSet(0xff);
+		SensorPins::DdrClear(0xff);
 		_phase = 0;
 		_dir = 0;
 	}
 
-	void SetDir(uint8_t dir)
+	static inline void SetDir(uint8_t dir)
 	{
 		_dir = dir;
 	}
 		
-	void P1()
+	static inline void P1()
 	{
-		if(HiInverted)
-			ControlPins::Write(Ph2Low | Ph2Hi | Ph3Hi);
-		else
-			ControlPins::Write(Ph2Low | Ph1Hi);
+		//if(HiInverted)
+			ControlPins::Write(0b00011001);
+	//	else
+		//	ControlPins::Write((uint8_t)(Ph2Low | Ph1Hi));
 	}
 
-	void P2()
+	static inline void P2()
 	{
-		if(HiInverted)
-			ControlPins::Write(Ph3Low | Ph1Hi | Ph3Hi);
-		else
-			ControlPins::Write(Ph3Low | Ph2Hi);
+	//	if(HiInverted)
+			ControlPins::Write(0b00110010);
+	//else
+		//	ControlPins::Write((uint8_t)(Ph3Low | Ph2Hi));
 	}
 
-	void P3()
+	static inline void P3()
 	{
-		if(HiInverted)
-			ControlPins::Write(Ph1Low | Ph1Hi | Ph2Hi);
-		else
-			ControlPins::Write(Ph1Low | Ph3Hi);
+		//if(HiInverted)
+			ControlPins::Write(0b00101100);
+	//	else
+		//	ControlPins::Write((uint8_t)(Ph1Low | Ph3Hi));
 	}
 
-	void Step()
+	static inline void Step()
 	{
 		switch(_phase)
 		{
 			case 0: 
 				P1();
+				Comparator::SetChannel(Comparator::ADC4);
 			break;
 			case 1:
 				P2();
+				Comparator::SetChannel(Comparator::ADC3);
 			break;
 			case 2:
 				P3();
+				Comparator::SetChannel(Comparator::AIN1);
 			break;
 		}
-		if(_dir)
+		//if(_dir)
 			_phase++;
-		else
-			_phase--;
-		if(_phase < 0)_phase = 2;
+		//else
+		//	_phase--;
+		//if(_phase < 0)_phase = 2;
 		if(_phase > 2)_phase = 0;
 		
 	}
 	
 protected:
-	int8_t _phase;
-	uint _dir;
+	static int8_t _phase;
+	static uint8_t _dir;
 };
 
+template<class ControlPins, class SensorPins, bool HiInverted>
+int8_t Bldc<ControlPins, SensorPins, HiInverted>::_phase;
+template<class ControlPins, class SensorPins, bool HiInverted>
+uint8_t Bldc<ControlPins, SensorPins, HiInverted>::_dir;
 
-class Comparator
+typedef Bldc<ControlPins, SersorPins, true> motor;
+
+ISR(TIMER0_OVF0_vect)
 {
-protected:
-	enum{AdmuxMask = (1<<MUX0)|(1<<MUX1)|(1<<MUX2)|(1<<MUX3)};
-	uint8_t& Control()
-	{
-		return ACSR;
-	}
-	uint8_t& Multiplexer()
-	{
-		return ADMUX;
-	}
-	void MuxEnable()
-	{
-		SFIOR |= (1<<ACME);
-	}
-
-	void MuxDisable()
-	{
-		SFIOR &= ~(1<<ACME);
-	}
-
-public:
-	enum ComparatorChannel {AIN1=255, ADC0=0, ADC1=1, ADC2=2, ADC3=3, ADC4=4, ADC5=6, ADC6=6, ADC7=7, ADC8=8, ADC9=1, ADC10=10};
-	enum InterruptMode{Togle=0; Falling=2, Rising=3};
-
-	void SetChannel(ComparatorChannel ch)
-	{
-		if(ch == AIN1)
-		{
-			MuxDisable();
-		}
-		else
-		{
-			MuxEnable();
-			Multiplexer() = Multiplexer() & AdmuxMask | ch;
-		}
-	}
-
-	void EnableInterrupt(InterruptMode mode)
-	{
-		Control() |= (1 << ACIE) | (mode << ACIS0);
-	}
-	
-	uint8_t IsSet()
-	{
-		return Control() & (1<<ACO);
-	}
-};
-
+	motor::Step();
+}
 
 
 ISR(ANA_COMP_vect)
 {
-
+	Comparator::DisableInterrupt();
+	Timer0::Reset();
+	motor::Step();
+	_delay_us(500);
+	Comparator::EnableInterrupt(Comparator::Rising);
 }
 
 
 int main()
 {
-
+	Comparator::SetChannel(Comparator::ADC4);
+	Comparator::EnableInterrupt(Comparator::Rising);
+	boostPin::SetDirWrite();
+	motor::Init();
+	Timer0::Start(Timer0::Ck1024);
+	Timer0::EnableOverflowInterrupt();
+	sei();
+	while(1)
+	{
+		boostPin::Togle();
+		_delay_us(100);
+	}
 }
