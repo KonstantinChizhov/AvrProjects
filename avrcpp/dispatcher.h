@@ -72,13 +72,14 @@ public:
 	static void Poll()
 	{
 		task_t task;
-		cli();
+		//NOTE: no beed to block task Queue here. This is the only place the Queue read.
+		//cli();
 		if(_tasks.Read(task))
 		{
-			sei();
+		//	sei();
 			task();
 		}
-		sei();
+		//sei();
 	}
 
 	static void TimerHandler()
