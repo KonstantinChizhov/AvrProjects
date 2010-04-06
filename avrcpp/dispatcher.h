@@ -3,11 +3,6 @@
 #include <avr/interrupt.h>
 #include "util.h"
 
-#define TASKS_LENGTH 8
-#define TIMERS_LENGTH 5
-
-#define TIMER_INTERVAL 187
-#define TIMER_START (256-TIMER_INTERVAL)
 
 typedef void (*task_t)();
 
@@ -17,35 +12,29 @@ typedef struct
 	uint16_t period;
 } timer_t;
 
-
+template<uint8_t TasksLenght, uint8_t TimersLenght>
 class Dispatcher
 {
 public:
+
 	static void Init()
-	{
+	{	
+		_tasks.Clear();
 		for(uint8_t i=0; i<_timers.Size(); i++)
 		{
 			_timers[i].task = 0;
 			_timers[i].period = 0;
 		}
-		TCNT0 = TIMER_START;
-		TCCR0 = (0<<CS02) | (1<<CS01) | (1<<CS00);
-		TIMSK |= (1<<TOIE0);
 	}
 
-	static uint16_t Ticks()
-	{
-		return TCNT0-TIMER_START + _ticks;
-	}
-
-	static void SetTask(task_t task) //__attribute__ ((noinline))
+	static void SetTask(task_t task)
 	{
 		ATOMIC{	_tasks.Write(task);}
 	}
 
 	static void SetTimer(task_t task, uint16_t period) __attribute__ ((noinline))
 	{
-		uint8_t i_idle=_timers.Size()-1;
+		uint8_t i_idle=0;
 		ATOMIC
 		{
 			for(uint8_t i=0; i<_timers.Size(); i++)
@@ -94,7 +83,6 @@ public:
 
 	static void TimerHandler()
 	{
-		_ticks+=TIMER_INTERVAL;
 		for(uint8_t i=0; i<_timers.Size(); i++)
 		{
 			if(_timers[i].task != 0 && --_timers[i].period == 0)
@@ -105,22 +93,17 @@ public:
 		}
 	}
 
-protected:
-
-	static Queue<TASKS_LENGTH, task_t> _tasks;
-	static Array<TIMERS_LENGTH, timer_t> _timers;
-	static uint16_t _ticks;
-
+private:
+	static Queue<TasksLenght, task_t> _tasks;
+	static Array<TimersLenght, timer_t> _timers;
 };
 
-	Queue<TASKS_LENGTH, task_t> Dispatcher::_tasks;
-	Array<TIMERS_LENGTH, timer_t> Dispatcher::_timers;
-	uint16_t Dispatcher::_ticks;
+template<uint8_t TasksLenght, uint8_t TimersLenght>
+Array<TimersLenght, timer_t> Dispatcher<TasksLenght, TimersLenght>::_timers;
 
-ISR(TIMER0_OVF_vect)
-{
-	TCNT0 = TIMER_START;
-	Dispatcher::TimerHandler();
-}
+template<uint8_t TasksLenght, uint8_t TimersLenght>
+Queue<TasksLenght, task_t> Dispatcher<TasksLenght, TimersLenght>::_tasks;
+
+
 
 
