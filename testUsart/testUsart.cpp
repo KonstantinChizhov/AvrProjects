@@ -1,23 +1,23 @@
 #include "Usart.h"
 
-Usart<512, 512> usart;
+typedef Usart<16, 16> usart;
 
 
 ISR(USART_UDRE_vect)
 {	
-	usart.TxHandler();
+	usart::TxHandler();
 }
 
 
-ISR(USART_RX_vect)
+ISR(USART_RXC_vect)
 {
-	usart.RxHandler();
+	usart::RxHandler();
 }
 
 
 int main()
 {
-	usart.Init(115200);
+	usart::Init(115200);
 	while(1)
 	{
 	

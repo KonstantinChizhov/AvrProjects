@@ -88,13 +88,13 @@ template<int TxSize, int RxSize, class Traits=Usart0Traits>
 class Usart
 {
 public:
-	inline void Init(unsigned long baund)
+	static inline void Init(unsigned long baund)
 	{
 		Traits::SetBaundRate(baund);
 		Traits::EnableTxRx();
 	}
 
-	uint8_t Putch(uint8_t c)__attribute__ ((noinline))
+	static uint8_t Putch(uint8_t c)__attribute__ ((noinline))
 	{
 		if(_tx.IsEmpty())
 		{
@@ -105,19 +105,19 @@ public:
 		return _tx.Write(c);
 	}
 
-	uint8_t Getch(uint8_t &c)__attribute__ ((noinline))
+	static uint8_t Getch(uint8_t &c)__attribute__ ((noinline))
 	{
 		return _rx.Read(c);
 	}
 
-	inline void TxHandler()
+	static inline void TxHandler()
 	{
 		uint8_t c;
 		if(_tx.Read(c))
 			Traits::Write(c);
 	}
 
-	inline void RxHandler()
+	static	inline void RxHandler()
 	{
 		if(!_rx.Write(Traits::Read()))//buffer overlow
 		{
@@ -127,9 +127,14 @@ public:
 	}
 
 private:
-	Queue<RxSize> _rx;
-	Queue<TxSize> _tx;
+	static Queue<RxSize> _rx;
+	static Queue<TxSize> _tx;
 };
+
+template<int TxSize, int RxSize, class Traits>
+	Queue<RxSize> Usart<TxSize, RxSize, Traits>::_rx;
+template<int TxSize, int RxSize, class Traits>
+	Queue<TxSize> Usart<TxSize, RxSize, Traits>::_tx;
 
 
 
