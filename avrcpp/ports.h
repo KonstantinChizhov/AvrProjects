@@ -8,8 +8,10 @@
 // TODO: think about XMega support. DIRSET/DIRCLR/OUTSET/OUTCLR/OUTCLR and other registers
 
 #define MAKE_PORT(portName, ddrName, pinName, className, ID) \
-	struct className{\
+	class className{\
+	public:\
 		typedef uint8_t DataT;\
+	private:\
 		static volatile DataT &data()\
 		{\
 			return portName;\
@@ -22,6 +24,7 @@
 		{\
 			return pinName;\
 		}\
+	public:\
 		static void Write(DataT value)\
 		{\
 			data() = value;\
@@ -29,6 +32,14 @@
 		static DataT Read()\
 		{\
 			return data();\
+		}\
+		static void DirWrite(DataT value)\
+		{\
+			dir() = value;\
+		}\
+		static DataT DirRead()\
+		{\
+			return dir();\
 		}\
 		static void Set(DataT value)\
 		{\
@@ -45,6 +56,10 @@
 		static void DirClear(DataT value)\
 		{\
 			dir() &= ~value;\
+		}\
+		static DataT PinRead()\
+		{\
+			return pin();\
 		}\
 		enum{Id = ID};\
 		enum{Width=8};\
@@ -530,15 +545,15 @@ class NullType{};
 			{   }
 			
 			template<class DATA_T>
-			static void DdrWrite(DATA_T value)
+			static void DirWrite(DATA_T value)
 			{	}
 
 			template<class DATA_T>
-			static void DdrSet(DATA_T value)
+			static void DirSet(DATA_T value)
 			{   }
 
 			template<class DATA_T>
-			static void DdrClear(DATA_T value)
+			static void DirClear(DATA_T value)
 			{   }
 
         };
@@ -546,25 +561,25 @@ class NullType{};
         template <class Head, class Tail, class PinList>
         struct PortWriteIterator< Typelist<Head, Tail>, PinList>
         {
+			//pins on current port
 			typedef typename GetPinsWithPort<PinList, Head>::Result Pins;
 			enum{Mask = GetMask<Pins>::value};
+			typedef Head Port; //Head points to current port i the list.
 			
 			template<class DATA_T>
 			static void Write(DATA_T value)
 			{   
-				if(Length<Pins>::value == 1)
-					Pins::Head::Pin::Set(value & (1 << Pins::Head::Position));
-				else if((int)Length<Pins>::value == (int)Head::Width)// whole port
+				if((int)Length<Pins>::value == (int)Port::Width)// whole port
 				{
 					uint8_t result=0;
 					PinWriteIterator<Pins>::UppendValue(value, result);
-					Head::data() = result;
+					Port::Write(result);
 				}
 				else
 				{
 					uint8_t result=0;
 					PinWriteIterator<Pins>::UppendValue(value, result);
-					Head::data() =  (Head::data() & ~Mask) | result ;
+					Port::Write((Port::Read() & ~Mask) | result) ;
 				}
 				PortWriteIterator<Tail, PinList>::Write(value);
 			}
@@ -572,106 +587,68 @@ class NullType{};
 			template<class DATA_T>
 			static void Set(DATA_T value)
 			{   
-				if(Length<Pins>::value == 1)
-				{
-					if(value & (1 << Pins::Head::Position))
-						Pins::Head::Pin::Set();
-				}
-				else
-				{
-					uint8_t result=0;
-					PinWriteIterator<Pins>::UppendValue(value, result);
-					Head::Set(result);
-				}
+				uint8_t result=0;
+				PinWriteIterator<Pins>::UppendValue(value, result);
+				Port::Set(result);
+				
 				PortWriteIterator<Tail, PinList>::Set(value);
 			}
 
 			template<class DATA_T>
 			static void Clear(DATA_T value)
 			{   
-				if(Length<Pins>::value == 1)
-				{
-					if(value & (1 << Pins::Head::Position))
-						Pins::Head::Pin::Clear();
-				}
-				else
-				{
-					uint8_t result=0;
-					PinWriteIterator<Pins>::UppendValue(value, result);
-					Head::Clear(result);
-				}
+				uint8_t result=0;
+				PinWriteIterator<Pins>::UppendValue(value, result);
+				Port::Clear(result);
+				
 				PortWriteIterator<Tail, PinList>::Clear(value);
 			}
 
 			template<class DATA_T>
-			static void DdrWrite(DATA_T value)
+			static void DirWrite(DATA_T value)
 			{   
-				if(Length<Pins>::value == 1)
-					Pins::Head::Pin::SetDir(value & (1 << Pins::Head::Position));
-				else if((int)Length<Pins>::value == (int)Head::Width)
+				if((int)Length<Pins>::value == (int)Port::Width)
 				{
 					uint8_t result=0;
 					PinWriteIterator<Pins>::UppendValue(value, result);
-					Head::dir() = result;
+					Port::dir() = result;
 				}
 				else
 				{
 					uint8_t result=0;
 					PinWriteIterator<Pins>::UppendValue(value, result);
-					Head::dir() =  (Head::dir() & ~Mask) | result ;
+					Port::DirWrite((Port::DirRead() & ~Mask) | result);
 				}
-				PortWriteIterator<Tail, PinList>::DdrWrite(value);
+				PortWriteIterator<Tail, PinList>::DirWrite(value);
 			}
 
 			template<class DATA_T>
-			static void DdrSet(DATA_T value)
+			static void DirSet(DATA_T value)
 			{   
-				if(Length<Pins>::value == 1)
-				{
-					if(value & (1 << Pins::Head::Position))
-						Pins::Head::Pin::SetDirWrite();
-				}
-				else
-				{
-					uint8_t result=0;
-					PinWriteIterator<Pins>::UppendValue(value, result);
-					Head::DirSet(result);
-				}
-				PortWriteIterator<Tail, PinList>::DdrSet(value);
+				uint8_t result = 0;
+				PinWriteIterator<Pins>::UppendValue(value, result);
+				Port::DirSet(result);
+				
+				PortWriteIterator<Tail, PinList>::DirSet(value);
 			}
 
 			template<class DATA_T>
-			static void DdrClear(DATA_T value)
+			static void DirClear(DATA_T value)
 			{   
-				if(Length<Pins>::value == 1)
-				{
-					if(value & (1 << Pins::Head::Position))
-						Pins::Head::Pin::SetDirRead();
-				}
-				else
-				{
-					uint8_t result=0;
-					PinWriteIterator<Pins>::UppendValue(value, result);
-					Head::DirClear(result);
-				}
-				PortWriteIterator<Tail, PinList>::DdrClear(value);
+				uint8_t result=0;
+				PinWriteIterator<Pins>::UppendValue(value, result);
+				Port::DirClear(result);
+				
+				PortWriteIterator<Tail, PinList>::DirClear(value);
 			}
 			
 			template<class DATA_T>
 			static void Read(DATA_T &value)
 			{   
 				value = DATA_T(0);
-				if(Length<Pins>::value == 1)
-				{
-					if(Pins::Head::Pin::IsSet())
-						value |= 1<<Pins::Head::Position;
-				}
-				else
-				{
-					uint8_t portValue=Head::pin();
-					PinWriteIterator<Pins>::UppendReadValue(value, portValue);
-				}
-	
+				uint8_t portValue = Port::PinRead();
+				PinWriteIterator<Pins>::UppendReadValue(value, portValue);
+				
 				PortWriteIterator<Tail, PinList>::Read(value);
 			}
 
@@ -718,21 +695,21 @@ class NullType{};
 			}
 
 			template<class DATA_T>
-			static void DdrWrite(DATA_T value)
+			static void DirWrite(DATA_T value)
 			{
-				PortWriteIterator<Ports, PINS>::DdrWrite(value);
+				PortWriteIterator<Ports, PINS>::DirWrite(value);
 			}
 			
 			template<class DATA_T>
-			static void DdrSet(DATA_T value)
+			static void DirSet(DATA_T value)
 			{
-				PortWriteIterator<Ports, PINS>::DdrSet(value);
+				PortWriteIterator<Ports, PINS>::DirSet(value);
 			}
 
 			template<class DATA_T>
-			static void DdrClear(DATA_T value)
+			static void DirClear(DATA_T value)
 			{
-				PortWriteIterator<Ports, PINS>::DdrClear(value);
+				PortWriteIterator<Ports, PINS>::DirClear(value);
 			}
 		};
 
