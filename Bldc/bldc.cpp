@@ -6,8 +6,13 @@
 #include "timer.h"
 
 typedef PinList<Pa0, Pa1, Pa2, Pb0, Pb1, Pb2> ControlPins;
-typedef PinList<Pa4, Pa5, Pa7> SersorPins;
+typedef PinList<Pa5, Pa6, Pa7> SersorPins;
+
 typedef Pa3 boostPin;
+typedef Pa5 s1;
+typedef Pa6 s2;
+typedef Pa7 s3;
+
 
 template<class ControlPins, class SensorPins, bool HiInverted=false>
 class Bldc{
@@ -84,7 +89,11 @@ public:
 		if(_phase > 2)_phase = 0;
 		
 	}
-	
+
+	static void SetPhase(uint8_t p)
+	{
+		_phase = p;
+	}
 protected:
 	static int8_t _phase;
 	static uint8_t _dir;
@@ -103,28 +112,36 @@ ISR(TIMER0_OVF0_vect)
 }
 
 
-ISR(ANA_COMP_vect)
-{
-	Comparator::DisableInterrupt();
-	Timer0::Reset();
-	motor::Step();
-	_delay_us(500);
-	Comparator::EnableInterrupt(Comparator::Rising);
-}
-
-
 int main()
 {
-	Comparator::SetChannel(Comparator::ADC4);
-	Comparator::EnableInterrupt(Comparator::Rising);
 	boostPin::SetDirWrite();
+	SersorPins::DdrSet(0xf);
 	motor::Init();
-	Timer0::Start(Timer0::Ck1024);
-	Timer0::EnableOverflowInterrupt();
-	sei();
+	//Timer0::Start(Timer0::Ck1024);
+	//Timer0::EnableOverflowInterrupt();
+//	sei();
 	while(1)
 	{
 		boostPin::Togle();
+		//_delay_us(100);
+		if(s1::IsSet())
+		{
 		_delay_us(100);
+			motor::P1();
+			motor::SetPhase(0);
+
+		}else
+		if(s2::IsSet())
+		{
+		_delay_us(100);
+			motor::P2();
+			motor::SetPhase(1);
+		}else
+		if(s3::IsSet())
+		{
+		_delay_us(100);
+			motor::P3();
+			motor::SetPhase(2);
+		}		
 	}
 }
