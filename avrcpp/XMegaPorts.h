@@ -113,3 +113,73 @@ MAKE_PORT(PORTQ, Portq, 'Q')
 MAKE_PORT(PORTR, Portr, 'R')
 #endif
 
+
+#define MAKE_VIRTUAL_PORT(portName, className, ID) \
+	class className{\
+	public:\
+		typedef uint8_t DataT;\
+	public:\
+		static void Write(DataT value)\
+		{\
+			portName.OUT = value;\
+		}\
+		static DataT Read()\
+		{\
+			return portName.OUT;\
+		}\
+		static void DirWrite(DataT value)\
+		{\
+			portName.DIR = value;\
+		}\
+		static DataT DirRead()\
+		{\
+			return portName.DIR;\
+		}\
+		static void Set(DataT value)\
+		{\
+			portName.OUT |= value;\
+		}\
+		static void Clear(DataT value)\
+		{\
+			portName.OUT &= ~value;\
+		}\
+		static void Togle(DataT value)\
+		{\
+			portName.OUT ^= value;\
+		}\
+		static void DirSet(DataT value)\
+		{\
+			portName.DIR |= value;\
+		}\
+		static void DirClear(DataT value)\
+		{\
+			portName.DIR &= ~value;\
+		}\
+		static DataT PinRead()\
+		{\
+			return portName.IN;\
+		}\
+		static void DirTogle(DataT value)\
+		{\
+			portName.DIR ^= value;\
+		}\
+		enum{Id = ID};\
+		enum{Width=8};\
+	};
+
+
+#ifdef VPORT0
+	MAKE_VIRTUAL_PORT(VPORT0, VPort0, 'V0')
+#endif
+
+#ifdef VPORT1
+	MAKE_VIRTUAL_PORT(VPORT1, VPort1, 'V1')
+#endif
+
+#ifdef VPORT2
+	MAKE_VIRTUAL_PORT(VPORT2, VPort2, 'V2')
+#endif
+
+#ifdef VPORT3
+	MAKE_VIRTUAL_PORT(VPORT3, VPort3, 'V3')
+#endif
