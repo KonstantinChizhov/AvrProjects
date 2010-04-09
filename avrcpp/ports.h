@@ -14,57 +14,6 @@ namespace IO
 #include "AvrPorts.h"
 #endif
 
-class Pin
-{
-public:
-	Pin(volatile unsigned char &port, uint8_t pin)
-	:_port(port)
-	{
-		_pin = pin; 
-	}
-
-	void Set()const
-	{
-		_port |= (1 << _pin);
-	}
-
-	void Set(uint8_t val)const
-	{
-		if(val)
-			Set();
-		else Clear();
-	}
-
-	void Clear()const
-	{
-		_port &= (uint8_t)~(1 << _pin);
-	}
-
-	void Togle()const
-	{
-		_port ^= (1 << _pin);
-	}
-
-	void SetDirWrite()const
-	{
-		*(&_port - 1) |= (1 << _pin);
-	}
-
-	void SetDirRead()const
-	{
-		*(&_port - 1) &= (uint8_t)~(1 << _pin);
-	}
-
-	uint8_t IsSet()const
-	{
-		return (*(&_port - 2)) & (uint8_t)(1 << _pin);
-	}
-
-private:
-	volatile unsigned char &_port; 
-	uint8_t _pin;
-}; 
-
 
 // this class represents one pin in a IO port.
 // It is fully static.
@@ -207,6 +156,61 @@ typedef TPin<Portg, 4> Pg4;
 typedef TPin<Portg, 5> Pg5;
 typedef TPin<Portg, 6> Pg6;
 typedef TPin<Portg, 7> Pg7;
+#endif
+
+#ifdef PORTH
+typedef TPin<Porth, 0> Ph0;
+typedef TPin<Porth, 1> Ph1;
+typedef TPin<Porth, 2> Ph2;
+typedef TPin<Porth, 3> Ph3;
+typedef TPin<Porth, 4> Ph4;
+typedef TPin<Porth, 5> Ph5;
+typedef TPin<Porth, 6> Ph6;
+typedef TPin<Porth, 7> Ph7;
+#endif
+
+#ifdef PORTJ
+typedef TPin<Portj, 0> Pj0;
+typedef TPin<Portj, 1> Pj1;
+typedef TPin<Portj, 2> Pj2;
+typedef TPin<Portj, 3> Pj3;
+typedef TPin<Portj, 4> Pj4;
+typedef TPin<Portj, 5> Pj5;
+typedef TPin<Portj, 6> Pj6;
+typedef TPin<Portj, 7> Pj7;
+#endif
+
+#ifdef PORTK
+typedef TPin<Portk, 0> Pk0;
+typedef TPin<Portk, 1> Pk1;
+typedef TPin<Portk, 2> Pk2;
+typedef TPin<Portk, 3> Pk3;
+typedef TPin<Portk, 4> Pk4;
+typedef TPin<Portk, 5> Pk5;
+typedef TPin<Portk, 6> Pk6;
+typedef TPin<Portk, 7> Pk7;
+#endif
+
+#ifdef PORTQ
+typedef TPin<Portq, 0> Pq0;
+typedef TPin<Portq, 1> Pq1;
+typedef TPin<Portq, 2> Pq2;
+typedef TPin<Portq, 3> Pq3;
+typedef TPin<Portq, 4> Pq4;
+typedef TPin<Portq, 5> Pq5;
+typedef TPin<Portq, 6> Pq6;
+typedef TPin<Portq, 7> Pq7;
+#endif
+
+#ifdef PORTR
+typedef TPin<Portr, 0> Pr0;
+typedef TPin<Portr, 1> Pr1;
+typedef TPin<Portr, 2> Pr2;
+typedef TPin<Portr, 3> Pr3;
+typedef TPin<Portr, 4> Pr4;
+typedef TPin<Portr, 5> Pr5;
+typedef TPin<Portr, 6> Pr6;
+typedef TPin<Portr, 7> Pr7;
 #endif
 
 	namespace IoPrivate
