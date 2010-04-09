@@ -18,8 +18,10 @@ ISR(USART_RXC_vect)
 int main()
 {
 	usart::Init(115200);
+	uint8_t c;
 	while(1)
-	{
-	
+	{	
+		if(usart::Getch(c))
+			usart::Putch(c);
 	}
 }

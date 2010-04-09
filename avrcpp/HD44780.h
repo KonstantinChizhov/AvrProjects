@@ -15,90 +15,10 @@ class LcdBase
 	}
 };
 
-template<class D4, class D5, class D6, class D7>
-class PinsLcdDataBus
-{
-
-protected:
-	PinsLcdDataBus(){}
-
-	static void SetDataRead()
-	{
-		D4::SetDirRead();
-		D5::SetDirRead();
-		D6::SetDirRead();
-		D7::SetDirRead();
-	}
-
-	static void SetDataWrite()
-	{
-		D4::SetDirWrite();
-		D5::SetDirWrite();
-		D6::SetDirWrite();
-		D7::SetDirWrite();
-	}
-
-	static void Write4(uint8_t c) //4 msb
-	{
-		D4::Set(c&16);
-		D5::Set(c&32);
-		D6::Set(c&64);
-		D7::Set(c&128);
-	}
-
-	static uint8_t Read4()
-	{
-		uint8_t res = 0;
-		if(D4::IsSet())
-			res|=(1);
-		if(D5::IsSet())
-			res|=(1<<1);
-		if(D6::IsSet())
-			res|=(1<<2);
-		if(D7::IsSet())
-			res|=(1<<3);
-		return res;
-	}
-};
-
-
-
-template<class PORT, uint8_t DATA_BUS_OFFSET>
-class PortLcdDataBus
-{
-
-protected:
-	
-	BOOST_STATIC_ASSERT(DATA_BUS_OFFSET < 5);
-
-	enum{PortMask = 0x0f << DATA_BUS_OFFSET};
-
-	PortLcdDataBus(){}
-
-	static void SetDataRead()
-	{
-		PORT::dir() &= (uint8_t)~PortMask;
-	}
-
-	static void SetDataWrite()
-	{
-		PORT::dir() |= (uint8_t)PortMask;
-	}
-
-	static void Write4(uint8_t c) //4 msb
-	{
-		PORT::data() = (PORT::data() & (uint8_t)~PortMask) | (c >> (4-DATA_BUS_OFFSET));
-	}
-
-	static uint8_t Read4()
-	{
-		return (PORT::pin() & PortMask) >> DATA_BUS_OFFSET;
-	}
-};
 
 
 template<class RS, class RW, class E, class DATA_BUS, uint8_t LINE_WIDTH=8, uint8_t LINES=2>
-class Lcd: public LcdBase, DATA_BUS
+class Lcd: public LcdBase
 {
 public:
 	static uint8_t LineWidth()
@@ -116,15 +36,15 @@ public:
 		E::SetDirWrite();
 		RW::SetDirWrite();
 		RS::SetDirWrite();
-		DATA_BUS::SetDataWrite();
+		DATA_BUS::DirSet(0x0f);
 		RW::Clear();
 		RS::Clear();
-		DATA_BUS::Write4(0x30); 
+		DATA_BUS::Write(0x03); 
 		Strobe();
 		Strobe();
 		Strobe();
 		_delay_ms(60);
-		DATA_BUS::Write4(0x20); // set 4 bit mode 
+		DATA_BUS::Write(0x02); // set 4 bit mode 
 		Strobe();
 		Write(0x28); // 4 bit mode, 1/16 duty, 5x8 font 
 	
@@ -203,24 +123,24 @@ protected:
 	static void Write(uint8_t c)//__attribute__ ((noinline))
 	{
 		RW::Clear();
-		DATA_BUS::SetDataWrite();
-		DATA_BUS::Write4(c);
+		DATA_BUS::DirSet(0x0f);
+		DATA_BUS::Write(c>>4);
 		Strobe();
-		DATA_BUS::Write4(c<<4); 
+		DATA_BUS::Write(c); 
 		Strobe();
 	}
 
 	static uint8_t Read() //__attribute__ ((noinline))
 	{
+		DATA_BUS::DirSet(0);
 		RW::Set();
-		DATA_BUS::SetDataRead();
 		E::Set();
 		//Delay();
-		uint8_t res = DATA_BUS::Read4() << 4;
+		uint8_t res = DATA_BUS::Read() << 4;
 		E::Clear();
 		Delay();
 		E::Set();
-		res |= DATA_BUS::Read4();
+		res |= DATA_BUS::Read();
 		E::Clear();
 		RW::Clear();
 		return res;
