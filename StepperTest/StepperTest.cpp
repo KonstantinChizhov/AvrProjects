@@ -2,44 +2,29 @@
 #include "ports.h"
 #include <util/delay.h>
 
-#if 0
-SimpleStepper
-<
-	StepperPerPinOutput
-	<
-		TPin<Portc, 4>,	//in1
-		TPin<Portc, 5>,	//in2
-		TPin<Portc, 6>,	//in3
-		TPin<Portc, 7>	//in4
-	>,
-	TPin<Portd, 7>,	//e1
-	TPin<Portd, 6>	//e2
-> stepper;
+//SimpleStepper<PinList<Pa6, Pa1, Pa2, Pa3, Pa4, Pa5> > stepper;
+/*
+void f1()
+{
+	stepper.StepBack();
+}
 
-#else
-
-SimpleStepper
-<
-	StepperPerPortOutput
-	<
-		Portc, 
-		4,	//in1
-		5,	//in2
-		6,	//in3
-		7	//in4
-	>,
-	TPin<Portd, 7>,	//e1
-	TPin<Portd, 6>	//e2
-> stepper;
-
-#endif
+void f3()
+{
+	stepper.StepFwd();
+}
+*/
 
 int main()
 {
-	stepper.Enable();
+	using namespace IO;
+	typedef PinList<Pa1, Pa2, Pa3, Pa4> p; 
+	p::Write(PORTC);
+	//PORTC = p::Read();
+	//stepper.Enable();
 	while(1)
 	{
-		stepper.StepFwd();
-		_delay_ms(3);
+		//stepper.StepFwd();
+		//_delay_ms(3);
 	}	
 }
