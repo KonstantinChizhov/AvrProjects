@@ -98,12 +98,12 @@ template<class DATA_SOURCE>
 class WaitAdapter :public DATA_SOURCE
 {
 public:
-	void Putch(uint8_t c)
+	static void Putch(uint8_t c)
 	{
 		while(!DATA_SOURCE::Putch(c));
 	}
 
-	void Getch(uint8_t &c)
+	static void Getch(uint8_t &c)
 	{
 		while(!DATA_SOURCE::Getch(c));
 	}
@@ -283,13 +283,13 @@ public:
 };
 
 template<class DATA_SOURCE>
-class BinaryFormater :DATA_SOURCE
+class BinaryFormater :public DATA_SOURCE
 {
 public:
 	template<class T>
 	BinaryFormater<DATA_SOURCE>& operator<< (const T &value)
 	{
-		uint8_t *const rawData = static_cast<uint8_t *const>(&value);
+		const uint8_t * rawData = reinterpret_cast<const uint8_t *>(&value);
 		for(uint8_t i=0; i<sizeof(T); ++i)
 			DATA_SOURCE::Putch(rawData[i]);
 		return *this;
@@ -298,10 +298,28 @@ public:
 	template<class T>
 	BinaryFormater<DATA_SOURCE>& operator>> (T &value)
 	{
-		uint8_t *const rawData = static_cast<uint8_t *const>(&value);
+		const uint8_t * rawData = reinterpret_cast<const uint8_t *>(&value);
 		for(uint8_t i=0; i<sizeof(T); ++i)
 			DATA_SOURCE::Getch(rawData[i]);
 		return *this;
+	}
+
+	template<class T>
+	static void Write(const T &value)
+	{
+		const uint8_t * rawData = reinterpret_cast<const uint8_t *>(&value);
+		for(uint8_t i=0; i<sizeof(T); ++i)
+			DATA_SOURCE::Putch(rawData[i]);
+	}
+
+	template<class T>
+	static T Read()
+	{
+		T value;
+		uint8_t *const rawData = reinterpret_cast<uint8_t*>(&value);
+		for(uint8_t i=0; i<sizeof(T); ++i)
+			DATA_SOURCE::Getch(rawData[i]);
+		return value;
 	}
 };
 

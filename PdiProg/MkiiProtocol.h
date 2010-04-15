@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "crc16.h"
+#include "Crc16.h"
 
 namespace MkII
 {
@@ -30,11 +30,11 @@ namespace MkII
 		CMND_RESET = 0x0B,
 		CMND_SET_DEVICE_DESCRIPTOR = 0x0C,
 		CMND_ERASEPAGE_SPM = 0x0D,
-		CMND_GET_SYNC 0x0F,
+		CMND_GET_SYNC = 0x0F,
 		CMND_SELFTEST = 0x10,
 		CMND_SET_BREAK = 0x11,
 		CMND_GET_BREAK = 0x12,
-		CMD_CHIP_ERASE = 0x13
+		CMD_CHIP_ERASE = 0x13,
 		CMND_ENTER_PROGMODE = 0x14,
 		CMND_LEAVE_PROGMODE = 0x15,
 		CMND_CLR_BREAK = 0x1A,
@@ -169,26 +169,141 @@ namespace MkII
 		// default TRUE
 		unsigned char ucCacheType; 			// CacheType_Normal 0x00,
 		// CacheType_CAN 0x01,
-		unsigned int uiSramStartAddr 		// Start of SRAM
+		unsigned int uiSramStartAddr; 		// Start of SRAM
 		unsigned char ucResetType; 			// Selects reset type. 0x00
 		unsigned char ucPCMaskExtended; 	// For parts with extended PC
 		unsigned char ucPCMaskHigh; 		// PC high mask
 		unsigned char ucEindAddress; 		// EIND IO address
 		unsigned int EECRAddress; 			// EECR IO address
 	};
-	
+
+	template<class DATA_SOURCE, bool calcRxCrc=false>
+	class CheckSummUpdater :public DATA_SOURCE
+	{
+	public:
+		static void Putch(uint8_t c)
+		{
+			DATA_SOURCE::Putch(c);
+			_writeCrc = Crc16_0x8408(c, _writeCrc);
+		}
+
+		static void Getch(uint8_t &c)
+		{
+			DATA_SOURCE::Getch(c);
+			if(calcRxCrc)
+				_readCrc = Crc16_0x8408(c, _readCrc);
+		}
+
+		static void BeginFrame()
+		{
+			_writeCrc = 0xffff;
+		}
+
+		static void WriteCrc()
+		{
+			DATA_SOURCE::Putch(_writeCrc & 0xff);
+			DATA_SOURCE::Putch((_writeCrc >> 8) & 0xff);
+		}
+
+		static void BeginRecive()
+		{
+			_readCrc = 0xffff;
+		}
+
+		static uint16_t GetReciveCrc()
+		{
+			return _readCrc;
+		}
+
+		static uint16_t _writeCrc;
+		static uint16_t _readCrc;
+	};
+
+	template<class DATA_SOURCE, bool calcRxCrc>
+	uint16_t CheckSummUpdater<DATA_SOURCE, calcRxCrc>::_writeCrc=0xffff;
+
+	template<class DATA_SOURCE, bool calcRxCrc>
+	uint16_t CheckSummUpdater<DATA_SOURCE, calcRxCrc>::_readCrc=0xffff;
+
 	template<class HwInterface>
 	class MkIIProtocol
 	{
-		void Send1ByteResponse(uint8_t sequenceNumber, Responses response)
+		typedef CheckSummUpdater<HwInterface> interface;
+
+		template<class T>
+		static void Write(const T &value)
 		{
-			uint16_t crc = 0xffff;
-			HwInterface::Write<uint8_t>(MessageStart);
-			HwInterface::Write<uint16_t>(sequenceNumber);
-			HwInterface::Write<uint8_t>(1);
-			HwInterface::Write<uint8_t>(Token);
-			HwInterface::Write<uint8_t>(response);
-			
+			interface::Write(value);
+		}
+
+		static void BeginFrame()
+		{
+			interface::BeginFrame();
+		}
+
+		static void WriteCrc()
+		{
+			interface::WriteCrc();
+		}
+	public:
+		static void Send1ByteResponse(uint8_t sequenceNumber, Responses response)
+		{
+			BeginFrame();
+			Write<uint8_t >(MessageStart);
+			Write<uint16_t>(sequenceNumber);
+			Write<uint8_t >(1);
+			Write<uint8_t >(Token);
+			Write<uint8_t >(response);
+			WriteCrc();
+		}
+
+		static void PollInterface()
+		{
+		
+		}
+
+		static void ProcessCommand(uint8_t sequenceNumber, Commands command)
+		{
+			switch(command)
+			{
+				case CMND_SIGN_OFF:
+				case CMND_GET_SIGN_ON:
+				case CMND_SET_PARAMETER:
+				case CMND_GET_PARAMETER:
+				case CMND_WRITE_MEMORY:
+				case CMND_READ_MEMORY:
+				case CMND_WRITE_PC:
+				case CMND_READ_PC:
+				case CMND_GO:
+				case CMND_SINGLE_STEP:
+				case CMND_FORCED_STOP:
+				case CMND_RESET:
+				case CMND_SET_DEVICE_DESCRIPTOR:
+				case CMND_ERASEPAGE_SPM:
+				case CMND_GET_SYNC:
+				case CMND_SELFTEST:
+				case CMND_SET_BREAK:
+				case CMND_GET_BREAK:
+				case CMD_CHIP_ERASE:
+				case CMND_ENTER_PROGMODE:
+				case CMND_LEAVE_PROGMODE:
+				case CMND_CLR_BREAK:
+				case CMND_RUN_TO_ADDR:
+				case CMND_SPI_CMD:
+				case CMND_CLEAR_EVENTS:
+				case CMND_RESTORE_TARGET:
+				case CMND_ISP_PACKET:
+				case CMND_JTAG_INSTR:
+				case CMND_JTAG_DATA:
+				case CMND_JTAG_SAB_WRITE:
+				case CMND_JTAG_SAB_READ:
+				case CMND_JTAG_BLOCK_READ:
+				case CMND_JTAG_BLOCK_WRITE:
+				case CMND_XMEGA_ERASE:
+
+				default:
+				Send1ByteResponse(sequenceNumber, RSP_ILLEGAL_COMMAND);
+			}
 		}
 	};
 

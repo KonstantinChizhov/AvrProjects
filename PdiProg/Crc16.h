@@ -1,20 +1,14 @@
 #ifndef CRC16_H
 #define CRC16_H
+#include <inttypes.h>
 
-class Crc16
+uint16_t Crc16(const uint8_t* message, uint16_t length, uint16_t crc);
+uint16_t Crc16_0x8408(uint8_t newchar, uint16_t crcval);
+
+template<class T>
+uint16_t Crc16(const T &val, uint16_t crc)
 {
-public:
-	// Calculate the checksum of a message.
-	static unsigned short Checksum(const unsigned char* message,
-								   unsigned long length,
-								   unsigned short crc = 0xffff);
-
-	// Verify that the last two bytes is a (LSB first) valid CRC of the message.
-	static bool VerifyChecksum(const unsigned char* message, unsigned long length);
-
-	// Append a two byte CRC (LSB first) to message. length is size of message excluding
-	// crc. Space for the CRC bytes must be allocated in advance!
-	static void AppendChecksum(unsigned char* message, unsigned long length);
-};
+	return Crc16((const uint8_t*)&val, sizeof(T), crc);
+}
 
 #endif
