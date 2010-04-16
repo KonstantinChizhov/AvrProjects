@@ -2,6 +2,7 @@
 #pragma once
 
 #include "Crc16.h"
+#include "ports.h"
 
 namespace MkII
 {
@@ -135,6 +136,37 @@ namespace MkII
 		XMEGA_ERASE_USERSIG = 0x07
 	};
 
+	enum Parameters
+	{
+		HardwareVersion = 0x01,
+		FwVersion = 0x02,
+		EmulatorMODE = 0x03,
+		BaudRate = 0x05,
+		OCD_Vtarget = 0x06,
+		OCD_JTAG_Clock = 0x07,
+		OCDBreakCause = 0x08,
+		TimersRunning = 0x09,
+		JTAGID = 0x0E,
+		FlashPageSize = 0x14,
+		EEPROMPageSize = 0x15,
+		BootAddress = 0x1C,
+		TargetSignature = 0x1D,
+		PDI_NVM_Offset = 0x31,
+ 		PDI_FlashOffset = 0x32,
+	 	PDI_FlashBootOffset = 0x33
+	};
+
+	enum EmulatorMode
+	{
+		DebugWire 	= 0x00,// debugWire
+		JTAG_Mega	= 0x01,// JTAG for megaAVR
+		Unknown 	= 0x02,// unknown / none (default)
+		Spi 		= 0x03,// SPI
+		JTAG_AVR32 	= 0x04,// JTAG for AVR32
+		JTAG_XMEGA 	= 0x05,// JTAG for XMEGA
+		PDI_XMEGA 	= 0x06// PDI for XMEGA
+	};
+
 	struct DeviceDescriptor
 	{
 		unsigned char ucReadIO[8]; 			//LSB = IOloc 0, MSB = IOloc63
@@ -242,10 +274,19 @@ namespace MkII
 		static T Read()
 		{
 			T value;
-			const uint8_t * rawData = reinterpret_cast<uint8_t*>(&value);
+			uint8_t * rawData = reinterpret_cast<uint8_t*>(&value);
 			for(uint8_t i=0; i<sizeof(T); ++i)
 				interface::Getch(rawData[i]);
 			return value;
+		}
+
+		static void Puts(const char *str)
+		{
+			while(*str)
+			{
+				interface::Putch(*str);
+				str++;
+			}
 		}
 
 		static void BeginFrame()
@@ -268,6 +309,42 @@ namespace MkII
 			Write<uint8_t >(response);
 			WriteCrc();
 		}
+		template<class T>
+		static void SendResponse(uint8_t sequenceNumber, Responses response, const T&value)
+		{
+			BeginFrame();
+			Write<uint8_t >(MessageStart);
+			Write<uint16_t>(sequenceNumber);
+			Write<uint32_t >(sizeof(T)+1);
+			Write<uint8_t >(Token);
+			Write<uint8_t >(response);
+			Write<T>(value);
+			WriteCrc();
+		}
+
+		static void SingOn(uint8_t sequenceNumber)
+		{
+			BeginFrame();
+			Write<uint8_t> (MessageStart);
+			Write<uint16_t>(sequenceNumber);
+			Write<uint32_t>(29);
+			Write<uint8_t> (Token);
+
+			Write<uint8_t> (RSP_SIGN_ON);
+			Write<uint8_t>(0);// Communications protocol version [BYTE]
+			Write<uint8_t>(0);// M_MCU boot-loader FW version [BYTE]
+			Write<uint8_t>(20);// M_MCU firmware version (minor) [BYTE]
+			Write<uint8_t>(6);// M_MCU firmware version (major) [BYTE]
+			Write<uint8_t>(0);// M_MCU hardware version [BYTE]
+			Write<uint8_t>(0);// S_MCU boot-loader FW version [BYTE]
+			Write<uint8_t>(20);// S_MCU firmware version (minor) [BYTE]
+			Write<uint8_t>(6);// S_MCU firmware version (major) [BYTE]
+			Write<uint8_t>(0);// S_MCU hardware version [BYTE]
+			Puts("123456");	//(USB) EEPROM stored s/n [BYTE] * 6,LSB FIRST
+			Puts("JTAGICE mkII");
+			Write<uint8_t>(0);
+			WriteCrc();		
+		}
 
 		static void PollInterface()
 		{
@@ -278,7 +355,74 @@ namespace MkII
 			if(Read<uint8_t>() != Token)
 				return;
 			uint8_t messageId = Read<uint8_t>();
-			ProcessCommand(seqNumber, messageId);
+
+			ProcessCommand(seqNumber, (Commands)messageId);
+		}
+
+		static void GetParameter(uint8_t sequenceNumber, Commands command)
+		{
+			uint8_t parameter = Read<uint8_t>();
+			
+			switch(parameter)
+			{
+				case BaudRate:
+					SendResponse<uint8_t>(sequenceNumber, RSP_PARAMETER, 0x04);
+					break;
+				case OCD_Vtarget:
+					SendResponse<uint16_t>(sequenceNumber, RSP_PARAMETER, 0x0ce4);
+					break;
+				case HardwareVersion:
+				case FwVersion:
+				case EmulatorMODE:
+				case OCD_JTAG_Clock:
+				case OCDBreakCause:
+				case TimersRunning:
+				case JTAGID:
+				case FlashPageSize:
+				case EEPROMPageSize:
+				case BootAddress:
+				case TargetSignature:
+				case PDI_NVM_Offset:
+		 		case PDI_FlashOffset:
+			 	case PDI_FlashBootOffset:
+				default:
+					Send1ByteResponse(sequenceNumber, RSP_ILLEGAL_PARAMETER);
+			}
+
+			//nd1ByteResponse(sequenceNumber, RSP_OK); 
+			
+		}
+
+		static void SetParameter(uint8_t sequenceNumber, Commands command)
+		{
+			uint8_t parameter = Read<uint8_t>();
+			
+			IO::Portb::DirSet(0xff);
+			IO::Portb::Write(parameter);
+
+			switch(parameter)
+			{
+				case HardwareVersion:
+				case FwVersion:
+				case EmulatorMODE:
+				case BaudRate:
+				case OCD_Vtarget:
+				case OCD_JTAG_Clock:
+				case OCDBreakCause:
+				case TimersRunning:
+				case JTAGID:
+				case FlashPageSize:
+				case EEPROMPageSize:
+				case BootAddress:
+				case TargetSignature:
+				case PDI_NVM_Offset:
+		 		case PDI_FlashOffset:
+			 	case PDI_FlashBootOffset:
+					Send1ByteResponse(sequenceNumber, RSP_OK); 
+					break;
+				default:
+					Send1ByteResponse(sequenceNumber, RSP_ILLEGAL_PARAMETER);
+			}
 		}
 
 		static void ProcessCommand(uint8_t sequenceNumber, Commands command)
@@ -286,12 +430,21 @@ namespace MkII
 			switch(command)
 			{
 				case CMND_SIGN_OFF:
-					Send1ByteResponse(sequenceNumber, RSP_OK); break;
+					Send1ByteResponse(sequenceNumber, RSP_OK); 
+					break;
+
 				case CMND_GET_SIGN_ON:
-					Send1ByteResponse(sequenceNumber, RSP_SIGN_ON); break;
+					SingOn(sequenceNumber); 
+					break;
 
 				case CMND_SET_PARAMETER:
+					SetParameter(sequenceNumber, command); 
+					break;
+
 				case CMND_GET_PARAMETER:
+					GetParameter(sequenceNumber, command); 
+					break;
+
 				case CMND_WRITE_MEMORY:
 				case CMND_READ_MEMORY:
 				case CMND_WRITE_PC:
