@@ -94,6 +94,14 @@ inline uint32_t div10(uint32_t num, uint32_t &rem)
     return q;
 }
 
+inline uint8_t CountOfOnes(uint8_t val)
+{
+	val = (val & 0x55) + ((val >> 1) & 0x55);
+	val = (val & 0x33) + ((val >> 2) & 0x33);
+	val = (val & 0x0F) + ((val >> 4) & 0x0F);
+	return val;
+}
+
 template<class DATA_SOURCE>
 class WaitAdapter :public DATA_SOURCE
 {

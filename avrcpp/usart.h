@@ -126,6 +126,11 @@ public:
 		}	
 	}
 
+	static void DropBuffers()
+	{
+		_rx.Clear();
+	}
+
 private:
 	static Queue<RxSize> _rx;
 	static Queue<TxSize> _tx;

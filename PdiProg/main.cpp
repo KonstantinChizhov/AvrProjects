@@ -7,12 +7,18 @@
 
 using namespace MkII;
 
-typedef BinaryFormater<WaitAdapter<Usart<16, 16> > > interface;
+typedef WaitAdapter<Usart<16, 16> > interface;
 typedef MkIIProtocol<interface> protocol;
+
+
 
 int main()
 {
 	interface::Init(19200);
-	protocol::Send1ByteResponse(1, RSP_OK);
+	
+	while(1)
+	{
+		protocol::PollInterface();
+	}
 	return 0;
 }

@@ -233,7 +233,19 @@ namespace MkII
 		template<class T>
 		static void Write(const T &value)
 		{
-			interface::Write(value);
+			const uint8_t * rawData = reinterpret_cast<const uint8_t *>(&value);
+			for(uint8_t i=0; i<sizeof(T); ++i)
+				interface::Putch(rawData[i]);
+		}
+
+		template<class T>
+		static T Read()
+		{
+			T value;
+			const uint8_t * rawData = reinterpret_cast<uint8_t*>(&value);
+			for(uint8_t i=0; i<sizeof(T); ++i)
+				interface::Getch(rawData[i]);
+			return value;
 		}
 
 		static void BeginFrame()
@@ -251,7 +263,7 @@ namespace MkII
 			BeginFrame();
 			Write<uint8_t >(MessageStart);
 			Write<uint16_t>(sequenceNumber);
-			Write<uint8_t >(1);
+			Write<uint32_t >(1);
 			Write<uint8_t >(Token);
 			Write<uint8_t >(response);
 			WriteCrc();
@@ -259,7 +271,14 @@ namespace MkII
 
 		static void PollInterface()
 		{
-		
+			if(Read<uint8_t>() != MessageStart)
+				return;
+			uint16_t seqNumber = Read<uint16_t>();
+			uint32_t messageLen = Read<uint32_t>();
+			if(Read<uint8_t>() != Token)
+				return;
+			uint8_t messageId = Read<uint8_t>();
+			ProcessCommand(seqNumber, messageId);
 		}
 
 		static void ProcessCommand(uint8_t sequenceNumber, Commands command)
@@ -270,6 +289,7 @@ namespace MkII
 					Send1ByteResponse(sequenceNumber, RSP_OK); break;
 				case CMND_GET_SIGN_ON:
 					Send1ByteResponse(sequenceNumber, RSP_SIGN_ON); break;
+
 				case CMND_SET_PARAMETER:
 				case CMND_GET_PARAMETER:
 				case CMND_WRITE_MEMORY:
@@ -304,7 +324,7 @@ namespace MkII
 				case CMND_XMEGA_ERASE:
 
 				default:
-				Send1ByteResponse(sequenceNumber, RSP_ILLEGAL_COMMAND);
+					Send1ByteResponse(sequenceNumber, RSP_ILLEGAL_COMMAND);
 			}
 		}
 	};
