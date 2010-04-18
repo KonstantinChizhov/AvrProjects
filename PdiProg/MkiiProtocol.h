@@ -3,211 +3,31 @@
 
 #include "Crc16.h"
 #include "ports.h"
+#include "xMega.h"
+#include "ProgInterface.h"
+#include "TargetDeviceCtrl.h"
+#include "constants.h"
 
 namespace MkII
 {
-	enum SlaveMode
+	struct DaisyChainInfoT
 	{
-		Stopped, 
-		Running, 
-		Programming
+		uint8_t UnitsBefore;
+		uint8_t UnitsAfter;
+		uint8_t BitsBefore;
+		uint8_t BitsAfter;
 	};
 
-	enum {MessageStart = 27, Token = 14};
-
-	enum Commands
+	struct MessageHeader
 	{
-		CMND_SIGN_OFF = 0x00,
-		CMND_GET_SIGN_ON = 0x01,
-		CMND_SET_PARAMETER = 0x02,
-		CMND_GET_PARAMETER = 0x03,
-		CMND_WRITE_MEMORY = 0x04,
-		CMND_READ_MEMORY = 0x05,
-		CMND_WRITE_PC = 0x06,
-		CMND_READ_PC = 0x07,
-		CMND_GO = 0x08,
-		CMND_SINGLE_STEP = 0x09,
-		CMND_FORCED_STOP = 0x0A,
-		CMND_RESET = 0x0B,
-		CMND_SET_DEVICE_DESCRIPTOR = 0x0C,
-		CMND_ERASEPAGE_SPM = 0x0D,
-		CMND_GET_SYNC = 0x0F,
-		CMND_SELFTEST = 0x10,
-		CMND_SET_BREAK = 0x11,
-		CMND_GET_BREAK = 0x12,
-		CMD_CHIP_ERASE = 0x13,
-		CMND_ENTER_PROGMODE = 0x14,
-		CMND_LEAVE_PROGMODE = 0x15,
-		CMND_CLR_BREAK = 0x1A,
-		CMND_RUN_TO_ADDR = 0x1C,
-		CMND_SPI_CMD = 0x1D,
-		CMND_CLEAR_EVENTS = 0x22,
-		CMND_RESTORE_TARGET = 0x23,
-		CMND_ISP_PACKET = 0x2F,
-		CMND_JTAG_INSTR = 0x24,
-		CMND_JTAG_DATA = 0x25,
-		CMND_JTAG_SAB_WRITE = 0x28,
-		CMND_JTAG_SAB_READ = 0x29,
-		CMND_JTAG_BLOCK_READ = 0x2C,
-		CMND_JTAG_BLOCK_WRITE = 0x2D,
-		CMND_XMEGA_ERASE  = 0x34
-	};
-	
-	enum Responses
-	{
-		RSP_OK  = 0x80,
-		RSP_FAILED = 0xA0,
-		RSP_PARAMETER = 0x81,
-		RSP_MEMORY = 0x82,
-		RSP_GET_BREAK = 0x83,
-		RSP_PC = 0x84,
-		RSP_SELFTEST = 0x85,
-		RSP_SPI_DATA = 0x88,
-		RSP_SIGN_ON = 0x86,
-		RSP_NO_TARGET_POWER = 0xAB,
-		RSP_DEBUGWIRE_SYNC_FAILED = 0xAC,
-		RSP_ILLEGAL_POWER_STATE = 0xAD,
-		RSP_ILLEGAL_PARAMETER = 0xA1,
-		RSP_ILLEGAL_BREAKPOINT = 0xA8,
-		RSP_ILLEGAL_JTAG_ID = 0xA9,
-		RSP_ILLEGAL_COMMAND = 0xAA,
-		RSP_ILLEGAL_VALUE = 0xA6,
-		RSP_ILLEGAL_EMULATOR_MODE = 0xA4,
-		RSP_ILLEGAL_MCU_STATE = 0xA5,
-		RSP_ILLEGAL_MEMORY_TYPE = 0xA2,
-		RSP_ILLEGAL_MEMORY_RANGE = 0xA3,
-		RSP_SCAN_CHAIN_READ = 0x87		
+		uint16_t seqNumber;
+		uint32_t messageLen;
+		uint8_t messageId;
 	};
 
-	enum Events
-	{
-		EVT_BREAK = 0xE0,
-		EVT_TARGET_POWER_ON = 0xE4,
-		EVT_TARGET_POWER_OFF = 0xE5,
-		EVT_EXT_RESET = 0xE7,
-		EVT_TARGET_SLEEP = 0xE8,
-		EVT_TARGET_WAKEUP = 0xE9,
-		EVT_POWER_ERROR_STATE = 0xEA,
-		EVT_POWER_OK = 0xEB,
-		EVT_IDR_DIRTY = 0xEC,
-		EVT_ERROR_PHY_FORCE_BREAK_TIMEOUT = 0xE2,
-		EVT_ERROR_PHY_RELEASE_BREAK_TIMEOUT = 0xE3,
-		EVT_ERROR_PHY_MAX_BIT_LENGTH_DIFF = 0xED,
-		EVT_ERROR_PHY_SYNC_TIMEOUT  = 0xF0,
-		EVT_ERROR_PHY_SYNC_TIMEOUT_BAUD = 0xF4,
-		EVT_ERROR_PHY_SYNC_OUT_OF_RANGE = 0xF5,
-		EVT_ERROR_PHY_SYNC_WAIT_TIMEOUT = 0xF6,
-		EVT_ERROR_PHY_RECEIVE_TIMEOUT = 0xF7,
-		EVT_ERROR_PHY_RECEIVED_BREAK = 0xF8,
-		EVT_ERROR_PHY_OPT_RECEIVE_TIMEOUT = 0xF9,
-		EVT_ERROR_PHY_OPT_RECEIVED_BREAK = 0xFA,
-		EVT_RESULT_PHY_NO_ACTIVITY = 0xFB
-	};
-
-	enum MemoryTypes
-	{
-		IO_SHADOW = 0x30,
-		SRAM = 0x20,
-		EEPROM = 0x22,
-		EVENT = 0x60,
-		SPM = 0xA0,
-		FLASH_PAGE = 0xB0,
-		EEPROM_PAGE = 0xB1,
-		FUSE_BITS = 0xB2,
-		LOCK_BITS = 0xB3,
-		SIGN_JTAG = 0xB4,
-		OSCCAL_BYTE = 0xB5,
-		CAN = 0xB6,
-		XMEGA_APPLICATION_FLASH = 0xC0,
-		XMEGA_BOOT_FLASH = 0xC1,
-		XMEGA_USER_SIGNATURE = 0xC5,
-		XMEGA_CALIBRATION_SIGNATURE = 0xC6
-	};
-
-	enum XMegaEraseMode
-	{
-		XMEGA_ERASE_CHIP = 0x00,
-		XMEGA_ERASE_APP = 0x01,
-		XMEGA_ERASE_BOOT = 0x02,
-		XMEGA_ERASE_EEPROM = 0x03,
-		XMEGA_ERASE_APP_PAGE = 0x04,
-		XMEGA_ERASE_BOOT_PAGE = 0x05,
-		XMEGA_ERASE_EEPROM_PAGE = 0x06,
-		XMEGA_ERASE_USERSIG = 0x07
-	};
-
-	enum Parameters
-	{
-		HardwareVersion = 0x01,
-		FwVersion = 0x02,
-		EmulatorMODE = 0x03,
-		BaudRate = 0x05,
-		OCD_Vtarget = 0x06,
-		OCD_JTAG_Clock = 0x07,
-		OCDBreakCause = 0x08,
-		TimersRunning = 0x09,
-		JTAGID = 0x0E,
-		FlashPageSize = 0x14,
-		EEPROMPageSize = 0x15,
-		BootAddress = 0x1C,
-		TargetSignature = 0x1D,
-		PDI_NVM_Offset = 0x31,
- 		PDI_FlashOffset = 0x32,
-	 	PDI_FlashBootOffset = 0x33
-	};
-
-	enum EmulatorMode
-	{
-		DebugWire 	= 0x00,// debugWire
-		JTAG_Mega	= 0x01,// JTAG for megaAVR
-		Unknown 	= 0x02,// unknown / none (default)
-		Spi 		= 0x03,// SPI
-		JTAG_AVR32 	= 0x04,// JTAG for AVR32
-		JTAG_XMEGA 	= 0x05,// JTAG for XMEGA
-		PDI_XMEGA 	= 0x06// PDI for XMEGA
-	};
-
-	struct DeviceDescriptor
-	{
-		unsigned char ucReadIO[8]; 			//LSB = IOloc 0, MSB = IOloc63
-		unsigned char ucReadIOShadow[8]; 	//LSB = IOloc 0, MSB = IOloc63
-		unsigned char ucWriteIO[8]; 		//LSB = IOloc 0, MSB = IOloc63
-		unsigned char ucWriteIOShadow[8]; 	//LSB = IOloc 0, MSB = IOloc63
-		unsigned char ucReadExtIO[52]; 		//LSB = IOloc 96, MSB = IOloc511
-		unsigned char ucReadIOExtShadow[52]; //LSB = IOloc 96, MSB = IOloc511
-		unsigned char ucWriteExtIO[52]; 	//LSB = IOloc 96, MSB = IOloc511
-		unsigned char ucWriteIOExtShadow[52];//LSB = IOloc 96, MSB = IOloc511
-		unsigned char ucIDRAddress; 		//IDR address
-		unsigned char ucSPMCRAddress; 		//SPMCR Register address and dW BasePC
-		unsigned long ulBootAddress; 		//Device Boot Loader Start Address
-		unsigned char ucRAMPZAddress; 		//RAMPZ Register address in SRAM I/O
-		//space
-		unsigned int uiFlashPageSize; 		//Device Flash Page Size, Size =
-		//2 exp ucFlashPageSize
-		unsigned char ucEepromPageSize; 		//Device Eeprom Page Size in bytes
-		unsigned int uiUpperExtIOLoc; 		//Topmost (last) extended I/O
-		//location, 0 if no external I/O
-		unsigned long ulFlashSize; 			//Device Flash Size
-		unsigned char ucEepromInst[20]; 	//Instructions for W/R EEPROM
-		unsigned char ucFlashInst[3]; 		//Instructions for W/R FLASH
-		unsigned char ucSPHaddr; 			// Stack pointer high
-		unsigned char ucSPLaddr; 			// Stack pointer low
-		unsigned int uiFlashpages; 			// number of pages in flash
-		unsigned char ucDWDRAddress; 		// DWDR register address
-		unsigned char ucDWBasePC; 			// Base/mask value of the PC
-		unsigned char ucAllowFullPageBitstream; // FALSE on ALL new parts
-		unsigned int uiStartSmallestBootLoaderSection; //
-		unsigned char EnablePageProgramming;// For JTAG parts only,
-		// default TRUE
-		unsigned char ucCacheType; 			// CacheType_Normal 0x00,
-		// CacheType_CAN 0x01,
-		unsigned int uiSramStartAddr; 		// Start of SRAM
-		unsigned char ucResetType; 			// Selects reset type. 0x00
-		unsigned char ucPCMaskExtended; 	// For parts with extended PC
-		unsigned char ucPCMaskHigh; 		// PC high mask
-		unsigned char ucEindAddress; 		// EIND IO address
-		unsigned int EECRAddress; 			// EECR IO address
-	};
+//----------------------------------------------------------------------------
+// 
+//----------------------------------------------------------------------------
 
 	template<class DATA_SOURCE, bool calcRxCrc=false>
 	class CheckSummUpdater :public DATA_SOURCE
@@ -257,17 +77,60 @@ namespace MkII
 	template<class DATA_SOURCE, bool calcRxCrc>
 	uint16_t CheckSummUpdater<DATA_SOURCE, calcRxCrc>::_readCrc=0xffff;
 
-	template<class HwInterface>
+//----------------------------------------------------------------------------
+// 
+//----------------------------------------------------------------------------
+
+struct ParametersT
+{
+	EmulatorMode EmuMode;
+	DaisyChainInfoT ChainInfo;
+	uint8_t ExternalReset;
+	uint8_t JTAG_Clock;
+	uint16_t FlashPageSize;
+	uint8_t EEPROMPageSize;
+	uint32_t BootAddress;
+	uint32_t PDI_NVM_Offset;
+	uint32_t PDI_FlashOffset;
+	uint32_t PDI_FlashBootOffset;
+	uint8_t RunAfterProgramming;
+};
+
+//----------------------------------------------------------------------------
+// 
+//----------------------------------------------------------------------------
+	template<
+		class HwInterface, 
+		class PdiInterface, 
+		class SpiInterface = NullProgInterface, 
+		class JTAGInterface = NullProgInterface
+		>
 	class MkIIProtocol
 	{
+		public:
 		typedef CheckSummUpdater<HwInterface> interface;
+		private:
+		//HW interfaces
+		static PdiInterface _pdi;
+		static NullProgInterface _nullProg;
+		static ProgInterface *_progIface;
+		//targets
+
+		static Xmega<CheckSummUpdater<HwInterface> > _xmega;
+		static NullTargetDeviceCtrl _nullTarget;
+		static TargetDeviceCtrl * _target;
 
 		template<class T>
 		static void Write(const T &value)
 		{
 			const uint8_t * rawData = reinterpret_cast<const uint8_t *>(&value);
-			for(uint8_t i=0; i<sizeof(T); ++i)
-				interface::Putch(rawData[i]);
+			Write(rawData, sizeof(T));
+		}
+
+		static void Write(const uint8_t *value, const uint8_t size)
+		{
+			for(uint8_t i=0; i<size; ++i)
+				interface::Putch(value[i]);
 		}
 
 		template<class T>
@@ -275,9 +138,15 @@ namespace MkII
 		{
 			T value;
 			uint8_t * rawData = reinterpret_cast<uint8_t*>(&value);
-			for(uint8_t i=0; i<sizeof(T); ++i)
-				interface::Getch(rawData[i]);
+			Read(rawData, sizeof(T));
 			return value;
+		}
+
+		static void Read(void *value, const uint8_t size)
+		{
+			uint8_t * data = reinterpret_cast<uint8_t*>(value);
+			for(uint8_t i=0; i<size; ++i)
+				interface::Getch(data[i]);
 		}
 
 		static void Puts(const char *str)
@@ -299,38 +168,68 @@ namespace MkII
 			interface::WriteCrc();
 		}
 	public:
-		static void Send1ByteResponse(uint8_t sequenceNumber, Responses response)
+		static void SetMode(EmulatorMode mode)
+		{
+			switch(mode)
+			{
+				case PDI_XMEGA:
+				case JTAG_XMEGA:
+					_progIface = &_pdi;
+					_target = &_xmega;
+					break;
+				case Spi:		//To be impemented
+				case JTAG_Mega:	//To be impemented	
+				case DebugWire:
+				case JTAG_AVR32:
+				case Unknown:
+				default:
+					_progIface = &_nullProg;
+					_target = &_nullTarget;
+			}
+			_target->SetProgInterface(_progIface);
+		}
+
+		static void Init()
+		{
+			params.EmuMode = Unknown;
+			_progIface = &_nullProg;
+			_target = &_nullTarget;
+		}
+
+		static void SendMessageHeader(const MessageHeader &header, uint16_t size, Responses response)
 		{
 			BeginFrame();
 			Write<uint8_t >(MessageStart);
-			Write<uint16_t>(sequenceNumber);
-			Write<uint32_t >(1);
+			Write<uint16_t>(header.seqNumber);
+			Write<uint32_t >(size);
 			Write<uint8_t >(Token);
 			Write<uint8_t >(response);
+		}
+
+		static void Send1ByteResponse(const MessageHeader &header, Responses response)
+		{
+			SendMessageHeader(header, 1, response);
 			WriteCrc();
 		}
+
 		template<class T>
-		static void SendResponse(uint8_t sequenceNumber, Responses response, const T&value)
+		static void SendResponse(const MessageHeader &header, Responses response, const T&value)
 		{
-			BeginFrame();
-			Write<uint8_t >(MessageStart);
-			Write<uint16_t>(sequenceNumber);
-			Write<uint32_t >(sizeof(T)+1);
-			Write<uint8_t >(Token);
-			Write<uint8_t >(response);
+			SendMessageHeader(header, sizeof(value)+1, response);
 			Write<T>(value);
 			WriteCrc();
 		}
 
-		static void SingOn(uint8_t sequenceNumber)
+		template<class T>
+		static void ParamResponse(const MessageHeader &header, const T&value)
 		{
-			BeginFrame();
-			Write<uint8_t> (MessageStart);
-			Write<uint16_t>(sequenceNumber);
-			Write<uint32_t>(29);
-			Write<uint8_t> (Token);
+			SendResponse(header, RSP_PARAMETER, value);
+		}
 
-			Write<uint8_t> (RSP_SIGN_ON);
+		static void SingOn(const MessageHeader &header)
+		{
+			SendMessageHeader(header, 29, RSP_SIGN_ON);
+
 			Write<uint8_t>(0);// Communications protocol version [BYTE]
 			Write<uint8_t>(0);// M_MCU boot-loader FW version [BYTE]
 			Write<uint8_t>(20);// M_MCU firmware version (minor) [BYTE]
@@ -343,125 +242,214 @@ namespace MkII
 			Puts("123456");	//(USB) EEPROM stored s/n [BYTE] * 6,LSB FIRST
 			Puts("JTAGICE mkII");
 			Write<uint8_t>(0);
-			WriteCrc();		
+			WriteCrc();	
+		}
+
+		static void SelfTest(const MessageHeader &header)
+		{
+			uint8_t flags = Read<uint8_t>();
+			SendMessageHeader(header, 9, RSP_SELFTEST);
+			for(uint8_t i=0; i<8; i++)
+			{
+				Write<uint8_t>(flags&1);
+				flags >>= 1;
+			}
+
+			WriteCrc();
 		}
 
 		static void PollInterface()
 		{
 			if(Read<uint8_t>() != MessageStart)
 				return;
-			uint16_t seqNumber = Read<uint16_t>();
-			uint32_t messageLen = Read<uint32_t>();
+			
+			header.seqNumber = Read<uint16_t>();
+			header.messageLen = Read<uint32_t>();
 			if(Read<uint8_t>() != Token)
 				return;
-			uint8_t messageId = Read<uint8_t>();
-
-			ProcessCommand(seqNumber, (Commands)messageId);
+			header.messageId = Read<uint8_t>();
+			
+			ProcessCommand(header);
 		}
 
-		static void GetParameter(uint8_t sequenceNumber, Commands command)
+		static void GetParameter(const MessageHeader &header)
+		{
+			uint8_t parameter = Read<uint8_t>();
+			//IO::Portb::Write(parameter);
+			switch(parameter)
+			{
+				case BaudRate:
+					ParamResponse<uint8_t>(header, 0x04);
+					break;
+				case OCD_Vtarget:
+					ParamResponse<uint16_t>(header, 0x0ce4);//3.3 v
+					break;
+				case DaisyChainInfo:
+					ParamResponse<DaisyChainInfoT>(header, params.ChainInfo );
+					break;
+				case ExternalReset:
+					ParamResponse<uint8_t>(header, params.ExternalReset);
+					break;
+				case EmulatorMODE:
+					ParamResponse<uint8_t>(header, params.EmuMode);
+					break;
+				case OCD_JTAG_Clock:
+					ParamResponse<uint8_t>(header, params.JTAG_Clock);
+					break;
+				case FlashPageSize:
+					ParamResponse<uint16_t>(header, params.FlashPageSize);
+					break;
+				case EEPROMPageSize:
+					ParamResponse<uint8_t>(header, params.EEPROMPageSize);
+					break;
+				case BootAddress:
+					ParamResponse<uint32_t>(header, params.BootAddress);
+					break;
+				case JTAGID:
+					ParamResponse<uint32_t>(header, _target->GetJTAGID());
+					break;
+				case PDI_NVM_Offset:
+					ParamResponse<uint32_t>(header, params.PDI_NVM_Offset);
+					break;
+ 				case PDI_FlashOffset:
+					ParamResponse<uint32_t>(header, params.PDI_FlashOffset);
+					break;
+	 			case PDI_FlashBootOffset:
+					ParamResponse<uint32_t>(header, params.PDI_FlashBootOffset);
+					break;
+
+				default:
+					//::Portb::Write(parameter);
+					Send1ByteResponse(header, RSP_ILLEGAL_PARAMETER);
+			}			
+		}
+
+		static void SetParameter(const MessageHeader &header)
 		{
 			uint8_t parameter = Read<uint8_t>();
 			
 			switch(parameter)
 			{
-				case BaudRate:
-					SendResponse<uint8_t>(sequenceNumber, RSP_PARAMETER, 0x04);
+				case DaisyChainInfo:
+					params.ChainInfo = Read<DaisyChainInfoT>();
 					break;
-				case OCD_Vtarget:
-					SendResponse<uint16_t>(sequenceNumber, RSP_PARAMETER, 0x0ce4);
+				case ExternalReset:
+					params.ExternalReset = Read<uint8_t>();
 					break;
-				case HardwareVersion:
-				case FwVersion:
-				case EmulatorMODE:
 				case OCD_JTAG_Clock:
-				case OCDBreakCause:
-				case TimersRunning:
-				case JTAGID:
+					params.JTAG_Clock = Read<uint8_t>();
+					break;
+				case EmulatorMODE:
+					params.EmuMode = (EmulatorMode)Read<uint8_t>();
+					SetMode(params.EmuMode);
+					break;
 				case FlashPageSize:
+					params.FlashPageSize = Read<uint16_t>();
+					break;
 				case EEPROMPageSize:
+					params.EEPROMPageSize = Read<uint8_t>();
+					break;
 				case BootAddress:
-				case TargetSignature:
+					params.BootAddress = Read<uint32_t>();
+					break;
 				case PDI_NVM_Offset:
-		 		case PDI_FlashOffset:
-			 	case PDI_FlashBootOffset:
-				default:
-					Send1ByteResponse(sequenceNumber, RSP_ILLEGAL_PARAMETER);
-			}
+					params.PDI_NVM_Offset = Read<uint32_t>();
+					break;
+ 				case PDI_FlashOffset:
+					params.PDI_FlashOffset = Read<uint32_t>();
+					break;
+	 			case PDI_FlashBootOffset:
+					params.PDI_FlashBootOffset = Read<uint32_t>();
+					break;
+				case RunAfterProgramming:
+					params.RunAfterProgramming = Read<uint8_t>();
+					break;
 
-			//nd1ByteResponse(sequenceNumber, RSP_OK); 
-			
+				case AllowPageProgrammingInScanChain:
+					break;
+				case BaudRate:
+					//SetBaund(); //does not work correctly
+					return;
+				default:
+					//IO::Portb::Write(parameter);
+					Send1ByteResponse(header, RSP_ILLEGAL_PARAMETER);
+			}
+			Send1ByteResponse(header, RSP_OK); 
 		}
 
-		static void SetParameter(uint8_t sequenceNumber, Commands command)
+		static void SetBaund()
 		{
-			uint8_t parameter = Read<uint8_t>();
-			
-			IO::Portb::DirSet(0xff);
-			IO::Portb::Write(parameter);
-
-			switch(parameter)
+			uint8_t baund = Read<uint8_t>();
+			HwInterface::Disable();
+			Send1ByteResponse(header, RSP_OK); 
+			switch(baund)
 			{
-				case HardwareVersion:
-				case FwVersion:
-				case EmulatorMODE:
-				case BaudRate:
-				case OCD_Vtarget:
-				case OCD_JTAG_Clock:
-				case OCDBreakCause:
-				case TimersRunning:
-				case JTAGID:
-				case FlashPageSize:
-				case EEPROMPageSize:
-				case BootAddress:
-				case TargetSignature:
-				case PDI_NVM_Offset:
-		 		case PDI_FlashOffset:
-			 	case PDI_FlashBootOffset:
-					Send1ByteResponse(sequenceNumber, RSP_OK); 
-					break;
-				default:
-					Send1ByteResponse(sequenceNumber, RSP_ILLEGAL_PARAMETER);
+				case 0x05: HwInterface::Init(38400);break;
+				case 0x06: HwInterface::Init(57600);break;
+				case 0x07: HwInterface::Init(115200);break;
+				case 0x04:
+				default: HwInterface::Init(19200);break;
 			}
 		}
 
-		static void ProcessCommand(uint8_t sequenceNumber, Commands command)
+		static void ProcessCommand(const MessageHeader &header)
 		{
-			switch(command)
+			IO::Portb::Write(header.messageId);
+			switch(header.messageId)
 			{
 				case CMND_SIGN_OFF:
-					Send1ByteResponse(sequenceNumber, RSP_OK); 
+					Send1ByteResponse(header, RSP_OK);
+					HwInterface::Init(19200);
 					break;
-
 				case CMND_GET_SIGN_ON:
-					SingOn(sequenceNumber); 
+					SingOn(header); 
 					break;
 
 				case CMND_SET_PARAMETER:
-					SetParameter(sequenceNumber, command); 
+					SetParameter(header); 
+					break;
+				case CMND_GET_PARAMETER:
+					GetParameter(header); 
 					break;
 
-				case CMND_GET_PARAMETER:
-					GetParameter(sequenceNumber, command); 
+				case CMND_ENTER_PROGMODE:
+					_target->EnterProgMode();
+					Send1ByteResponse(header, RSP_OK);
 					break;
+				case CMND_LEAVE_PROGMODE:
+					_target->LeaveProgMode();
+					Send1ByteResponse(header, RSP_OK); 
+					break;
+				break;
+
+				case CMND_SELFTEST:
+					SelfTest(header);
+				break;
 
 				case CMND_WRITE_MEMORY:
+					WriteMem(header);
+				break;
+
 				case CMND_READ_MEMORY:
+					ReadMem(header);
+				break;
+				
+				case CMND_SET_DEVICE_DESCRIPTOR:
+					Read(&deviceDescriptor, sizeof(deviceDescriptor));
+					Send1ByteResponse(header, RSP_OK);
+				break;
+
 				case CMND_WRITE_PC:
 				case CMND_READ_PC:
 				case CMND_GO:
 				case CMND_SINGLE_STEP:
 				case CMND_FORCED_STOP:
 				case CMND_RESET:
-				case CMND_SET_DEVICE_DESCRIPTOR:
 				case CMND_ERASEPAGE_SPM:
 				case CMND_GET_SYNC:
-				case CMND_SELFTEST:
 				case CMND_SET_BREAK:
 				case CMND_GET_BREAK:
 				case CMD_CHIP_ERASE:
-				case CMND_ENTER_PROGMODE:
-				case CMND_LEAVE_PROGMODE:
 				case CMND_CLR_BREAK:
 				case CMND_RUN_TO_ADDR:
 				case CMND_SPI_CMD:
@@ -477,9 +465,60 @@ namespace MkII
 				case CMND_XMEGA_ERASE:
 
 				default:
-					Send1ByteResponse(sequenceNumber, RSP_ILLEGAL_COMMAND);
+					//IO::Portb::Write(header.messageId);
+					Send1ByteResponse(header, RSP_ILLEGAL_COMMAND);
 			}
 		}
+
+		static void WriteMem(const MessageHeader &header)
+		{
+			Send1ByteResponse(header, RSP_ILLEGAL_COMMAND);
+		}
+
+		static void ReadMem(const MessageHeader &header)
+		{
+			uint8_t memType = Read<uint8_t>();
+			uint32_t size = Read<uint32_t>();
+			uint32_t address = Read<uint32_t>();
+			Read<uint16_t>();//ignore crc
+			SendMessageHeader(header, size+1, RSP_MEMORY);
+			_target->ReadMem(memType, size, address);
+			WriteCrc();	
+		}
+
+		static ParametersT params;
+		static DeviceDescriptor deviceDescriptor;
+		static MessageHeader header;
 	};
 
+
+	template<class HwInterface, class PdiInterface, class SpiInterface, class JTAGInterface >
+	ParametersT	MkIIProtocol<HwInterface, PdiInterface, SpiInterface, JTAGInterface>::params;
+
+		//HW interfaces
+	template<class HwInterface, class PdiInterface, class SpiInterface, class JTAGInterface>
+	PdiInterface MkIIProtocol<HwInterface, PdiInterface, SpiInterface, JTAGInterface>::_pdi;
+
+	template<class HwInterface, class PdiInterface, class SpiInterface, class JTAGInterface>
+	NullProgInterface MkIIProtocol<HwInterface, PdiInterface, SpiInterface, JTAGInterface>::_nullProg;
+
+	template<class HwInterface, class PdiInterface, class SpiInterface, class JTAGInterface>
+	ProgInterface *MkIIProtocol<HwInterface, PdiInterface, SpiInterface, JTAGInterface>::_progIface;
+	
+		//targets
+	template<class HwInterface, class PdiInterface, class SpiInterface, class JTAGInterface>
+	Xmega<CheckSummUpdater<HwInterface> >
+		MkIIProtocol<HwInterface, PdiInterface, SpiInterface, JTAGInterface>::_xmega;
+
+	template<class HwInterface, class PdiInterface, class SpiInterface, class JTAGInterface>
+	NullTargetDeviceCtrl MkIIProtocol<HwInterface, PdiInterface, SpiInterface, JTAGInterface>::_nullTarget;
+
+	template<class HwInterface, class PdiInterface, class SpiInterface, class JTAGInterface>
+	TargetDeviceCtrl * MkIIProtocol<HwInterface, PdiInterface, SpiInterface, JTAGInterface>::_target;
+
+	template<class HwInterface, class PdiInterface, class SpiInterface, class JTAGInterface>
+	DeviceDescriptor MkIIProtocol<HwInterface, PdiInterface, SpiInterface, JTAGInterface>::deviceDescriptor;
+
+	template<class HwInterface, class PdiInterface, class SpiInterface, class JTAGInterface>
+	MessageHeader MkIIProtocol<HwInterface, PdiInterface, SpiInterface, JTAGInterface>::header;
 }

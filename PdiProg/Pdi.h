@@ -1,12 +1,13 @@
 #pragma once
 #include <util/delay.h>
 #include "util.h"
+#include "ProgInterface.h"
 
 template<class DATA, class CLK>
-class PdiSoftwarePhisical
+class PdiSoftwarePhisical :public ProgInterface
 {
 	public:
-	static void Enable()
+	void Enable()
 	{
 		CLK::SetDirWrite();
 		DATA::SetDirWrite();
@@ -18,14 +19,14 @@ class PdiSoftwarePhisical
 		Break();
 	}
 
-	static void Release()
+	void Disable()
 	{
 		DATA::Clear();
 		DATA::SetDirRead();
 		CLK::SetDirRead();
 	}
 	
-	static void Write(uint8_t c)
+	void Write(uint8_t c)
 	{
 		DATA::SetDirWrite();
 		uint16_t value = c << 2 | 0x1801; //start bit, 8 data bits and 2 stop bits
@@ -35,7 +36,7 @@ class PdiSoftwarePhisical
 		SendFrame(value, 12);
 	}
 
-	static uint8_t Read()
+	uint8_t Read()
 	{
 		DATA::SetDirRead();
 		DATA::Set();//pullup enable
@@ -65,13 +66,19 @@ class PdiSoftwarePhisical
 			i++;
 			CLK::Set();
 		}
-		
 		return data;
 	}
 
-	static void Reset()
+	void Reset()
 	{
-	
+		DATA::Clear();
+		DATA::SetDirRead();
+		CLK::SetDirWrite();
+		CLK::Set();
+		_delay_ms(10);
+		CLK::Clear();
+		_delay_us(10);
+		CLK::Set();
 	}
 
 	void Break()

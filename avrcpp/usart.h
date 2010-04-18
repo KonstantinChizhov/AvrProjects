@@ -69,6 +69,12 @@ struct CLASS_NAME\
 	{\
 		return _UCSRA_ & (1<<UDRE);\
 	}\
+	static inline void Disable()\
+	{\
+		_UCSRA_ = 0x00; \
+		_UCSRB_ = 0x00; \
+		_UCSRC_ = 0x00; \
+	}\
 };\
 
 #ifdef UDR //the one usart
@@ -130,6 +136,14 @@ public:
 	{
 		_rx.Clear();
 	}
+
+	static void Disable()
+	{
+		Traits::Disable();
+		_rx.Clear();
+		_tx.Clear();
+	}
+
 
 private:
 	static Queue<RxSize> _rx;
