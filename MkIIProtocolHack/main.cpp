@@ -11,21 +11,10 @@ typedef Usart<8, 4> usart;
 typedef IO::Pd5 led;
 
 
-uchar usbFunctionWrite(uchar *data, uchar len)
-{
-    return 1;
-}
-
-
-uchar usbFunctionRead(uchar *data, uchar len)
-{
-    return len;
-}
-
-
-
 void usbFunctionWriteOut(uchar *data, uchar len)
 {
+	for(uint8_t i=0; i<min<uint8_t>(8, len); i++)
+		usart::Putch(data[i]);
 }
 
 
@@ -39,7 +28,18 @@ usbRequest_t    *rq = (usbRequest_t *)data;
 	return 0;   /* default for not implemented requests: return no data back to host */
 }
 
-/* ------------------------------------------------------------------------- */
+// -------------------------------------------------------------------------
+
+inline void BulkWrite()
+{
+	if(usbInterruptIsReady())// only if previous data was sent
+	{               
+    	uchar *p;
+    	uchar len = getInterruptData(&p);   // obtain chunk of max 8 bytes
+    	if(len > 0)                         // only send if we have data
+       	usbSetInterrupt(p, len);
+	}
+}
 
 int	main(void)
 {
@@ -55,7 +55,10 @@ int	main(void)
     }
     usbDeviceConnect();
 	sei();
-	for(;;){                /* main event loop */
+	for(;;) /* main event loop */
+	{               
+		
+		BulkWrite();
 		usbPoll();
 	}
 	return 0;
