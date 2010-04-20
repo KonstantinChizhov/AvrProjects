@@ -80,6 +80,11 @@ public:
 		return ((INDEX_T)(_writeCount - _readCount) & (INDEX_T)~(SIZE-1)) != 0;
 	}
 
+	INDEX_T Count()const
+	{
+		return ((INDEX_T)(_writeCount - _readCount) & (INDEX_T)(SIZE-1));
+	}
+
 	inline void Clear()
 	{
 		_readCount=0;

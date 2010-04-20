@@ -6,13 +6,14 @@
 #include <avr/interrupt.h>  /* for sei() */
 #include <avr/pgmspace.h>   /* required by usbdrv.h */
 #include <util/delay.h>
+#include <avr/wdt.h>
 
-typedef Usart<8, 4> usart;
+TextFormater< WaitAdapter< Usart<8, 4> > > usart;
 typedef IO::Pd5 led;
 
 // USB Configuration Descriptor 
 
-PROGMEM char usbDescriptorConfiguration[] = 
+PROGMEM char usbDescriptorConfiguration2[] = 
 {	
 	9,		  				// length of descriptor in bytes
 	USBDESCR_CONFIG,		// descriptor type 
@@ -115,41 +116,87 @@ struct UsbEndpointDescriptor
 void usbFunctionWriteOut(uint8_t *data, uint8_t len)
 {
 	for(uint8_t i=0; i<min<uint8_t>(8, len); i++)
-		usart::Putch(data[i]);
+		usart.Putch(data[i]);
 }
-
 
 
 USB_PUBLIC usbMsgLen_t  usbFunctionSetup(uint8_t data[8])
 {
+	led::Togle();
 	return 0; 
 }
 
 uchar usbFunctionDescriptor(usbRequest_t *rq) 
 {
-	usbMsgPtr = (uint8_t*)usbDescriptorConfiguration;
-	return sizeof(usbDescriptorConfiguration);
+	usbMsgPtr = (uint8_t*)usbDescriptorConfiguration2;
+	return sizeof(usbDescriptorConfiguration2);
 }
 
 // -------------------------------------------------------------------------
+
+/*
+template<class DataSource>
+void usbSetInterruptDataGeneric(uchar len, usbTxStatus_t *txStatus)
+{
+uchar   *p, c;
+char    i;
+
+#if USB_CFG_IMPLEMENT_HALT
+    if(usbTxLen1 == USBPID_STALL)
+        return;
+#endif
+    if(txStatus->len & 0x10)// packet buffer was empty
+	{    
+        txStatus->buffer[0] ^= USBPID_DATA0 ^ USBPID_DATA1; // toggle token 
+    }
+	else
+	{
+        txStatus->len = USBPID_NAK; // avoid sending outdated (overwritten) interrupt data 
+    }
+    p = txStatus->buffer + 1;
+    i = len;
+    do 	//if len == 0, we still copy 1 byte, but that's no problem
+	{      
+		DataSource::Getch(c);
+        *p++ = c;
+    }while(--i > 0);
+    usbCrc16Append(&txStatus->buffer[1], len);
+    txStatus->len = len + 4;    // len must be given including sync byte
+}
+
+template<class DataSource>
+void usbSetInterrupt(uchar len)
+{
+    usbSetInterruptDataGeneric<DataSource>(len, &usbTxStatus1);
+}
 
 inline void BulkWrite()
 {
 	if(usbInterruptIsReady())// only if previous data was sent
 	{               
-    	uchar *p;
-    	uchar len = getInterruptData(&p);   // obtain chunk of max 8 bytes
-    	if(len > 0)                         // only send if we have data
-       	usbSetInterrupt(p, len);
+    	usbSetInterrupt<typeof(usart)>(usart.BytesRecived());
 	}
 }
 
+*/
+
+ISR(USART_RX_vect)
+{
+	usart.RxHandler();
+}
+
+ISR(USART_UDRE_vect)
+{
+	usart.TxHandler();
+}
+
+
 int	main(void)
 {
-	uchar   i;
+	uint8_t i;
 	led::SetDirWrite();
-	usart::Init(115200);
-
+	usart.Init(115200);
+	
 	usbInit();
     usbDeviceDisconnect();  /* enforce re-enumeration, do this while interrupts are disabled! */
     i = 0;
@@ -158,10 +205,11 @@ int	main(void)
     }
     usbDeviceConnect();
 	sei();
+	//usart << "Hello!\r\n";
 	for(;;) /* main event loop */
 	{               
-		
-		BulkWrite();
+		wdt_reset();
+		//BulkWrite();
 		usbPoll();
 	}
 	return 0;
