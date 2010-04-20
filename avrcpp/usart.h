@@ -6,12 +6,9 @@
 #include <avr/interrupt.h>
 
 #ifdef URSEL
-enum{ursel = URSEL};
+enum{ursel = 1 << URSEL};
 #else
-
-#ifdef UMSEL
-enum{ursel = UMSEL};
-#endif
+enum{ursel = 0};
 #endif
 
 #define DECLARE_HW_USART(CLASS_NAME, _UDR_, _UCSRA_, _UCSRB_, _UCSRC_, _UBRRL_, _UBRRH_)\
@@ -61,7 +58,7 @@ struct CLASS_NAME\
 	static inline void EnableTxRx()\
 	{\
 		_UCSRB_ = 0x00; \
-		_UCSRC_ = (1 << ursel) | (1 << UCSZ1) | (1 << UCSZ0);\
+		_UCSRC_ = ursel | (1 << UCSZ1) | (1 << UCSZ0);\
 		_UCSRB_ = (1 << RXCIE) | (0 << TXCIE) | (1 << UDRIE) | (1 << RXEN) | (1 << TXEN);\
 	}\
 	\
@@ -69,11 +66,13 @@ struct CLASS_NAME\
 	{\
 		return _UCSRA_ & (1<<UDRE);\
 	}\
-	static inline void Disable()\
+	static inline void TXIntDisable()\
 	{\
-		_UCSRA_ = 0x00; \
-		_UCSRB_ = 0x00; \
-		_UCSRC_ = 0x00; \
+		_UCSRB_ &= ~(1 << UDRIE);\
+	}\
+	static inline void TXIntEnable()\
+	{\
+		_UCSRB_ |= (1 << UDRIE);\
 	}\
 };\
 
@@ -106,6 +105,7 @@ public:
 		{
 			while(!Traits::CanWriteData());
 			Traits::Write(c);
+			Traits::TXIntEnable();
 			return 1;
 		}else 
 		return _tx.Write(c);
@@ -121,6 +121,8 @@ public:
 		uint8_t c;
 		if(_tx.Read(c))
 			Traits::Write(c);
+		else
+			Traits::TXIntDisable();
 	}
 
 	static	inline void RxHandler()
@@ -142,6 +144,11 @@ public:
 		Traits::Disable();
 		_rx.Clear();
 		_tx.Clear();
+	}
+
+	static uint8_t BytesRecived()
+	{
+		return _rx.Count();
 	}
 
 
