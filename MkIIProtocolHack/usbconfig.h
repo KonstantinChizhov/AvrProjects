@@ -84,7 +84,7 @@ section at the end of this file).
  * configured below) and a catch-all default interrupt-in endpoint as above.
  * You must also define USB_CFG_HAVE_INTRIN_ENDPOINT to 1 for this feature.
  */
-#define USB_CFG_EP3_NUMBER              3
+#define USB_CFG_EP3_NUMBER              2
 /* If the so-called endpoint 3 is used, it can now be configured to any other
  * endpoint number (except 0) with this macro. Default if undefined is 3.
  */
@@ -117,7 +117,7 @@ section at the end of this file).
 /* Define this to 1 if the device has its own power supply. Set it to 0 if the
  * device is powered from the USB bus.
  */
-#define USB_CFG_MAX_BUS_POWER           100
+#define USB_CFG_MAX_BUS_POWER           200
 /* Set this variable to the maximum USB bus power consumption of your device.
  * The value is in milliamperes. [It will be divided by two since USB
  * communicates power requirements in units of 2 mA.]
@@ -139,7 +139,7 @@ section at the end of this file).
  * interrupt/bulk data sent to any endpoint other than 0. The endpoint number
  * can be found in 'usbRxToken'.
  */
-#define USB_CFG_HAVE_FLOWCONTROL        0
+#define USB_CFG_HAVE_FLOWCONTROL        1
 /* Define this to 1 if you want flowcontrol over USB data. See the definition
  * of the macros usbDisableAllRequests() and usbEnableAllRequests() in
  * usbdrv.h.
@@ -219,8 +219,8 @@ section at the end of this file).
 #define USB_CFG_DEVICE_VERSION  0x02, 0x00
 /* Version number of the device: Minor number first, then major number.
  */
-//#define USB_CFG_VENDOR_NAME     'A', 't', 'm', 'e', 'l', '.', 'c', 'o' , 'm'
-//#define USB_CFG_VENDOR_NAME_LEN 9
+#define USB_CFG_VENDOR_NAME     'A', 't', 'm', 'e', 'l'
+#define USB_CFG_VENDOR_NAME_LEN 5
 /* These two values define the vendor name returned by the USB device. The name
  * must be given as a list of characters under single quotes. The characters
  * are interpreted as Unicode (UTF-16) entities.
@@ -229,14 +229,15 @@ section at the end of this file).
  * obdev's free shared VID/PID pair. See the file USB-IDs-for-free.txt for
  * details.
  */
-//#define USB_CFG_DEVICE_NAME     'J', 'T', 'A', 'G', 'I', 'C', 'E', ' ', 'm', 'k', 'I', 'I'
-//#define USB_CFG_DEVICE_NAME_LEN 12
+#define USB_CFG_DEVICE_NAME     'J', 'T', 'A', 'G', 'I', 'C', 'E', ' ', 'm', 'k', 'I', 'I'
+#define USB_CFG_DEVICE_NAME_LEN 12
 /* Same as above for the device name. If you don't want a device name, undefine
  * the macros. See the file USB-IDs-for-free.txt before you assign a name if
  * you use a shared VID/PID.
  */
-/*#define USB_CFG_SERIAL_NUMBER   'N', 'o', 'n', 'e' */
-/*#define USB_CFG_SERIAL_NUMBER_LEN   0 */
+#define USB_CFG_SERIAL_NUMBER       '0', '0', 'B', '2', '0', '0', '0', '0', '0', '1', '1', 'C', '0'
+#define USB_CFG_SERIAL_NUMBER_LEN   13
+
 /* Same as above for the serial number. If you don't want a serial number,
  * undefine the macros.
  * It may be useful to provide the serial number through other means than at
