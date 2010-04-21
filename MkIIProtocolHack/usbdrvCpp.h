@@ -128,3 +128,18 @@ namespace Usb
 	}
 
 }
+
+#define STRING_DESCRIPTOR(name, value) \
+	struct \
+	{\
+		uint8_t bLength;\
+		uint8_t bDescriptorType;\
+		wchar_t bString[sizeof(value)/2];\
+	} name = \
+		{\
+			sizeof(value) + 2,\
+			Usb::StringDescriptor,\
+			value\
+		}\
+
+

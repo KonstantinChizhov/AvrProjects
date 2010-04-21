@@ -80,37 +80,67 @@ PROGMEM MyConfiguration myConfig =
 	}
 };
 
-struct StrDescr
-{
-	uint8_t bLength;
-	uint8_t bDescriptorType;
-	wchar_t *bString;
+
+PROGMEM char usbDescriptorString0[] = {
+    4,          /* sizeof(usbDescriptorString0): length of descriptor in bytes */
+    3,          /* descriptor type */
+    0x09, 0x04, /* language index (0x0409 = US-English) */
 };
 
+PROGMEM STRING_DESCRIPTOR(Vendor, L"Atmel");
+PROGMEM STRING_DESCRIPTOR(Prodict, L"JTAGICE mkII");
+PROGMEM STRING_DESCRIPTOR(SerialNumber, L"00A20000011E0");
 
-PROGMEM StrDescr Device =
-{
-	11,
-	Usb::StringDescriptor,
-	L"String"
-};
 
 extern "C" uchar usbFunctionDescriptor(Usb::usbRequest_t *rq) 
 {
-	Usb::usbMsgPtr = (uint8_t*)&diviceDescr;
-	return sizeof(diviceDescr);
+usart.Putch('D');
+	uint8_t len;
+	switch(rq->wValue.bytes[1])
+	{
+		case USBDESCR_DEVICE:
+			len = sizeof(diviceDescr);
+            Usb::usbMsgPtr = (uchar *)(&diviceDescr);
+			break;
+		case USBDESCR_CONFIG:
+			len = sizeof(myConfig);
+            Usb::usbMsgPtr = (uchar *)(&myConfig);
+			break;
+		case USBDESCR_STRING:
+		switch(rq->wValue.bytes[0])
+		{
+			case 0:
+				len = sizeof(usbDescriptorString0);
+				Usb::usbMsgPtr = (uchar *)(usbDescriptorString0);
+			break;
+			case 1:
+				len = sizeof(Vendor);
+				Usb::usbMsgPtr = (uchar *)(&Vendor);
+			break;
+			case 2:
+				len = sizeof(Prodict);
+				Usb::usbMsgPtr = (uchar *)(&Prodict);
+			break;
+			case 3:
+				len = sizeof(SerialNumber);
+				Usb::usbMsgPtr = (uchar *)(&SerialNumber);
+			break;
+		}
+	}
+	return len;
 }
 
 extern "C" void usbFunctionWriteOut(uint8_t *data, uint8_t len)
 {
+	//usart.Putch('W');
 	for(uint8_t i=0; i<min<uint8_t>(8, len); i++)
 		usart.Putch(data[i]);
 }
 
-
 extern "C" usbMsgLen_t usbFunctionSetup(uint8_t data[8])
 {
 	led::Togle();
+	usart.Putch('F');
 	return 0; 
 }
 
@@ -143,7 +173,7 @@ int	main(void)
 	uint8_t i;
 	led::SetDirWrite();
 	usart.Init(115200);
-	
+	usart.Putch('M');
 	Usb::usbInit();
     usbDeviceDisconnect();  /* enforce re-enumeration, do this while interrupts are disabled! */
     i = 0;
