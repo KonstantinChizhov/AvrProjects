@@ -87,9 +87,9 @@ PROGMEM char usbDescriptorString0[] = {
     0x09, 0x04, /* language index (0x0409 = US-English) */
 };
 
-PROGMEM STRING_DESCRIPTOR(Vendor, L"Atmel");
-PROGMEM STRING_DESCRIPTOR(Prodict, L"JTAGICE mkII");
-PROGMEM STRING_DESCRIPTOR(SerialNumber, L"00A20000011E0");
+PROGMEM STRING_DESCRIPTOR(Vendor, "Atmel");
+PROGMEM STRING_DESCRIPTOR(Prodict, "JTAGICE mkII");
+PROGMEM STRING_DESCRIPTOR(SerialNumber, "00A20000011E0");
 
 
 extern "C" uchar usbFunctionDescriptor(Usb::usbRequest_t *rq) 
@@ -130,32 +130,73 @@ usart.Putch('D');
 	return len;
 }
 
+
+class UsbFifo
+{
+public:
+	static uint8_t Putch(uint8_t c)__attribute__ ((noinline))
+	{
+		return _tx.Write(c);
+	}
+
+	static uint8_t Getch(uint8_t &c)__attribute__ ((noinline))
+	{
+		return _rx.Read(c);
+	}
+
+	static inline void TxHandler()
+	{
+		if(Usb::InterruptIsReady())
+		{
+			uint8_t len = min<uint8_t>(_tx.Count(), 8);
+			Usb::SetStreamData(_tx, len);
+		}
+	}
+
+	static	inline void RxHandler(uint8_t *data, uint8_t len)
+	{
+		for(uint8_t i=0; i<len; i++)
+			_rx.Write(data[i]);
+	}
+
+	static void DropBuffers()
+	{
+		_rx.Clear();
+	}
+
+	static uint8_t BytesRecived()
+	{
+		return _rx.Count();
+	}
+
+	static void BeginTxFrame()
+	{
+		Usb::SetStreamData(_tx, 0);//send ZLP
+	}
+
+protected:
+	static Queue<16> _rx;
+	static Queue<16> _tx;
+};
+
+Queue<16> UsbFifo::_rx;
+Queue<16> UsbFifo::_tx;
+
+
 extern "C" void usbFunctionWriteOut(uint8_t *data, uint8_t len)
 {
-	//usart.Putch('W');
-	for(uint8_t i=0; i<min<uint8_t>(8, len); i++)
-		usart.Putch(data[i]);
+	UsbFifo::RxHandler(data, len);
+//	for(uint8_t i=0; i<min<uint8_t>(8, len); i++)
+//		usart.Putch(data[i]);
 }
 
 extern "C" usbMsgLen_t usbFunctionSetup(uint8_t data[8])
 {
-	led::Togle();
-	usart.Putch('F');
 	return 0; 
 }
 
 // -------------------------------------------------------------------------
 
-/*
-inline void BulkWrite()
-{
-	if(usbInterruptIsReady())// only if previous data was sent
-	{               
-    	usbSetInterrupt<typeof(usart)>(usart.BytesRecived());
-	}
-}
-
-*/
 
 ISR(USART_RX_vect)
 {

@@ -93,10 +93,9 @@ namespace Usb
 	};
 
 	template<class DataSource>
-	void usbSetInterruptDataGeneric(uchar len, usbTxStatus_t *txStatus)
+	void SetStreamDataGeneric(DataSource &ds, uchar len, usbTxStatus_t *txStatus)
 	{
 	uchar   *p, c;
-	char    i;
 
 	#if USB_CFG_IMPLEMENT_HALT
 	    if(usbTxLen1 == USBPID_STALL)
@@ -111,20 +110,25 @@ namespace Usb
 	        txStatus->len = USBPID_NAK; // avoid sending outdated (overwritten) interrupt data 
 	    }
 	    p = txStatus->buffer + 1;
-	    i = len;
-	    do 	//if len == 0, we still copy 1 byte, but that's no problem
+	
+	    for(uint8_t i=len; i--;)
 		{      
-			DataSource::Getch(c);
+			ds.Read(c);
 	        *p++ = c;
-	    }while(--i > 0);
+	    }
 	    usbCrc16Append(&txStatus->buffer[1], len);
 	    txStatus->len = len + 4;    // len must be given including sync byte
 	}
 
 	template<class DataSource>
-	void usbSetInterrupt(uchar len)
+	void SetStreamData(DataSource &ds, uchar len)
 	{
-	    usbSetInterruptDataGeneric<DataSource>(len, &usbTxStatus1);
+	    SetStreamDataGeneric(ds, len, &usbTxStatus1);
+	}
+
+	inline uint8_t InterruptIsReady()   
+	{
+		return (usbTxLen1 & 0x10);
 	}
 
 }
@@ -134,12 +138,12 @@ namespace Usb
 	{\
 		uint8_t bLength;\
 		uint8_t bDescriptorType;\
-		wchar_t bString[sizeof(value)/2];\
+		wchar_t bString[sizeof(value)];\
 	} name = \
 		{\
-			sizeof(value) + 2,\
+			sizeof(L##value) + 2,\
 			Usb::StringDescriptor,\
-			value\
+			L##value\
 		}\
 
 
