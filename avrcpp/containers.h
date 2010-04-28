@@ -168,6 +168,11 @@ public:
 		return _data[i];
 	}
 
+	inline operator T*()
+	{
+		return &_data[0];
+	}
+
 protected:
 	T _data[SIZE];
 };

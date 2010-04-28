@@ -151,6 +151,18 @@ public:
 		return _rx.Count();
 	}
 
+	static void BeginTxFrame()
+	{}
+
+	static void EndTxFrame()
+	{}
+
+	static void BeginRx()
+	{}
+
+	static void EndRx()
+	{}
+
 
 private:
 	static Queue<RxSize> _rx;

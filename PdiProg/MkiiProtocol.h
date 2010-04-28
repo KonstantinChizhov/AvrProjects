@@ -46,7 +46,7 @@ namespace MkII
 				_readCrc = Crc16_0x8408(c, _readCrc);
 		}
 
-		static void BeginFrame()
+		static void ResetWriteCrc()
 		{
 			_writeCrc = 0xffff;
 		}
@@ -57,7 +57,7 @@ namespace MkII
 			DATA_SOURCE::Putch((_writeCrc >> 8) & 0xff);
 		}
 
-		static void BeginRecive()
+		static void ResetReadCrc()
 		{
 			_readCrc = 0xffff;
 		}
@@ -127,7 +127,7 @@ struct ParametersT
 			Write(rawData, sizeof(T));
 		}
 
-		static void Write(const uint8_t *value, const uint8_t size)
+		static void Write(const uint8_t *value, const size_t size)
 		{
 			for(uint8_t i=0; i<size; ++i)
 				interface::Putch(value[i]);
@@ -142,7 +142,7 @@ struct ParametersT
 			return value;
 		}
 
-		static void Read(void *value, const uint8_t size)
+		static void Read(void *value, const size_t size)
 		{
 			uint8_t * data = reinterpret_cast<uint8_t*>(value);
 			for(uint8_t i=0; i<size; ++i)
@@ -160,13 +160,16 @@ struct ParametersT
 
 		static void BeginFrame()
 		{
-			interface::BeginFrame();
+			interface::ResetWriteCrc();
+			interface::BeginTxFrame();
 		}
 
-		static void WriteCrc()
+		static void EndFrame()
 		{
 			interface::WriteCrc();
+			interface::EndTxFrame();
 		}
+
 	public:
 		static void SetMode(EmulatorMode mode)
 		{
@@ -209,7 +212,7 @@ struct ParametersT
 		static void Send1ByteResponse(const MessageHeader &header, Responses response)
 		{
 			SendMessageHeader(header, 1, response);
-			WriteCrc();
+			EndFrame();
 		}
 
 		template<class T>
@@ -217,7 +220,7 @@ struct ParametersT
 		{
 			SendMessageHeader(header, sizeof(value)+1, response);
 			Write<T>(value);
-			WriteCrc();
+			EndFrame();
 		}
 
 		template<class T>
@@ -242,7 +245,7 @@ struct ParametersT
 			Puts("123456");	//(USB) EEPROM stored s/n [BYTE] * 6,LSB FIRST
 			Puts("JTAGICE mkII");
 			Write<uint8_t>(0);
-			WriteCrc();	
+			EndFrame();	
 		}
 
 		static void SelfTest(const MessageHeader &header)
@@ -255,7 +258,7 @@ struct ParametersT
 				flags >>= 1;
 			}
 
-			WriteCrc();
+			EndFrame();
 		}
 
 		static void PollInterface()
@@ -270,6 +273,7 @@ struct ParametersT
 			header.messageId = Read<uint8_t>();
 			
 			ProcessCommand(header);
+			uint16_t crc = Read<uint16_t>();
 		}
 
 		static void GetParameter(const MessageHeader &header)
@@ -394,12 +398,11 @@ struct ParametersT
 
 		static void ProcessCommand(const MessageHeader &header)
 		{
-			IO::Portb::Write(header.messageId);
+			//IO::Portb::Write(header.messageId);
 			switch(header.messageId)
 			{
 				case CMND_SIGN_OFF:
 					Send1ByteResponse(header, RSP_OK);
-					HwInterface::Init(19200);
 					break;
 				case CMND_GET_SIGN_ON:
 					SingOn(header); 
@@ -483,7 +486,7 @@ struct ParametersT
 			Read<uint16_t>();//ignore crc
 			SendMessageHeader(header, size+1, RSP_MEMORY);
 			_target->ReadMem(memType, size, address);
-			WriteCrc();	
+			EndFrame();	
 		}
 
 		static ParametersT params;

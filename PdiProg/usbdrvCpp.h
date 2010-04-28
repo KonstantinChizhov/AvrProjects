@@ -128,7 +128,7 @@ namespace Usb
 
 	inline uint8_t InterruptIsReady()   
 	{
-		return (usbTxLen1 & 0x10);
+		return (usbTxStatus1.len & 0x10);
 	}
 
 }

@@ -133,59 +133,70 @@ usart.Putch('D');
 
 class UsbFifo
 {
+	enum {UsbPacketSize = 8};
 public:
-	static uint8_t Putch(uint8_t c)__attribute__ ((noinline))
+	static void Putch(uint8_t c)
 	{
-		return _tx.Write(c);
-	}
-
-	static uint8_t Getch(uint8_t &c)__attribute__ ((noinline))
-	{
-		return _rx.Read(c);
-	}
-
-	static inline void TxHandler()
-	{
-		if(Usb::InterruptIsReady())
+		_txBuf[_txCount++] = c;
+		if(_txCount == UsbPacketSize)
 		{
-			uint8_t len = min<uint8_t>(_tx.Count(), 8);
-			Usb::SetStreamData(_tx, len);
+			while(!Usb::InterruptIsReady())
+				Usb::usbPoll();
+			Usb::usbSetInterrupt(_txBuf, _txCount);
 		}
 	}
 
-	static	inline void RxHandler(uint8_t *data, uint8_t len)
+	static void Getch(uint8_t &c)
 	{
-		for(uint8_t i=0; i<len; i++)
-			_rx.Write(data[i]);
-	}
-
-	static void DropBuffers()
-	{
-		_rx.Clear();
-	}
-
-	static uint8_t BytesRecived()
-	{
-		return _rx.Count();
+		while(!_rxBuf.Read(c))
+		{
+			Usb::usbPoll();
+		}
 	}
 
 	static void BeginTxFrame()
 	{
-		Usb::SetStreamData(_tx, 0);//send ZLP
+		Usb::usbSetInterrupt(0, 0);
+	}
+
+	static void EndTxFrame()
+	{
+		while(!Usb::InterruptIsReady())
+			Usb::usbPoll();
+		Usb::usbSetInterrupt(_txBuf, _txCount);
+		Usb::usbSetInterrupt(0, 0);
+	}
+
+	static void BeginRx()
+	{
+		
+	}
+
+	static void EndRx()
+	{
+	
+	}
+
+	static void RxCallBack(uint8_t *data, uint8_t len)
+	{
+		for(uint8_t i=0; i < len; i++)
+			_rxBuf.Write(data[i]);
 	}
 
 protected:
-	static Queue<16> _rx;
-	static Queue<16> _tx;
+	static Queue<16> _rxBuf;
+	static Array<8> _txBuf;
+	static uint8_t _txCount;
 };
 
-Queue<16> UsbFifo::_rx;
-Queue<16> UsbFifo::_tx;
+	Queue<16> UsbFifo::_rxBuf;
+	Array<8> UsbFifo::_txBuf;
+	uint8_t UsbFifo::_txCount = 0;
 
 
 extern "C" void usbFunctionWriteOut(uint8_t *data, uint8_t len)
 {
-	UsbFifo::RxHandler(data, len);
+	UsbFifo::RxCallBack(data, len);
 //	for(uint8_t i=0; i<min<uint8_t>(8, len); i++)
 //		usart.Putch(data[i]);
 }
@@ -228,7 +239,9 @@ int	main(void)
 	{               
 		wdt_reset();
 		//BulkWrite();
-		Usb::usbPoll();
+		//Usb::usbPoll();
+		UsbFifo::Getch(i);
+		usart.Putch(i);
 	}
 	return 0;
 }
