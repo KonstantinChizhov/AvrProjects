@@ -5,17 +5,28 @@
 	class CheckSummUpdater :public DATA_SOURCE
 	{
 	public:
-		static void Putch(uint8_t c)
+		using DATA_SOURCE::Read<T>;
+		using DATA_SOURCE::Write;
+
+		static uint8_t Putch(uint8_t c)
 		{
-			DATA_SOURCE::Putch(c);
-			_writeCrc = Crc16_0x8408(c, _writeCrc);
+			if(DATA_SOURCE::Putch(c))
+			{
+				_writeCrc = Crc16_0x8408(c, _writeCrc);
+				return 1;
+			}
+			return 0;
 		}
 
-		static void Getch(uint8_t &c)
+		static uint8_t Getch(uint8_t &c)
 		{
-			DATA_SOURCE::Getch(c);
-			if(calcRxCrc)
-				_readCrc = Crc16_0x8408(c, _readCrc);
+			if(DATA_SOURCE::Getch(c))
+			{
+				if(calcRxCrc)
+					_readCrc = Crc16_0x8408(c, _readCrc);
+				return 1;
+			}
+			return 0;
 		}
 
 		static void ResetWriteCrc()
@@ -25,8 +36,8 @@
 
 		static void WriteCrc()
 		{
-			DATA_SOURCE::Putch(_writeCrc & 0xff);
-			DATA_SOURCE::Putch((_writeCrc >> 8) & 0xff);
+			DATA_SOURCE::Write(uint8_t(_writeCrc & 0xff));
+			DATA_SOURCE::Write(uint8_t((_writeCrc >> 8) & 0xff));
 		}
 
 		static void ResetReadCrc()
@@ -37,6 +48,28 @@
 		static uint16_t GetReciveCrc()
 		{
 			return _readCrc;
+		}
+
+		static void BeginTxFrame()
+		{
+			ResetWriteCrc();
+			DATA_SOURCE::BeginTxFrame();
+		}
+
+		static void EndTxFrame()
+		{
+			WriteCrc();
+			DATA_SOURCE::EndTxFrame();
+		}
+
+		static void BeginRx()
+		{
+			DATA_SOURCE::BeginTxFrame();
+		}
+
+		static void EndRx()
+		{
+			DATA_SOURCE::BeginTxFrame();
 		}
 
 		static uint16_t _writeCrc;

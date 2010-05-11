@@ -8,14 +8,13 @@
 #include "Pdi.h"
 #include "ports.h"
 
-#include "UsbDescriptors.h"
 //#include "UsbFifo.h"
 
 using namespace MkII;
 using namespace IO;
 
 
-typedef WaitAdapter< Usart<16, 32> > interface;
+typedef BinaryFormater< WaitAdapter< Usart<16, 32> > > interface;
 
 typedef MkIIProtocol
 	<

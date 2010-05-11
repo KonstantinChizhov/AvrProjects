@@ -8,6 +8,12 @@
 #include <avr/eeprom.h>
 #include <avr/pgmspace.h>
 
+union Int32
+{
+	uint32_t Dword;
+	uint16_t Words[2];
+	uint8_t Bytes[4];
+};
 
 template<int num, int pow> 
 struct Pow 
@@ -106,14 +112,16 @@ template<class DATA_SOURCE>
 class WaitAdapter :public DATA_SOURCE
 {
 public:
-	static void Putch(uint8_t c)
+	static void Write(uint8_t c)
 	{
 		while(!DATA_SOURCE::Putch(c));
 	}
 
-	static void Getch(uint8_t &c)
+	static uint8_t Read()
 	{
+		uint8_t c;
 		while(!DATA_SOURCE::Getch(c));
+		return c;
 	}
 };
 
@@ -294,39 +302,66 @@ template<class DATA_SOURCE>
 class BinaryFormater :public DATA_SOURCE
 {
 public:
-	template<class T>
-	BinaryFormater<DATA_SOURCE>& operator<< (const T &value)
+	using DATA_SOURCE::Write;
+	using DATA_SOURCE::Read;
+
+	static void Write(uint32_t value)
 	{
-		const uint8_t * rawData = reinterpret_cast<const uint8_t *>(&value);
-		for(uint8_t i=0; i<sizeof(T); ++i)
-			DATA_SOURCE::Putch(rawData[i]);
-		return *this;
+		Int32 i;
+		i.Dword = value;
+		DATA_SOURCE::Putch(i.Bytes[0]);
+		DATA_SOURCE::Putch(i.Bytes[1]);
+		DATA_SOURCE::Putch(i.Bytes[2]);
+		DATA_SOURCE::Putch(i.Bytes[3]);
 	}
 
-	template<class T>
-	BinaryFormater<DATA_SOURCE>& operator>> (T &value)
+	static void Write(uint16_t value)
 	{
-		const uint8_t * rawData = reinterpret_cast<const uint8_t *>(&value);
-		for(uint8_t i=0; i<sizeof(T); ++i)
-			DATA_SOURCE::Getch(rawData[i]);
-		return *this;
+		DATA_SOURCE::Write(value & 0xff);
+		DATA_SOURCE::Write((value >>= 8) & 0xff);
 	}
 
 	template<class T>
 	static void Write(const T &value)
 	{
-		const uint8_t * rawData = reinterpret_cast<const uint8_t *>(&value);
-		for(uint8_t i=0; i<sizeof(T); ++i)
-			DATA_SOURCE::Putch(rawData[i]);
+		Write(&value, sizeof(T));
+	}
+
+	static void Write(const void *data, size_t size)
+	{
+		for(size_t i=0; i<size; ++i)
+		{
+			DATA_SOURCE::Write(((const uint8_t*)data)[i]);
+		}
+	}
+
+	static void Puts(const char *str)
+	{
+		while(*str)
+		{
+			DATA_SOURCE::Write(*str);
+			str++;
+		}
+	}
+
+	static void Read(void *data, size_t size)
+	{
+		for(size_t i=0; i<size; ++i)
+		{
+			((uint8_t*)data)[i] = DATA_SOURCE::Read();
+		}
 	}
 
 	template<class T>
 	static T Read()
 	{
-		T value;
-		uint8_t *const rawData = reinterpret_cast<uint8_t*>(&value);
-		for(uint8_t i=0; i<sizeof(T); ++i)
-			DATA_SOURCE::Getch(rawData[i]);
+		union
+		{
+			T value;
+			uint8_t rawData[sizeof(T)];
+		};
+
+		Read(rawData, sizeof(T));
 		return value;
 	}
 };

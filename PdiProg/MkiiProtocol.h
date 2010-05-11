@@ -70,56 +70,6 @@ struct ParametersT
 		static NullTargetDeviceCtrl _nullTarget;
 		static TargetDeviceCtrl * _target;
 
-		template<class T>
-		static void Write(const T &value)
-		{
-			const uint8_t * rawData = reinterpret_cast<const uint8_t *>(&value);
-			Write(rawData, sizeof(T));
-		}
-
-		static void Write(const uint8_t *value, const size_t size)
-		{
-			for(uint8_t i=0; i<size; ++i)
-				interface::Putch(value[i]);
-		}
-
-		template<class T>
-		static T Read()
-		{
-			T value;
-			uint8_t * rawData = reinterpret_cast<uint8_t*>(&value);
-			Read(rawData, sizeof(T));
-			return value;
-		}
-
-		static void Read(void *value, const size_t size)
-		{
-			uint8_t * data = reinterpret_cast<uint8_t*>(value);
-			for(uint8_t i=0; i<size; ++i)
-				interface::Getch(data[i]);
-		}
-
-		static void Puts(const char *str)
-		{
-			while(*str)
-			{
-				interface::Putch(*str);
-				str++;
-			}
-		}
-
-		static void BeginFrame()
-		{
-			interface::ResetWriteCrc();
-			interface::BeginTxFrame();
-		}
-
-		static void EndFrame()
-		{
-			interface::WriteCrc();
-			interface::EndTxFrame();
-		}
-
 	public:
 		static void SetMode(EmulatorMode mode)
 		{
@@ -152,26 +102,26 @@ struct ParametersT
 
 		static void SendMessageHeader(const MessageHeader &header, uint16_t size, Responses response)
 		{
-			BeginFrame();
-			Write<uint8_t >(MessageStart);
-			Write<uint16_t>(header.seqNumber);
-			Write<uint32_t >(size);
-			Write<uint8_t >(Token);
-			Write<uint8_t >(response);
+			interface::BeginTxFrame();
+			interface::Write(uint8_t(MessageStart));
+			interface::Write(header.seqNumber);
+			interface::Write(size);
+			interface::Write(uint8_t(Token));
+			interface::Write(uint8_t(response));
 		}
 
 		static void Send1ByteResponse(const MessageHeader &header, Responses response)
 		{
 			SendMessageHeader(header, 1, response);
-			EndFrame();
+			interface::EndTxFrame();
 		}
 
 		template<class T>
 		static void SendResponse(const MessageHeader &header, Responses response, const T&value)
 		{
 			SendMessageHeader(header, sizeof(value)+1, response);
-			Write<T>(value);
-			EndFrame();
+			interface::Write(value);
+			interface::EndTxFrame();
 		}
 
 		template<class T>
@@ -184,32 +134,31 @@ struct ParametersT
 		{
 			SendMessageHeader(header, 29, RSP_SIGN_ON);
 
-			Write<uint8_t>(0);// Communications protocol version [BYTE]
-			Write<uint8_t>(0);// M_MCU boot-loader FW version [BYTE]
-			Write<uint8_t>(20);// M_MCU firmware version (minor) [BYTE]
-			Write<uint8_t>(6);// M_MCU firmware version (major) [BYTE]
-			Write<uint8_t>(0);// M_MCU hardware version [BYTE]
-			Write<uint8_t>(0);// S_MCU boot-loader FW version [BYTE]
-			Write<uint8_t>(20);// S_MCU firmware version (minor) [BYTE]
-			Write<uint8_t>(6);// S_MCU firmware version (major) [BYTE]
-			Write<uint8_t>(0);// S_MCU hardware version [BYTE]
-			Puts("123456");	//(USB) EEPROM stored s/n [BYTE] * 6,LSB FIRST
-			Puts("JTAGICE mkII");
-			Write<uint8_t>(0);
-			EndFrame();	
+			interface::Write(uint8_t(0));// Communications protocol version [BYTE]
+			interface::Write(uint8_t(0));// M_MCU boot-loader FW version [BYTE]
+			interface::Write(uint8_t(20));// M_MCU firmware version (minor) [BYTE]
+			interface::Write(uint8_t(6));// M_MCU firmware version (major) [BYTE]
+			interface::Write(uint8_t(0));// M_MCU hardware version [BYTE]
+			interface::Write(uint8_t(0));// S_MCU boot-loader FW version [BYTE]
+			interface::Write(uint8_t(20));// S_MCU firmware version (minor) [BYTE]
+			interface::Write(uint8_t(6));// S_MCU firmware version (major) [BYTE]
+			interface::Write(uint8_t(0));// S_MCU hardware version [BYTE]
+			interface::Puts("123456");	//(USB) EEPROM stored s/n [BYTE] * 6,LSB FIRST
+			interface::Puts("JTAGICE mkII");
+			interface::Write(uint8_t(0));
+			interface::EndTxFrame();
 		}
 
 		static void SelfTest(const MessageHeader &header)
 		{
-			uint8_t flags = Read<uint8_t>();
+			uint8_t flags = interface::Read<uint8_t>();
 			SendMessageHeader(header, 9, RSP_SELFTEST);
 			for(uint8_t i=0; i<8; i++)
 			{
-				Write<uint8_t>(flags&1);
+				interface::Write(flags&1);
 				flags >>= 1;
 			}
-
-			EndFrame();
+			interface::EndTxFrame();
 		}
 
 		static void PollInterface()
@@ -389,7 +338,7 @@ struct ParametersT
 				break;
 				
 				case CMND_SET_DEVICE_DESCRIPTOR:
-					Read(&deviceDescriptor, sizeof(deviceDescriptor));
+					interface::Read(&deviceDescriptor, sizeof(deviceDescriptor));
 					Send1ByteResponse(header, RSP_OK);
 				break;
 
@@ -431,20 +380,20 @@ struct ParametersT
 			uint32_t address = Read<uint32_t>();
 			_target->WriteMem(memType, size, address);
 
-			Read<uint16_t>();//ignore crc
+			interface::Read<uint16_t>();//ignore crc
 
 			Send1ByteResponse(header, RSP_OK);
 		}
 
 		static void ReadMem(const MessageHeader &header)
 		{
-			uint8_t memType = Read<uint8_t>();
-			uint32_t size = Read<uint32_t>();
-			uint32_t address = Read<uint32_t>();
-			Read<uint16_t>();//ignore crc
+			uint8_t memType = interface::Read<uint8_t>();
+			uint32_t size = interface::Read<uint32_t>();
+			uint32_t address = interface::Read<uint32_t>();
+			interface::Read<uint16_t>();//ignore crc
 			SendMessageHeader(header, size+1, RSP_MEMORY);
 			_target->ReadMem(memType, size, address);
-			EndFrame();	
+			interface::EndTxFrame();
 		}
 
 		static ParametersT params;
