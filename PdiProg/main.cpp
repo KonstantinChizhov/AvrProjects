@@ -20,7 +20,7 @@ typedef WaitAdapter< Usart<16, 32> > interface;
 typedef MkIIProtocol
 	<
 		interface, 
-		PdiSoftwarePhisical<Pd5, Pd6>
+		Pdi::PdiSoftwarePhisical<Pd5, Pd6>
 	> protocol;
 
 

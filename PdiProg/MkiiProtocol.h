@@ -8,6 +8,7 @@
 #include "TargetDeviceCtrl.h"
 #include "constants.h"
 #include "DeviceDescriptor.h"
+#include "CheckSummUpdater.h"
 
 namespace MkII
 {
@@ -25,58 +26,6 @@ namespace MkII
 		uint32_t messageLen;
 		uint8_t messageId;
 	};
-
-//----------------------------------------------------------------------------
-// 
-//----------------------------------------------------------------------------
-
-	template<class DATA_SOURCE, bool calcRxCrc=false>
-	class CheckSummUpdater :public DATA_SOURCE
-	{
-	public:
-		static void Putch(uint8_t c)
-		{
-			DATA_SOURCE::Putch(c);
-			_writeCrc = Crc16_0x8408(c, _writeCrc);
-		}
-
-		static void Getch(uint8_t &c)
-		{
-			DATA_SOURCE::Getch(c);
-			if(calcRxCrc)
-				_readCrc = Crc16_0x8408(c, _readCrc);
-		}
-
-		static void ResetWriteCrc()
-		{
-			_writeCrc = 0xffff;
-		}
-
-		static void WriteCrc()
-		{
-			DATA_SOURCE::Putch(_writeCrc & 0xff);
-			DATA_SOURCE::Putch((_writeCrc >> 8) & 0xff);
-		}
-
-		static void ResetReadCrc()
-		{
-			_readCrc = 0xffff;
-		}
-
-		static uint16_t GetReciveCrc()
-		{
-			return _readCrc;
-		}
-
-		static uint16_t _writeCrc;
-		static uint16_t _readCrc;
-	};
-
-	template<class DATA_SOURCE, bool calcRxCrc>
-	uint16_t CheckSummUpdater<DATA_SOURCE, calcRxCrc>::_writeCrc=0xffff;
-
-	template<class DATA_SOURCE, bool calcRxCrc>
-	uint16_t CheckSummUpdater<DATA_SOURCE, calcRxCrc>::_readCrc=0xffff;
 
 //----------------------------------------------------------------------------
 // 
@@ -117,7 +66,7 @@ struct ParametersT
 		static ProgInterface *_progIface;
 		//targets
 
-		static Xmega<CheckSummUpdater<HwInterface> > _xmega;
+		static XMega::Xmega<CheckSummUpdater<HwInterface> > _xmega;
 		static NullTargetDeviceCtrl _nullTarget;
 		static TargetDeviceCtrl * _target;
 
@@ -191,6 +140,7 @@ struct ParametersT
 					_target = &_nullTarget;
 			}
 			_target->SetProgInterface(_progIface);
+			_target->SetDeviceDescriptor(&deviceDescriptor);
 		}
 
 		static void Init()
@@ -476,7 +426,14 @@ struct ParametersT
 
 		static void WriteMem(const MessageHeader &header)
 		{
-			Send1ByteResponse(header, RSP_ILLEGAL_COMMAND);
+			uint8_t memType = Read<uint8_t>();
+			uint32_t size = Read<uint32_t>();
+			uint32_t address = Read<uint32_t>();
+			_target->WriteMem(memType, size, address);
+
+			Read<uint16_t>();//ignore crc
+
+			Send1ByteResponse(header, RSP_OK);
 		}
 
 		static void ReadMem(const MessageHeader &header)
@@ -511,7 +468,7 @@ struct ParametersT
 	
 		//targets
 	template<class HwInterface, class PdiInterface, class SpiInterface, class JTAGInterface>
-	Xmega<CheckSummUpdater<HwInterface> >
+	XMega::Xmega<CheckSummUpdater<HwInterface> >
 		MkIIProtocol<HwInterface, PdiInterface, SpiInterface, JTAGInterface>::_xmega;
 
 	template<class HwInterface, class PdiInterface, class SpiInterface, class JTAGInterface>
