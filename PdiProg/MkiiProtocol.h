@@ -7,6 +7,7 @@
 #include "ProgInterface.h"
 #include "TargetDeviceCtrl.h"
 #include "constants.h"
+#include "DeviceDescriptor.h"
 
 namespace MkII
 {
