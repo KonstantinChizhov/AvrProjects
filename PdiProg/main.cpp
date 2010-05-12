@@ -20,7 +20,7 @@ typedef MkIIProtocol
 	<
 		interface, 
 		Pdi::PdiSoftwarePhisical<Pd5, Pd6>
-	> protocol;
+	> Protocol;
 
 
 ISR(USART_UDRE_vect)
@@ -38,12 +38,13 @@ int main()
 {
 	interface::Init(115200);
 	sei();
+	Protocol protocol;
 
 	IO::Portb::DirWrite(0xff);
 
 	while(1)
 	{
-		protocol::PollInterface();
+		protocol.PollInterface();
 	}
 	return 0;
 }

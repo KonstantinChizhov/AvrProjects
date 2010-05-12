@@ -61,17 +61,17 @@ struct ParametersT
 		typedef CheckSummUpdater<HwInterface> interface;
 		private:
 		//HW interfaces
-		static PdiInterface _pdi;
-		static NullProgInterface _nullProg;
-		static ProgInterface *_progIface;
+		PdiInterface _pdi;
+		NullProgInterface _nullProg;
+		ProgInterface *_progIface;
 		//targets
 
-		static XMega::Xmega<CheckSummUpdater<HwInterface> > _xmega;
-		static NullTargetDeviceCtrl _nullTarget;
-		static TargetDeviceCtrl * _target;
+		XMega::Xmega<CheckSummUpdater<HwInterface> > _xmega;
+		NullTargetDeviceCtrl _nullTarget;
+		TargetDeviceCtrl * _target;
 
 	public:
-		static void SetMode(EmulatorMode mode)
+		void SetMode(EmulatorMode mode)
 		{
 			switch(mode)
 			{
@@ -93,14 +93,14 @@ struct ParametersT
 			_target->SetDeviceDescriptor(&deviceDescriptor);
 		}
 
-		static void Init()
+		void Init()
 		{
 			params.EmuMode = Unknown;
 			_progIface = &_nullProg;
 			_target = &_nullTarget;
 		}
 
-		static void SendMessageHeader(const MessageHeader &header, uint16_t size, Responses response)
+		void SendMessageHeader(const MessageHeader &header, uint16_t size, Responses response)
 		{
 			interface::BeginTxFrame();
 			interface::Write(uint8_t(MessageStart));
@@ -110,14 +110,14 @@ struct ParametersT
 			interface::Write(uint8_t(response));
 		}
 
-		static void Send1ByteResponse(const MessageHeader &header, Responses response)
+		void Send1ByteResponse(const MessageHeader &header, Responses response)
 		{
 			SendMessageHeader(header, 1, response);
 			interface::EndTxFrame();
 		}
 
 		template<class T>
-		static void SendResponse(const MessageHeader &header, Responses response, const T&value)
+		void SendResponse(const MessageHeader &header, Responses response, const T&value)
 		{
 			SendMessageHeader(header, sizeof(value)+1, response);
 			interface::Write(value);
@@ -125,12 +125,12 @@ struct ParametersT
 		}
 
 		template<class T>
-		static void ParamResponse(const MessageHeader &header, const T&value)
+		void ParamResponse(const MessageHeader &header, const T&value)
 		{
 			SendResponse(header, RSP_PARAMETER, value);
 		}
 
-		static void SingOn(const MessageHeader &header)
+		void SingOn(const MessageHeader &header)
 		{
 			SendMessageHeader(header, 29, RSP_SIGN_ON);
 
@@ -149,7 +149,7 @@ struct ParametersT
 			interface::EndTxFrame();
 		}
 
-		static void SelfTest(const MessageHeader &header)
+		void SelfTest(const MessageHeader &header)
 		{
 			uint8_t flags = interface::Read<uint8_t>();
 			SendMessageHeader(header, 9, RSP_SELFTEST);
@@ -161,7 +161,7 @@ struct ParametersT
 			interface::EndTxFrame();
 		}
 
-		static void PollInterface()
+		void PollInterface()
 		{
 			if(Read<uint8_t>() != MessageStart)
 				return;
@@ -176,7 +176,7 @@ struct ParametersT
 			uint16_t crc = Read<uint16_t>();
 		}
 
-		static void GetParameter(const MessageHeader &header)
+		void GetParameter(const MessageHeader &header)
 		{
 			uint8_t parameter = Read<uint8_t>();
 			//IO::Portb::Write(parameter);
@@ -228,7 +228,7 @@ struct ParametersT
 			}			
 		}
 
-		static void SetParameter(const MessageHeader &header)
+		void SetParameter(const MessageHeader &header)
 		{
 			uint8_t parameter = Read<uint8_t>();
 			
@@ -281,7 +281,7 @@ struct ParametersT
 			Send1ByteResponse(header, RSP_OK); 
 		}
 
-		static void SetBaund()
+		void SetBaund()
 		{
 			uint8_t baund = Read<uint8_t>();
 			HwInterface::Disable();
@@ -296,7 +296,7 @@ struct ParametersT
 			}
 		}
 
-		static void ProcessCommand(const MessageHeader &header)
+		void ProcessCommand(const MessageHeader &header)
 		{
 			//IO::Portb::Write(header.messageId);
 			switch(header.messageId)
@@ -373,7 +373,7 @@ struct ParametersT
 			}
 		}
 
-		static void WriteMem(const MessageHeader &header)
+		void WriteMem(const MessageHeader &header)
 		{
 			uint8_t memType = Read<uint8_t>();
 			uint32_t size = Read<uint32_t>();
@@ -385,7 +385,7 @@ struct ParametersT
 			Send1ByteResponse(header, RSP_OK);
 		}
 
-		static void ReadMem(const MessageHeader &header)
+		void ReadMem(const MessageHeader &header)
 		{
 			uint8_t memType = interface::Read<uint8_t>();
 			uint32_t size = interface::Read<uint32_t>();
@@ -396,39 +396,9 @@ struct ParametersT
 			interface::EndTxFrame();
 		}
 
-		static ParametersT params;
-		static DeviceDescriptor deviceDescriptor;
-		static MessageHeader header;
+		ParametersT params;
+		DeviceDescriptor deviceDescriptor;
+		MessageHeader header;
 	};
 
-
-	template<class HwInterface, class PdiInterface, class SpiInterface, class JTAGInterface >
-	ParametersT	MkIIProtocol<HwInterface, PdiInterface, SpiInterface, JTAGInterface>::params;
-
-		//HW interfaces
-	template<class HwInterface, class PdiInterface, class SpiInterface, class JTAGInterface>
-	PdiInterface MkIIProtocol<HwInterface, PdiInterface, SpiInterface, JTAGInterface>::_pdi;
-
-	template<class HwInterface, class PdiInterface, class SpiInterface, class JTAGInterface>
-	NullProgInterface MkIIProtocol<HwInterface, PdiInterface, SpiInterface, JTAGInterface>::_nullProg;
-
-	template<class HwInterface, class PdiInterface, class SpiInterface, class JTAGInterface>
-	ProgInterface *MkIIProtocol<HwInterface, PdiInterface, SpiInterface, JTAGInterface>::_progIface;
-	
-		//targets
-	template<class HwInterface, class PdiInterface, class SpiInterface, class JTAGInterface>
-	XMega::Xmega<CheckSummUpdater<HwInterface> >
-		MkIIProtocol<HwInterface, PdiInterface, SpiInterface, JTAGInterface>::_xmega;
-
-	template<class HwInterface, class PdiInterface, class SpiInterface, class JTAGInterface>
-	NullTargetDeviceCtrl MkIIProtocol<HwInterface, PdiInterface, SpiInterface, JTAGInterface>::_nullTarget;
-
-	template<class HwInterface, class PdiInterface, class SpiInterface, class JTAGInterface>
-	TargetDeviceCtrl * MkIIProtocol<HwInterface, PdiInterface, SpiInterface, JTAGInterface>::_target;
-
-	template<class HwInterface, class PdiInterface, class SpiInterface, class JTAGInterface>
-	DeviceDescriptor MkIIProtocol<HwInterface, PdiInterface, SpiInterface, JTAGInterface>::deviceDescriptor;
-
-	template<class HwInterface, class PdiInterface, class SpiInterface, class JTAGInterface>
-	MessageHeader MkIIProtocol<HwInterface, PdiInterface, SpiInterface, JTAGInterface>::header;
 }
