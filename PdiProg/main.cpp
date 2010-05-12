@@ -33,12 +33,12 @@ ISR(USART_RXC_vect)
 	interface::RxHandler();
 }
 
+Protocol protocol;
 
 int main()
 {
-	interface::Init(115200);
+	interface::Init(19200);
 	sei();
-	Protocol protocol;
 
 	IO::Portb::DirWrite(0xff);
 

@@ -64,12 +64,17 @@ namespace XMega
 	class Xmega :public TargetDeviceCtrl
 	{
 		public:
+		
+		Xmega(ProgParameters *progParams, DeviceDescriptor *deviceDescroptor)
+			:TargetDeviceCtrl(progParams, deviceDescroptor)
+		{		
+		}
 
 		virtual void EnterProgMode()
 		{
 			_progIface->Enable();
-			_progIface->Write(Pdi::CMD_STCS | Pdi::RESET_REG);	
-			_progIface->Write(Pdi::RESET_KEY);
+			_progIface->WriteByte(Pdi::CMD_STCS | Pdi::RESET_REG);	
+			_progIface->WriteByte(Pdi::RESET_KEY);
 
 			//_progIface->Write(Pdi::CMD_STCS | Pdi::CTRL_REG);	
 			//_progIface->Write(0x04);
@@ -82,8 +87,8 @@ namespace XMega
 
 		virtual void LeaveProgMode()
 		{
-			_progIface->Write(Pdi::CMD_STCS | Pdi::RESET_REG);	
-			_progIface->Write(0x00);
+			_progIface->WriteByte(Pdi::CMD_STCS | Pdi::RESET_REG);	
+			_progIface->WriteByte(0x00);
 			_progIface->Disable();
 		}
 
@@ -97,9 +102,9 @@ namespace XMega
 			switch(memType)
 			{
 				case SIGN_JTAG:
-					Comm::Putch(0x1E);
-					Comm::Putch(0x97);
-					Comm::Putch(0x4C);
+				//	Comm::Putch(0x1E);
+				//	Comm::Putch(0x97);
+				//	Comm::Putch(0x4C);
 					break;
 				case IO_SHADOW:
 				case SRAM:
@@ -117,10 +122,15 @@ namespace XMega
 				case XMEGA_CALIBRATION_SIGNATURE:
 				case XMEGA_USER_SIGNATURE:
 				default:
-					for(uint32_t i=0; i<size; i++)
-					{
-						Comm::Putch(0xff);
-					}
+				break;
+			}
+
+			if(!ReadMemory(address, size))
+			{
+				for(uint32_t i=0; i<size; i++)
+				{
+					Comm::Write(0x00);
+				}
 			}
 		}
 
@@ -153,6 +163,34 @@ namespace XMega
 			}
 		}
 	protected:
+
+		bool ReadMemory(uint32_t readAddress, uint16_t size)
+		{
+			if (!(WaitWhileControllerBusy()))
+				return false;
+
+			_progIface->WriteByte(Pdi::CMD_STS | (Pdi::DATSIZE_4BYTES << 2));
+
+			_progIface->Write(_progParams->PDI_NVM_Offset | REG_CMD);
+
+			_progIface->WriteByte(CMD_READNVM);
+
+			_progIface->WriteByte(Pdi::CMD_ST | (Pdi::POINTER_DIRECT << 2) | Pdi::DATSIZE_4BYTES);
+			_progIface->Write(readAddress);
+
+			_progIface->WriteByte(Pdi::CMD_REPEAT | Pdi::DATSIZE_1BYTE);
+			_progIface->WriteByte(size - 1);
+
+			_progIface->WriteByte(Pdi::CMD_LD | (Pdi::POINTER_INDIRECT_PI << 2) | Pdi::DATSIZE_1BYTE);
+			while (size--)
+			{
+				uint8_t c = _progIface->ReadByte();
+				Comm::Write(c);
+			}
+
+			return true;
+		}
+
 		bool WaitWhileBusBusy()
 		{
 			uint16_t timeout=500;

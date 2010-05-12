@@ -20,7 +20,7 @@ namespace Pdi
 		RESET_REG             = 0x1,
 		CTRL_REG              = 0x2,
 
-		STATUS_NVM            = (1 << 1),
+		STATUS_NVM            = 0x02,
 		RESET_KEY             = 0x59,
 
 		DATSIZE_1BYTE         = 0x0,

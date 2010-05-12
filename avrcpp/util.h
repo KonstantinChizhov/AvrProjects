@@ -15,6 +15,13 @@ union Int32
 	uint8_t Bytes[4];
 };
 
+union Int16
+{
+	uint16_t Word;
+	uint8_t Bytes[2];
+};
+
+
 template<int num, int pow> 
 struct Pow 
 {
@@ -353,16 +360,27 @@ public:
 	}
 
 	template<class T>
-	static T Read()
+	static void Read(T &value)
 	{
-		union
-		{
-			T value;
-			uint8_t rawData[sizeof(T)];
-		};
+		Read(&value, sizeof(T));
+	}
 
-		Read(rawData, sizeof(T));
-		return value;
+	static uint32_t ReadU32()
+	{
+		Int32 i;
+		i.Bytes[0] = DATA_SOURCE::Read();
+		i.Bytes[1] = DATA_SOURCE::Read();
+		i.Bytes[2] = DATA_SOURCE::Read();
+		i.Bytes[3] = DATA_SOURCE::Read();
+		return i.Dword;
+	}
+
+	static uint16_t ReadU16()
+	{
+		Int16 i;
+		i.Bytes[0] = DATA_SOURCE::Read();
+		i.Bytes[1] = DATA_SOURCE::Read();
+		return i.Word;
 	}
 };
 

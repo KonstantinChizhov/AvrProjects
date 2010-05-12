@@ -1,16 +1,18 @@
 #pragma once
 #include "ProgInterface.h"
 #include "DeviceDescriptor.h"
+#include "ProgrammerParameters.h"
 
 class TargetDeviceCtrl
 {
 public:
-	void SetDeviceDescriptor(DeviceDescriptor *descroptor)
+	TargetDeviceCtrl(ProgParameters *progParams, DeviceDescriptor *deviceDescroptor)
 	{
-		_deviceDescriptor = descroptor;
+		_deviceDescriptor = deviceDescroptor;
+		_progParams = progParams;
 	}
 
-	virtual void SetProgInterface(ProgInterface *iface)
+	void SetProgInterface(ProgInterface *iface)
 	{
 		_progIface = iface;
 	}
@@ -22,10 +24,16 @@ public:
 protected:
 	ProgInterface *_progIface;
 	DeviceDescriptor *_deviceDescriptor;
+	ProgParameters *_progParams;
 };
 
 class NullTargetDeviceCtrl : public TargetDeviceCtrl
 {
+public:
+	NullTargetDeviceCtrl()
+		:TargetDeviceCtrl(0,0)
+	{}
+
 	virtual void EnterProgMode(){}
 	virtual void LeaveProgMode(){}
 	virtual uint32_t GetJTAGID()

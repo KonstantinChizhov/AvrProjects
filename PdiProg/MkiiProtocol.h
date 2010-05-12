@@ -9,17 +9,11 @@
 #include "constants.h"
 #include "DeviceDescriptor.h"
 #include "CheckSummUpdater.h"
+#include "ProgrammerParameters.h"
+
 
 namespace MkII
 {
-	struct DaisyChainInfoT
-	{
-		uint8_t UnitsBefore;
-		uint8_t UnitsAfter;
-		uint8_t BitsBefore;
-		uint8_t BitsAfter;
-	};
-
 	struct MessageHeader
 	{
 		uint16_t seqNumber;
@@ -27,24 +21,6 @@ namespace MkII
 		uint8_t messageId;
 	};
 
-//----------------------------------------------------------------------------
-// 
-//----------------------------------------------------------------------------
-
-struct ParametersT
-{
-	EmulatorMode EmuMode;
-	DaisyChainInfoT ChainInfo;
-	uint8_t ExternalReset;
-	uint8_t JTAG_Clock;
-	uint16_t FlashPageSize;
-	uint8_t EEPROMPageSize;
-	uint32_t BootAddress;
-	uint32_t PDI_NVM_Offset;
-	uint32_t PDI_FlashOffset;
-	uint32_t PDI_FlashBootOffset;
-	uint8_t RunAfterProgramming;
-};
 
 //----------------------------------------------------------------------------
 // 
@@ -57,9 +33,9 @@ struct ParametersT
 		>
 	class MkIIProtocol
 	{
-		public:
+	public:
 		typedef CheckSummUpdater<HwInterface> interface;
-		private:
+	private:
 		//HW interfaces
 		PdiInterface _pdi;
 		NullProgInterface _nullProg;
@@ -69,8 +45,20 @@ struct ParametersT
 		XMega::Xmega<CheckSummUpdater<HwInterface> > _xmega;
 		NullTargetDeviceCtrl _nullTarget;
 		TargetDeviceCtrl * _target;
+		ProgParameters _params;
+		DeviceDescriptor _deviceDescriptor;
+		MessageHeader _header;
 
 	public:
+
+		MkIIProtocol()
+		:_xmega(&_params, &_deviceDescriptor)
+		{
+			_params.EmuMode = Unknown;
+			_progIface = &_nullProg;
+			_target = &_nullTarget;
+		}
+
 		void SetMode(EmulatorMode mode)
 		{
 			switch(mode)
@@ -90,49 +78,41 @@ struct ParametersT
 					_target = &_nullTarget;
 			}
 			_target->SetProgInterface(_progIface);
-			_target->SetDeviceDescriptor(&deviceDescriptor);
 		}
 
-		void Init()
-		{
-			params.EmuMode = Unknown;
-			_progIface = &_nullProg;
-			_target = &_nullTarget;
-		}
-
-		void SendMessageHeader(const MessageHeader &header, uint16_t size, Responses response)
+		void SendMessageHeader(const MessageHeader &_header, uint16_t size, Responses response)
 		{
 			interface::BeginTxFrame();
 			interface::Write(uint8_t(MessageStart));
-			interface::Write(header.seqNumber);
+			interface::Write(_header.seqNumber);
 			interface::Write(size);
 			interface::Write(uint8_t(Token));
 			interface::Write(uint8_t(response));
 		}
 
-		void Send1ByteResponse(const MessageHeader &header, Responses response)
+		void Send1ByteResponse(const MessageHeader &_header, Responses response)
 		{
-			SendMessageHeader(header, 1, response);
+			SendMessageHeader(_header, 1, response);
 			interface::EndTxFrame();
 		}
 
 		template<class T>
-		void SendResponse(const MessageHeader &header, Responses response, const T&value)
+		void SendResponse(const MessageHeader &_header, Responses response, const T&value)
 		{
-			SendMessageHeader(header, sizeof(value)+1, response);
+			SendMessageHeader(_header, sizeof(value)+1, response);
 			interface::Write(value);
 			interface::EndTxFrame();
 		}
 
 		template<class T>
-		void ParamResponse(const MessageHeader &header, const T&value)
+		void ParamResponse(const MessageHeader &_header, const T&value)
 		{
-			SendResponse(header, RSP_PARAMETER, value);
+			SendResponse(_header, RSP_PARAMETER, value);
 		}
 
-		void SingOn(const MessageHeader &header)
+		void SingOn(const MessageHeader &_header)
 		{
-			SendMessageHeader(header, 29, RSP_SIGN_ON);
+			SendMessageHeader(_header, 29, RSP_SIGN_ON);
 
 			interface::Write(uint8_t(0));// Communications protocol version [BYTE]
 			interface::Write(uint8_t(0));// M_MCU boot-loader FW version [BYTE]
@@ -149,10 +129,10 @@ struct ParametersT
 			interface::EndTxFrame();
 		}
 
-		void SelfTest(const MessageHeader &header)
+		void SelfTest(const MessageHeader &_header)
 		{
-			uint8_t flags = interface::Read<uint8_t>();
-			SendMessageHeader(header, 9, RSP_SELFTEST);
+			uint8_t flags = interface::Read();
+			SendMessageHeader(_header, 9, RSP_SELFTEST);
 			for(uint8_t i=0; i<8; i++)
 			{
 				interface::Write(flags&1);
@@ -163,110 +143,110 @@ struct ParametersT
 
 		void PollInterface()
 		{
-			if(Read<uint8_t>() != MessageStart)
+			if(interface::Read() != MessageStart)
 				return;
 			
-			header.seqNumber = Read<uint16_t>();
-			header.messageLen = Read<uint32_t>();
-			if(Read<uint8_t>() != Token)
+			_header.seqNumber = interface::ReadU16();
+			_header.messageLen = interface::ReadU32();
+			if(interface::Read() != Token)
 				return;
-			header.messageId = Read<uint8_t>();
+			_header.messageId = interface::Read();
 			
-			ProcessCommand(header);
-			uint16_t crc = Read<uint16_t>();
+			ProcessCommand(_header);
+			uint16_t crc = interface::ReadU16();
 		}
 
-		void GetParameter(const MessageHeader &header)
+		void GetParameter(const MessageHeader &_header)
 		{
-			uint8_t parameter = Read<uint8_t>();
+			uint8_t parameter = interface::Read();
 			//IO::Portb::Write(parameter);
 			switch(parameter)
 			{
 				case BaudRate:
-					ParamResponse<uint8_t>(header, 0x04);
+					ParamResponse<uint8_t>(_header, 0x04);
 					break;
 				case OCD_Vtarget:
-					ParamResponse<uint16_t>(header, 0x0ce4);//3.3 v
+					ParamResponse<uint16_t>(_header, 0x0ce4);//3.3 v
 					break;
 				case DaisyChainInfo:
-					ParamResponse<DaisyChainInfoT>(header, params.ChainInfo );
+					ParamResponse<ProgDaisyChainInfo>(_header, _params.ChainInfo );
 					break;
 				case ExternalReset:
-					ParamResponse<uint8_t>(header, params.ExternalReset);
+					ParamResponse<uint8_t>(_header, _params.ExternalReset);
 					break;
 				case EmulatorMODE:
-					ParamResponse<uint8_t>(header, params.EmuMode);
+					ParamResponse<uint8_t>(_header, _params.EmuMode);
 					break;
 				case OCD_JTAG_Clock:
-					ParamResponse<uint8_t>(header, params.JTAG_Clock);
+					ParamResponse<uint8_t>(_header, _params.JTAG_Clock);
 					break;
 				case FlashPageSize:
-					ParamResponse<uint16_t>(header, params.FlashPageSize);
+					ParamResponse<uint16_t>(_header, _params.FlashPageSize);
 					break;
 				case EEPROMPageSize:
-					ParamResponse<uint8_t>(header, params.EEPROMPageSize);
+					ParamResponse<uint8_t>(_header, _params.EEPROMPageSize);
 					break;
 				case BootAddress:
-					ParamResponse<uint32_t>(header, params.BootAddress);
+					ParamResponse<uint32_t>(_header, _params.BootAddress);
 					break;
 				case JTAGID:
-					ParamResponse<uint32_t>(header, _target->GetJTAGID());
+					ParamResponse<uint32_t>(_header, _target->GetJTAGID());
 					break;
 				case PDI_NVM_Offset:
-					ParamResponse<uint32_t>(header, params.PDI_NVM_Offset);
+					ParamResponse<uint32_t>(_header, _params.PDI_NVM_Offset);
 					break;
  				case PDI_FlashOffset:
-					ParamResponse<uint32_t>(header, params.PDI_FlashOffset);
+					ParamResponse<uint32_t>(_header, _params.PDI_FlashOffset);
 					break;
 	 			case PDI_FlashBootOffset:
-					ParamResponse<uint32_t>(header, params.PDI_FlashBootOffset);
+					ParamResponse<uint32_t>(_header, _params.PDI_FlashBootOffset);
 					break;
 
 				default:
 					//::Portb::Write(parameter);
-					Send1ByteResponse(header, RSP_ILLEGAL_PARAMETER);
+					Send1ByteResponse(_header, RSP_ILLEGAL_PARAMETER);
 			}			
 		}
 
-		void SetParameter(const MessageHeader &header)
+		void SetParameter(const MessageHeader &_header)
 		{
-			uint8_t parameter = Read<uint8_t>();
+			uint8_t parameter = interface::Read();
 			
 			switch(parameter)
 			{
 				case DaisyChainInfo:
-					params.ChainInfo = Read<DaisyChainInfoT>();
+					interface::Read(_params.ChainInfo);
 					break;
 				case ExternalReset:
-					params.ExternalReset = Read<uint8_t>();
+					_params.ExternalReset = interface::Read();
 					break;
 				case OCD_JTAG_Clock:
-					params.JTAG_Clock = Read<uint8_t>();
+					_params.JTAG_Clock =interface:: Read();
 					break;
 				case EmulatorMODE:
-					params.EmuMode = (EmulatorMode)Read<uint8_t>();
-					SetMode(params.EmuMode);
+					_params.EmuMode = (EmulatorMode)interface::Read();
+					SetMode(_params.EmuMode);
 					break;
 				case FlashPageSize:
-					params.FlashPageSize = Read<uint16_t>();
+					_params.FlashPageSize = interface::ReadU16();
 					break;
 				case EEPROMPageSize:
-					params.EEPROMPageSize = Read<uint8_t>();
+					_params.EEPROMPageSize = interface::Read();
 					break;
 				case BootAddress:
-					params.BootAddress = Read<uint32_t>();
+					_params.BootAddress = interface::Read();
 					break;
 				case PDI_NVM_Offset:
-					params.PDI_NVM_Offset = Read<uint32_t>();
+					_params.PDI_NVM_Offset = interface::ReadU32();
 					break;
  				case PDI_FlashOffset:
-					params.PDI_FlashOffset = Read<uint32_t>();
+					_params.PDI_FlashOffset =interface:: ReadU32();
 					break;
 	 			case PDI_FlashBootOffset:
-					params.PDI_FlashBootOffset = Read<uint32_t>();
+					_params.PDI_FlashBootOffset = interface::ReadU32();
 					break;
 				case RunAfterProgramming:
-					params.RunAfterProgramming = Read<uint8_t>();
+					_params.RunAfterProgramming = interface::Read();
 					break;
 
 				case AllowPageProgrammingInScanChain:
@@ -276,16 +256,16 @@ struct ParametersT
 					return;
 				default:
 					//IO::Portb::Write(parameter);
-					Send1ByteResponse(header, RSP_ILLEGAL_PARAMETER);
+					Send1ByteResponse(_header, RSP_ILLEGAL_PARAMETER);
 			}
-			Send1ByteResponse(header, RSP_OK); 
+			Send1ByteResponse(_header, RSP_OK); 
 		}
 
 		void SetBaund()
 		{
-			uint8_t baund = Read<uint8_t>();
+			uint8_t baund = interface::Read();
 			HwInterface::Disable();
-			Send1ByteResponse(header, RSP_OK); 
+			Send1ByteResponse(_header, RSP_OK); 
 			switch(baund)
 			{
 				case 0x05: HwInterface::Init(38400);break;
@@ -296,50 +276,50 @@ struct ParametersT
 			}
 		}
 
-		void ProcessCommand(const MessageHeader &header)
+		void ProcessCommand(const MessageHeader &_header)
 		{
-			//IO::Portb::Write(header.messageId);
-			switch(header.messageId)
+			//IO::Portb::Write(_header.messageId);
+			switch(_header.messageId)
 			{
 				case CMND_SIGN_OFF:
-					Send1ByteResponse(header, RSP_OK);
+					Send1ByteResponse(_header, RSP_OK);
 					break;
 				case CMND_GET_SIGN_ON:
-					SingOn(header); 
+					SingOn(_header); 
 					break;
 
 				case CMND_SET_PARAMETER:
-					SetParameter(header); 
+					SetParameter(_header); 
 					break;
 				case CMND_GET_PARAMETER:
-					GetParameter(header); 
+					GetParameter(_header); 
 					break;
 
 				case CMND_ENTER_PROGMODE:
 					_target->EnterProgMode();
-					Send1ByteResponse(header, RSP_OK);
+					Send1ByteResponse(_header, RSP_OK);
 					break;
 				case CMND_LEAVE_PROGMODE:
 					_target->LeaveProgMode();
-					Send1ByteResponse(header, RSP_OK); 
+					Send1ByteResponse(_header, RSP_OK); 
 					break;
 				break;
 
 				case CMND_SELFTEST:
-					SelfTest(header);
+					SelfTest(_header);
 				break;
 
 				case CMND_WRITE_MEMORY:
-					WriteMem(header);
+					WriteMem(_header);
 				break;
 
 				case CMND_READ_MEMORY:
-					ReadMem(header);
+					ReadMem(_header);
 				break;
 				
 				case CMND_SET_DEVICE_DESCRIPTOR:
-					interface::Read(&deviceDescriptor, sizeof(deviceDescriptor));
-					Send1ByteResponse(header, RSP_OK);
+					interface::Read(&_deviceDescriptor, sizeof(_deviceDescriptor));
+					Send1ByteResponse(_header, RSP_OK);
 				break;
 
 				case CMND_WRITE_PC:
@@ -368,37 +348,33 @@ struct ParametersT
 				case CMND_XMEGA_ERASE:
 
 				default:
-					//IO::Portb::Write(header.messageId);
-					Send1ByteResponse(header, RSP_ILLEGAL_COMMAND);
+					//IO::Portb::Write(_header.messageId);
+					Send1ByteResponse(_header, RSP_ILLEGAL_COMMAND);
 			}
 		}
 
-		void WriteMem(const MessageHeader &header)
+		void WriteMem(const MessageHeader &_header)
 		{
-			uint8_t memType = Read<uint8_t>();
-			uint32_t size = Read<uint32_t>();
-			uint32_t address = Read<uint32_t>();
+			uint8_t memType = interface::Read();
+			uint32_t size = interface::ReadU32();
+			uint32_t address = interface::ReadU32();
 			_target->WriteMem(memType, size, address);
 
-			interface::Read<uint16_t>();//ignore crc
+			interface::ReadU16();//ignore crc
 
-			Send1ByteResponse(header, RSP_OK);
+			Send1ByteResponse(_header, RSP_OK);
 		}
 
-		void ReadMem(const MessageHeader &header)
+		void ReadMem(const MessageHeader &_header)
 		{
-			uint8_t memType = interface::Read<uint8_t>();
-			uint32_t size = interface::Read<uint32_t>();
-			uint32_t address = interface::Read<uint32_t>();
-			interface::Read<uint16_t>();//ignore crc
-			SendMessageHeader(header, size+1, RSP_MEMORY);
+			uint8_t memType = interface::Read();
+			uint32_t size = interface::ReadU32();
+			uint32_t address = interface::ReadU32();
+			interface::ReadU16();//ignore crc
+			SendMessageHeader(_header, size+1, RSP_MEMORY);
 			_target->ReadMem(memType, size, address);
 			interface::EndTxFrame();
 		}
-
-		ParametersT params;
-		DeviceDescriptor deviceDescriptor;
-		MessageHeader header;
 	};
 
 }

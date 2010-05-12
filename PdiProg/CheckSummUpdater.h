@@ -5,7 +5,7 @@
 	class CheckSummUpdater :public DATA_SOURCE
 	{
 	public:
-		using DATA_SOURCE::Read<T>;
+		using DATA_SOURCE::Read;
 		using DATA_SOURCE::Write;
 
 		static uint8_t Putch(uint8_t c)
