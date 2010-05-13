@@ -114,15 +114,15 @@ namespace MkII
 		{
 			SendMessageHeader(29, RSP_SIGN_ON);
 
-			interface::Write(uint8_t(0));	// Communications protocol version [BYTE]
+			interface::Write(uint8_t(1));	// Communications protocol version [BYTE]
 			interface::Write(uint8_t(0));	// M_MCU boot-loader FW version [BYTE]
 			interface::Write(uint8_t(20));	// M_MCU firmware version (minor) [BYTE]
 			interface::Write(uint8_t(6));	// M_MCU firmware version (major) [BYTE]
-			interface::Write(uint8_t(0));	// M_MCU hardware version [BYTE]
+			interface::Write(uint8_t(2));	// M_MCU hardware version [BYTE]
 			interface::Write(uint8_t(0));	// S_MCU boot-loader FW version [BYTE]
 			interface::Write(uint8_t(20));	// S_MCU firmware version (minor) [BYTE]
 			interface::Write(uint8_t(6));	// S_MCU firmware version (major) [BYTE]
-			interface::Write(uint8_t(0));	// S_MCU hardware version [BYTE]
+			interface::Write(uint8_t(2));	// S_MCU hardware version [BYTE]
 			interface::Puts("123456");		//(USB) EEPROM stored s/n [BYTE] * 6,LSB FIRST
 			interface::Puts("JTAGICE mkII");
 			interface::Write(uint8_t(0));
