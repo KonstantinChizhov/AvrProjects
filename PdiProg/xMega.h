@@ -78,11 +78,9 @@ namespace XMega
 
 			//_progIface->Write(Pdi::CMD_STCS | Pdi::CTRL_REG);	
 			//_progIface->Write(0x04);
-
-			uint8_t nvmKey[] = PDI_NVMENABLE_KEY;
-			for (uint8_t i = sizeof(nvmKey); i > 0; i--)
-				_progIface->Write(nvmKey[i - 1]);
-
+			_progIface->WriteByte(Pdi::CMD_KEY);
+			long long key = 0x1289AB45CDD888FFll;
+			_progIface->Write(key);
 		}
 
 		virtual void LeaveProgMode()

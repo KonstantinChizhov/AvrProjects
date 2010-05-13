@@ -43,7 +43,7 @@ namespace MkII
 		//targets
 
 		XMega::Xmega<interface> _xmega;
-		NullTargetDeviceCtrl _nullTarget;
+		NullTargetDeviceCtrl<interface> _nullTarget;
 		TargetDeviceCtrl * _target;
 		ProgParameters _params;
 		DeviceDescriptor _deviceDescriptor;
@@ -61,13 +61,14 @@ namespace MkII
 
 		void SetMode(EmulatorMode mode)
 		{
+			//IO::Portb::Write(mode);
 			switch(mode)
 			{
 				case PDI_XMEGA:
+				//	_progIface = &_pdi;
+				//	_target = &_xmega;
+				//	break;
 				case JTAG_XMEGA:
-					_progIface = &_pdi;
-					_target = &_xmega;
-					break;
 				case Spi:		//To be impemented
 				case JTAG_Mega:	//To be impemented	
 				case DebugWire:
@@ -85,7 +86,7 @@ namespace MkII
 			interface::BeginTxFrame();
 			interface::Write(uint8_t(MessageStart));
 			interface::Write(_header.seqNumber);
-			interface::Write(size);
+			interface::Write(uint32_t(size));
 			interface::Write(uint8_t(Token));
 			interface::Write(uint8_t(response));
 		}
@@ -157,7 +158,7 @@ namespace MkII
 			}
 			
 			_header.seqNumber = interface::ReadU16();
-			IO::Portb::Write(_header.seqNumber);
+			
 			_header.messageLen = interface::ReadU32();
 
 			if(interface::Read() != Token)
@@ -167,9 +168,9 @@ namespace MkII
 			}
 
 			_header.messageId = interface::Read();
-
+		
 			ProcessCommand();
-			uint16_t crc = interface::ReadU16();
+			//uint16_t crc = interface::ReadU16();
 		}
 
 		void GetParameter()
@@ -219,7 +220,7 @@ namespace MkII
 					break;
 
 				default:
-					//::Portb::Write(parameter);
+					//IO::Portb::Write(parameter);
 					Send1ByteResponse(RSP_ILLEGAL_PARAMETER);
 			}			
 		}
@@ -250,7 +251,7 @@ namespace MkII
 					_params.EEPROMPageSize = interface::Read();
 					break;
 				case BootAddress:
-					_params.BootAddress = interface::Read();
+					_params.BootAddress = interface::ReadU32();
 					break;
 				case PDI_NVM_Offset:
 					_params.PDI_NVM_Offset = interface::ReadU32();
@@ -294,7 +295,7 @@ namespace MkII
 
 		void ProcessCommand()
 		{
-			//IO::Portb::Write(_header.messageId);
+			IO::Portb::Write(_header.messageId);
 			switch(_header.messageId)
 			{
 				case CMND_SIGN_OFF:
@@ -337,6 +338,9 @@ namespace MkII
 					interface::Read(&_deviceDescriptor, sizeof(_deviceDescriptor));
 					Send1ByteResponse(RSP_OK);
 				break;
+				case CMND_CLEAR_EVENTS:
+					Send1ByteResponse(RSP_OK);
+				break;
 
 				case CMND_WRITE_PC:
 				case CMND_READ_PC:
@@ -352,7 +356,6 @@ namespace MkII
 				case CMND_CLR_BREAK:
 				case CMND_RUN_TO_ADDR:
 				case CMND_SPI_CMD:
-				case CMND_CLEAR_EVENTS:
 				case CMND_RESTORE_TARGET:
 				case CMND_ISP_PACKET:
 				case CMND_JTAG_INSTR:
@@ -383,6 +386,12 @@ namespace MkII
 			uint8_t memType = interface::Read();
 			uint32_t size = interface::ReadU32();
 			uint32_t address = interface::ReadU32();
+			Int32 i;
+			i.Dword = address;
+			//IO::Portb::Write(memType);
+			//IO::Portb::Write(size);
+			//IO::Portb::Write(i.Bytes[0]);
+
 			SendMessageHeader(size+1, RSP_MEMORY);
 			_target->ReadMem(memType, size, address);
 			interface::EndTxFrame();

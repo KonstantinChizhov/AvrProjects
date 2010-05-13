@@ -126,7 +126,8 @@ public:
 
 	static uint8_t Read()
 	{
-		uint8_t c;
+		//uint16_t timeout = 1000;
+		uint8_t c=0;
 		while(!DATA_SOURCE::Getch(c));
 		return c;
 	}

@@ -27,6 +27,7 @@ protected:
 	ProgParameters *_progParams;
 };
 
+template<class Comm>
 class NullTargetDeviceCtrl : public TargetDeviceCtrl
 {
 public:
@@ -38,11 +39,29 @@ public:
 	virtual void LeaveProgMode(){}
 	virtual uint32_t GetJTAGID()
 	{
-		return 0;
+		return 0x0974C03F;
 	}
 
 	virtual void ReadMem(uint8_t memType, uint32_t size, uint32_t address)
-	{}
+	{
+		switch(memType)
+			{
+				case SIGN_JTAG:
+					Comm::Write(uint8_t(0x1E));
+					Comm::Write(uint8_t(0x97));
+					Comm::Write(uint8_t(0x4C));
+					break;
+				default:
+					Comm::Write(uint8_t(0x1E));
+					Comm::Write(uint8_t(0x97));
+					Comm::Write(uint8_t(0x4C));
+				//	for(uint32_t i=0; i<size; i++)
+					//{
+					//	Comm::Write(0xff);
+				//	}
+				break;
+			}
+	}
 
 	virtual void WriteMem(uint8_t memType, uint32_t size, uint32_t address)
 	{}
