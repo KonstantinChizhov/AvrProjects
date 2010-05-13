@@ -5,8 +5,6 @@
 	class CheckSummUpdater :public DATA_SOURCE
 	{
 	public:
-		using DATA_SOURCE::Read;
-		using DATA_SOURCE::Write;
 
 		static uint8_t Putch(uint8_t c)
 		{
@@ -27,6 +25,20 @@
 				return 1;
 			}
 			return 0;
+		}
+
+		static void Write(uint8_t c)
+		{
+			DATA_SOURCE::Write(c);
+			_writeCrc = Crc16_0x8408(c, _writeCrc);
+		}
+
+		static uint8_t Read()
+		{
+			uint8_t c = DATA_SOURCE::Read();
+			if(calcRxCrc)
+				_readCrc = Crc16_0x8408(c, _readCrc);
+			return c;
 		}
 
 		static void ResetWriteCrc()
