@@ -34,7 +34,7 @@ namespace MkII
 	class MkIIProtocol
 	{
 	public:
-		typedef CheckSummUpdater<HwInterface> interface;
+		typedef BinaryFormater<CheckSummUpdater<WaitAdapter< HwInterface> > > interface;
 	private:
 		//HW interfaces
 		PdiInterface _pdi;
@@ -42,7 +42,7 @@ namespace MkII
 		ProgInterface *_progIface;
 		//targets
 
-		XMega::Xmega<CheckSummUpdater<HwInterface> > _xmega;
+		XMega::Xmega<interface> _xmega;
 		NullTargetDeviceCtrl _nullTarget;
 		TargetDeviceCtrl * _target;
 		ProgParameters _params;
@@ -80,7 +80,7 @@ namespace MkII
 			_target->SetProgInterface(_progIface);
 		}
 
-		void SendMessageHeader(const MessageHeader &_header, uint16_t size, Responses response)
+		void SendMessageHeader(uint16_t size, Responses response)
 		{
 			interface::BeginTxFrame();
 			interface::Write(uint8_t(MessageStart));
@@ -90,49 +90,49 @@ namespace MkII
 			interface::Write(uint8_t(response));
 		}
 
-		void Send1ByteResponse(const MessageHeader &_header, Responses response)
+		void Send1ByteResponse(Responses response)
 		{
-			SendMessageHeader(_header, 1, response);
+			SendMessageHeader(1, response);
 			interface::EndTxFrame();
 		}
 
 		template<class T>
-		void SendResponse(const MessageHeader &_header, Responses response, const T&value)
+		void SendResponse(Responses response, const T&value)
 		{
-			SendMessageHeader(_header, sizeof(value)+1, response);
+			SendMessageHeader(sizeof(value)+1, response);
 			interface::Write(value);
 			interface::EndTxFrame();
 		}
 
 		template<class T>
-		void ParamResponse(const MessageHeader &_header, const T&value)
+		void ParamResponse(const T&value)
 		{
-			SendResponse(_header, RSP_PARAMETER, value);
+			SendResponse(RSP_PARAMETER, value);
 		}
 
-		void SingOn(const MessageHeader &_header)
+		void SingOn()
 		{
-			SendMessageHeader(_header, 29, RSP_SIGN_ON);
+			SendMessageHeader(29, RSP_SIGN_ON);
 
-			interface::Write(uint8_t(0));// Communications protocol version [BYTE]
-			interface::Write(uint8_t(0));// M_MCU boot-loader FW version [BYTE]
-			interface::Write(uint8_t(20));// M_MCU firmware version (minor) [BYTE]
-			interface::Write(uint8_t(6));// M_MCU firmware version (major) [BYTE]
-			interface::Write(uint8_t(0));// M_MCU hardware version [BYTE]
-			interface::Write(uint8_t(0));// S_MCU boot-loader FW version [BYTE]
-			interface::Write(uint8_t(20));// S_MCU firmware version (minor) [BYTE]
-			interface::Write(uint8_t(6));// S_MCU firmware version (major) [BYTE]
-			interface::Write(uint8_t(0));// S_MCU hardware version [BYTE]
-			interface::Puts("123456");	//(USB) EEPROM stored s/n [BYTE] * 6,LSB FIRST
+			interface::Write(uint8_t(0));	// Communications protocol version [BYTE]
+			interface::Write(uint8_t(0));	// M_MCU boot-loader FW version [BYTE]
+			interface::Write(uint8_t(20));	// M_MCU firmware version (minor) [BYTE]
+			interface::Write(uint8_t(6));	// M_MCU firmware version (major) [BYTE]
+			interface::Write(uint8_t(0));	// M_MCU hardware version [BYTE]
+			interface::Write(uint8_t(0));	// S_MCU boot-loader FW version [BYTE]
+			interface::Write(uint8_t(20));	// S_MCU firmware version (minor) [BYTE]
+			interface::Write(uint8_t(6));	// S_MCU firmware version (major) [BYTE]
+			interface::Write(uint8_t(0));	// S_MCU hardware version [BYTE]
+			interface::Puts("123456");		//(USB) EEPROM stored s/n [BYTE] * 6,LSB FIRST
 			interface::Puts("JTAGICE mkII");
 			interface::Write(uint8_t(0));
 			interface::EndTxFrame();
 		}
 
-		void SelfTest(const MessageHeader &_header)
+		void SelfTest()
 		{
 			uint8_t flags = interface::Read();
-			SendMessageHeader(_header, 9, RSP_SELFTEST);
+			SendMessageHeader(9, RSP_SELFTEST);
 			for(uint8_t i=0; i<8; i++)
 			{
 				interface::Write(flags&1);
@@ -168,63 +168,63 @@ namespace MkII
 
 			_header.messageId = interface::Read();
 
-			ProcessCommand(_header);
+			ProcessCommand();
 			uint16_t crc = interface::ReadU16();
 		}
 
-		void GetParameter(const MessageHeader &_header)
+		void GetParameter()
 		{
 			uint8_t parameter = interface::Read();
 			//IO::Portb::Write(parameter);
 			switch(parameter)
 			{
 				case BaudRate:
-					ParamResponse<uint8_t>(_header, 0x04);
+					ParamResponse<uint8_t>(0x04);
 					break;
 				case OCD_Vtarget:
-					ParamResponse<uint16_t>(_header, 0x0ce4);//3.3 v
+					ParamResponse<uint16_t>(0x0ce4);//3.3 v
 					break;
 				case DaisyChainInfo:
-					ParamResponse<ProgDaisyChainInfo>(_header, _params.ChainInfo );
+					ParamResponse<ProgDaisyChainInfo>(_params.ChainInfo );
 					break;
 				case ExternalReset:
-					ParamResponse<uint8_t>(_header, _params.ExternalReset);
+					ParamResponse<uint8_t>(_params.ExternalReset);
 					break;
 				case EmulatorMODE:
-					ParamResponse<uint8_t>(_header, _params.EmuMode);
+					ParamResponse<uint8_t>(_params.EmuMode);
 					break;
 				case OCD_JTAG_Clock:
-					ParamResponse<uint8_t>(_header, _params.JTAG_Clock);
+					ParamResponse<uint8_t>(_params.JTAG_Clock);
 					break;
 				case FlashPageSize:
-					ParamResponse<uint16_t>(_header, _params.FlashPageSize);
+					ParamResponse<uint16_t>(_params.FlashPageSize);
 					break;
 				case EEPROMPageSize:
-					ParamResponse<uint8_t>(_header, _params.EEPROMPageSize);
+					ParamResponse<uint8_t>(_params.EEPROMPageSize);
 					break;
 				case BootAddress:
-					ParamResponse<uint32_t>(_header, _params.BootAddress);
+					ParamResponse<uint32_t>(_params.BootAddress);
 					break;
 				case JTAGID:
-					ParamResponse<uint32_t>(_header, _target->GetJTAGID());
+					ParamResponse<uint32_t>(_target->GetJTAGID());
 					break;
 				case PDI_NVM_Offset:
-					ParamResponse<uint32_t>(_header, _params.PDI_NVM_Offset);
+					ParamResponse<uint32_t>(_params.PDI_NVM_Offset);
 					break;
  				case PDI_FlashOffset:
-					ParamResponse<uint32_t>(_header, _params.PDI_FlashOffset);
+					ParamResponse<uint32_t>(_params.PDI_FlashOffset);
 					break;
 	 			case PDI_FlashBootOffset:
-					ParamResponse<uint32_t>(_header, _params.PDI_FlashBootOffset);
+					ParamResponse<uint32_t>(_params.PDI_FlashBootOffset);
 					break;
 
 				default:
 					//::Portb::Write(parameter);
-					Send1ByteResponse(_header, RSP_ILLEGAL_PARAMETER);
+					Send1ByteResponse(RSP_ILLEGAL_PARAMETER);
 			}			
 		}
 
-		void SetParameter(const MessageHeader &_header)
+		void SetParameter()
 		{
 			uint8_t parameter = interface::Read();
 			
@@ -272,16 +272,16 @@ namespace MkII
 					return;
 				default:
 					//IO::Portb::Write(parameter);
-					Send1ByteResponse(_header, RSP_ILLEGAL_PARAMETER);
+					Send1ByteResponse(RSP_ILLEGAL_PARAMETER);
 			}
-			Send1ByteResponse(_header, RSP_OK); 
+			Send1ByteResponse(RSP_OK); 
 		}
 
 		void SetBaund()
 		{
 			uint8_t baund = interface::Read();
 			HwInterface::Disable();
-			Send1ByteResponse(_header, RSP_OK); 
+			Send1ByteResponse(RSP_OK); 
 			switch(baund)
 			{
 				case 0x05: HwInterface::Init(38400);break;
@@ -292,50 +292,50 @@ namespace MkII
 			}
 		}
 
-		void ProcessCommand(const MessageHeader &_header)
+		void ProcessCommand()
 		{
 			//IO::Portb::Write(_header.messageId);
 			switch(_header.messageId)
 			{
 				case CMND_SIGN_OFF:
-					Send1ByteResponse(_header, RSP_OK);
+					Send1ByteResponse(RSP_OK);
 					break;
 				case CMND_GET_SIGN_ON:
-					SingOn(_header); 
+					SingOn(); 
 					break;
 
 				case CMND_SET_PARAMETER:
-					SetParameter(_header); 
+					SetParameter(); 
 					break;
 				case CMND_GET_PARAMETER:
-					GetParameter(_header); 
+					GetParameter(); 
 					break;
 
 				case CMND_ENTER_PROGMODE:
 					_target->EnterProgMode();
-					Send1ByteResponse(_header, RSP_OK);
+					Send1ByteResponse(RSP_OK);
 					break;
 				case CMND_LEAVE_PROGMODE:
 					_target->LeaveProgMode();
-					Send1ByteResponse(_header, RSP_OK); 
+					Send1ByteResponse(RSP_OK); 
 					break;
 				break;
 
 				case CMND_SELFTEST:
-					SelfTest(_header);
+					SelfTest();
 				break;
 
 				case CMND_WRITE_MEMORY:
-					WriteMem(_header);
+					WriteMem();
 				break;
 
 				case CMND_READ_MEMORY:
-					ReadMem(_header);
+					ReadMem();
 				break;
 				
 				case CMND_SET_DEVICE_DESCRIPTOR:
 					interface::Read(&_deviceDescriptor, sizeof(_deviceDescriptor));
-					Send1ByteResponse(_header, RSP_OK);
+					Send1ByteResponse(RSP_OK);
 				break;
 
 				case CMND_WRITE_PC:
@@ -365,29 +365,25 @@ namespace MkII
 
 				default:
 					//IO::Portb::Write(_header.messageId);
-					Send1ByteResponse(_header, RSP_ILLEGAL_COMMAND);
+					Send1ByteResponse(RSP_ILLEGAL_COMMAND);
 			}
 		}
 
-		void WriteMem(const MessageHeader &_header)
+		void WriteMem()
 		{
 			uint8_t memType = interface::Read();
 			uint32_t size = interface::ReadU32();
 			uint32_t address = interface::ReadU32();
 			_target->WriteMem(memType, size, address);
-
-			
-
-			Send1ByteResponse(_header, RSP_OK);
+			Send1ByteResponse(RSP_OK);
 		}
 
-		void ReadMem(const MessageHeader &_header)
+		void ReadMem()
 		{
 			uint8_t memType = interface::Read();
 			uint32_t size = interface::ReadU32();
 			uint32_t address = interface::ReadU32();
-
-			SendMessageHeader(_header, size+1, RSP_MEMORY);
+			SendMessageHeader(size+1, RSP_MEMORY);
 			_target->ReadMem(memType, size, address);
 			interface::EndTxFrame();
 		}

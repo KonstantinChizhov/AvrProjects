@@ -14,7 +14,7 @@ using namespace MkII;
 using namespace IO;
 
 
-typedef BinaryFormater< WaitAdapter< Usart<16, 32> > > interface;
+typedef Usart<16, 32> interface;
 
 typedef MkIIProtocol
 	<
