@@ -143,15 +143,31 @@ namespace MkII
 
 		void PollInterface()
 		{
-			if(interface::Read() != MessageStart)
+			uint8_t ch;
+			if(interface::Getch(ch))
+			{
+				//_progIface->Idle();
 				return;
+			}
+
+			if(ch != MessageStart)
+			{
+				//_progIface->Idle();
+				return;
+			}
 			
 			_header.seqNumber = interface::ReadU16();
+			IO::Portb::Write(_header.seqNumber);
 			_header.messageLen = interface::ReadU32();
+
 			if(interface::Read() != Token)
+			{
+				//_progIface->Idle();
 				return;
+			}
+
 			_header.messageId = interface::Read();
-			
+
 			ProcessCommand(_header);
 			uint16_t crc = interface::ReadU16();
 		}
@@ -360,7 +376,7 @@ namespace MkII
 			uint32_t address = interface::ReadU32();
 			_target->WriteMem(memType, size, address);
 
-			interface::ReadU16();//ignore crc
+			
 
 			Send1ByteResponse(_header, RSP_OK);
 		}
@@ -370,7 +386,7 @@ namespace MkII
 			uint8_t memType = interface::Read();
 			uint32_t size = interface::ReadU32();
 			uint32_t address = interface::ReadU32();
-			interface::ReadU16();//ignore crc
+
 			SendMessageHeader(_header, size+1, RSP_MEMORY);
 			_target->ReadMem(memType, size, address);
 			interface::EndTxFrame();
