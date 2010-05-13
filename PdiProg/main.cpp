@@ -35,6 +35,7 @@ ISR(USART_RXC_vect)
 
 Protocol protocol;
 
+__attribute__ ((OS_main))
 int main()
 {
 	interface::Init(19200);
