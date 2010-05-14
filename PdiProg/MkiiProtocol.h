@@ -147,13 +147,13 @@ namespace MkII
 			uint8_t ch;
 			if(interface::Getch(ch))
 			{
-				//_progIface->Idle();
+				_progIface->Idle();
 				return;
 			}
 
 			if(ch != MessageStart)
 			{
-				//_progIface->Idle();
+				_progIface->Idle();
 				return;
 			}
 			
@@ -163,7 +163,7 @@ namespace MkII
 
 			if(interface::Read() != Token)
 			{
-				//_progIface->Idle();
+				_progIface->Idle();
 				return;
 			}
 
@@ -270,10 +270,11 @@ namespace MkII
 					break;
 				case BaudRate:
 					//SetBaund(); //does not work correctly
-					return;
+					break;
 				default:
 					//IO::Portb::Write(parameter);
 					SendResponse(RSP_ILLEGAL_PARAMETER);
+					return;
 			}
 			SendResponse(RSP_OK); 
 		}
