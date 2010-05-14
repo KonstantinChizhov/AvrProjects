@@ -91,7 +91,7 @@ namespace MkII
 			interface::Write(uint8_t(response));
 		}
 
-		void Send1ByteResponse(Responses response)
+		void SendResponse(Responses response)
 		{
 			SendMessageHeader(1, response);
 			interface::EndTxFrame();
@@ -221,7 +221,7 @@ namespace MkII
 
 				default:
 					//IO::Portb::Write(parameter);
-					Send1ByteResponse(RSP_ILLEGAL_PARAMETER);
+					SendResponse(RSP_ILLEGAL_PARAMETER);
 			}			
 		}
 
@@ -273,16 +273,16 @@ namespace MkII
 					return;
 				default:
 					//IO::Portb::Write(parameter);
-					Send1ByteResponse(RSP_ILLEGAL_PARAMETER);
+					SendResponse(RSP_ILLEGAL_PARAMETER);
 			}
-			Send1ByteResponse(RSP_OK); 
+			SendResponse(RSP_OK); 
 		}
 
 		void SetBaund()
 		{
 			uint8_t baund = interface::Read();
 			HwInterface::Disable();
-			Send1ByteResponse(RSP_OK); 
+			SendResponse(RSP_OK); 
 			switch(baund)
 			{
 				case 0x05: HwInterface::Init(38400);break;
@@ -299,7 +299,7 @@ namespace MkII
 			switch(_header.messageId)
 			{
 				case CMND_SIGN_OFF:
-					Send1ByteResponse(RSP_OK);
+					SendResponse(RSP_OK);
 					break;
 				case CMND_GET_SIGN_ON:
 					SingOn(); 
@@ -314,11 +314,11 @@ namespace MkII
 
 				case CMND_ENTER_PROGMODE:
 					_target->EnterProgMode();
-					Send1ByteResponse(RSP_OK);
+					SendResponse(RSP_OK);
 					break;
 				case CMND_LEAVE_PROGMODE:
 					_target->LeaveProgMode();
-					Send1ByteResponse(RSP_OK); 
+					SendResponse(RSP_OK); 
 					break;
 				break;
 
@@ -336,10 +336,10 @@ namespace MkII
 				
 				case CMND_SET_DEVICE_DESCRIPTOR:
 					interface::Read(&_deviceDescriptor, sizeof(_deviceDescriptor));
-					Send1ByteResponse(RSP_OK);
+					SendResponse(RSP_OK);
 				break;
 				case CMND_CLEAR_EVENTS:
-					Send1ByteResponse(RSP_OK);
+					SendResponse(RSP_OK);
 				break;
 
 				case CMND_WRITE_PC:
@@ -368,7 +368,7 @@ namespace MkII
 
 				default:
 					//IO::Portb::Write(_header.messageId);
-					Send1ByteResponse(RSP_ILLEGAL_COMMAND);
+					SendResponse(RSP_ILLEGAL_COMMAND);
 			}
 		}
 
@@ -378,7 +378,7 @@ namespace MkII
 			uint32_t size = interface::ReadU32();
 			uint32_t address = interface::ReadU32();
 			_target->WriteMem(memType, size, address);
-			Send1ByteResponse(RSP_OK);
+			SendResponse(RSP_OK);
 		}
 
 		void ReadMem()
