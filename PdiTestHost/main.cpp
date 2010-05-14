@@ -40,9 +40,9 @@ ComPort::ComPort(wchar_t *portName, unsigned int baund)
     SetCommState(hCOM, &dcb);
 
     GetCommTimeouts(hCOM,&CommTimeouts);
-    CommTimeouts.ReadIntervalTimeout = 100;
+    CommTimeouts.ReadIntervalTimeout = 500;
     CommTimeouts.ReadTotalTimeoutMultiplier = 1;
-    CommTimeouts.ReadTotalTimeoutConstant = 100;
+    CommTimeouts.ReadTotalTimeoutConstant = 500;
     CommTimeouts.WriteTotalTimeoutMultiplier = 0;
     CommTimeouts.WriteTotalTimeoutConstant = 0;
     SetCommTimeouts(hCOM,&CommTimeouts);
@@ -95,28 +95,72 @@ unsigned int ComPort::BytesAvailable()
     return ComState.cbInQue;
 }
 
-inline uint16_t div5(uint16_t num, uint16_t &rem)
+ComPort port;
+
+        enum
+        {
+                CMD_LDS               = 0x00,
+                CMD_LD                = 0x20,
+                CMD_STS               = 0x40,
+                CMD_ST                = 0x60,
+                CMD_LDCS              = 0x80,
+                CMD_REPEAT            = 0xA0,
+                CMD_STCS              = 0xC0,
+                CMD_KEY               = 0xE0,
+
+                STATUS_REG            = 0x0,
+                RESET_REG             = 0x1,
+                CTRL_REG              = 0x2,
+
+                STATUS_NVM            = 0x02,
+                RESET_KEY             = 0x59,
+
+                DATSIZE_1BYTE         = 0x0,
+                DATSIZE_2BYTES        = 0x1,
+                DATSIZE_3BYTES        = 0x2,
+                DATSIZE_4BYTES        = 0x3,
+
+                POINTER_INDIRECT      = 0x0,
+                POINTER_INDIRECT_PI   = 0x1,
+                POINTER_DIRECT        = 0x2
+        };
+
+void WriteCmd(uint8_t cmd)
 {
-    uint16_t q = num*0x6667 >> 16;
-    q >>= 1;
-    rem = num - q*5;
-    return q;
+    port.WriteBuffer("SW", 2);
+    port.WriteBuffer(&cmd, 1);
 }
 
+template<class T>
+void WriteCmd(uint8_t cmd, T value)
+{
+    port.WriteBuffer("SW", 2);
+    port.WriteBuffer(&cmd, 1);
+    port.WriteBuffer(&value, sizeof(T));
+}
 
+uint8_t Read()
+{
+    int16_t value=0;
+    port.WriteBuffer("SR", 2);
+    if(!port.ReadBuffer(&value, 1))
+        std::cout << "timeout" << std::endl;
+    else
+        std::cout << value << std::endl;
+    return value;
+}
 
 int main(int argc, char *argv[])
 {
-    ComPort port;
-    int16_t delta=0, old=0;
+    int16_t value=0;
+    uint8_t cmd = 0;
     for(;;)
     {
-       if(port.ReadBuffer(&delta, 2))
-       {
-           std::cout << delta << "\t";
-       }
-       else Sleep(1);
-       old = delta;
+       WriteCmd(CMD_STCS | CTRL_REG, uint8_t(3));
+       WriteCmd(CMD_LDCS | CTRL_REG);
+       Read();
+
+       Sleep(10);
     }
 
 

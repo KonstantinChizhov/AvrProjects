@@ -23,7 +23,7 @@ ISR(USART_RXC_vect)
 	interface::RxHandler();
 }
 
-typedef PdiSoftwarePhisical<Pc0, Pc1> Pdi;
+typedef Pdi::PdiSoftwarePhisical<Pc0, Pc1> MyPdi;
 
 enum {MsgStart='S', MsgWrite='W', MsgRead='R'};
 enum {StateIdle, SateMsgBegin, StateMsgWrite};
@@ -31,7 +31,7 @@ enum {Idle, Read, Write};
 
 int main()
 {
-	Pdi pdi;
+	MyPdi pdi;
 	uint8_t c;
 	uint8_t cmd = Idle;
 
@@ -80,7 +80,7 @@ int main()
 		switch(cmd)
 		{
 			case Read:
-				interface::Putch(pdi.Read());
+				interface::Putch(pdi.ReadByte());
 				cmd = Idle;
 			break;
 			case Write:
