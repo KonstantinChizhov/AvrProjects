@@ -6,10 +6,15 @@ class Timer0
 {
 public:
 	typedef uint8_t DataT;
-	enum ClockDiv{Stop=0, Ck=1, Ck8=2, Ck64=3, Ck256=4, Ck1024=5, ExtFalling=6, ExRising=7};
+	enum ClockDiv{CkStop=0, Ck=1, Ck8=2, Ck64=3, Ck256=4, Ck1024=5, ExtFalling=6, ExRising=7};
 	static void Start(ClockDiv div)
 	{
-		TCCR0 =  (div << CS00);
+		TCCR0 = (div << CS00);
+	}
+
+	static void Stop()
+	{
+		TCCR0 = CkStop;
 	}
 
 	static void Set(DataT val)
@@ -74,19 +79,19 @@ public:
 
 	static void SetOcrMode(OcrMode mode)
 	{
-		TCCR0 = (TCCR0 & ~(1 << COM00) | (1 << COM01))) | mode;
+		TCCR0 = (TCCR0 & ~(1 << COM00) | (1 << COM01)) | mode;
 	}
 
-	static enum OcrMode{
-			Normal = 0, 
+	enum WgmMode{
+			WgmNormal = 0, 
 			PWM = (1 << WGM00), 
 			CTC = (1 << WGM01), 
 			FastPWM = (1 << WGM00) | (1 << WGM01)
 		};
 
-	static void SetWGM(OcrMode mode)
+	static void SetWGM(WgmMode mode)
 	{
-		TCCR0 = (TCCR0 & ~(1 << WGM00) | (1 << WGM01))) | mode;
+		TCCR0 = (TCCR0 & ~(1 << WGM00) | (1 << WGM01)) | mode;
 	}
 #endif
 };
@@ -182,11 +187,11 @@ public:
 
 	static void SetOcrMode(OcrMode mode)
 	{
-		TCCR0 = (TCCR0 & ~(1 << COM00) | (1 << COM01))) | mode;
+		TCCR0 = (TCCR0 & ~(1 << COM00) | (1 << COM01)) | mode;
 	}
 
-	static enum OcrMode{
-			Normal = 0, 
+	enum WgmMode{
+			WgmNormal = 0, 
 			PWM = (1 << WGM00), 
 			CTC = (1 << WGM01), 
 			FastPWM = (1 << WGM00) | (1 << WGM01)
@@ -194,7 +199,7 @@ public:
 
 	static void SetWGM(OcrMode mode)
 	{
-		TCCR0 = (TCCR0 & ~(1 << WGM00) | (1 << WGM01))) | mode;
+		TCCR0 = (TCCR0 & ~(1 << WGM00) | (1 << WGM01)) | mode;
 	}
 #endif
 	protected:
