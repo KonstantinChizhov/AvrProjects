@@ -6,7 +6,7 @@
 
 #include "Pdi.h"
 #include "ports.h"
-
+#include "timer.h"
 
 using namespace IO;
 
@@ -23,75 +23,44 @@ ISR(USART_RXC_vect)
 	interface::RxHandler();
 }
 
-typedef Pdi::PdiSoftwarePhisical<Pc0, Pc1> MyPdi;
+Pdi::PdiSoftwarePhisical<Pc1, Pc0> pdi;
 
-enum {MsgStart='S', MsgWrite='W', MsgRead='R'};
-enum {StateIdle, SateMsgBegin, StateMsgWrite};
-enum {Idle, Read, Write};
+ISR(TIMER0_OVF_vect)
+{
+	pdi.TimerHandler();
+}
 
 int main()
 {
-	MyPdi pdi;
-	uint8_t c;
-	uint8_t cmd = Idle;
-
-	uint8_t state = StateIdle;
-
-	interface::Init(115200);
 	sei();
-
-	IO::Portb::DirWrite(0xff);
 	pdi.Enable();
+	interface::Init(115200);
+	IO::Portb::DirWrite(0xff);
 
 	while(1)
 	{
-		if(interface::Getch(c))
-		{
-			switch(state)
-			{
-				case StateIdle:
-					if(c == MsgStart)
-						state = SateMsgBegin;
-					cmd = Idle;
-				break;
-				case SateMsgBegin:
-					if(c == MsgWrite)
-					{
-						state = StateMsgWrite;
-						cmd = Idle;
-					}
-					else
-					if(c == MsgRead)
-					{
-						state = StateIdle;
-						cmd = Read;
-					}
-				break;
-				case StateMsgWrite:
-					state = StateIdle;
-					cmd = Write;
-				break;
-				default:
-					state = StateIdle;
-					cmd = Idle;
-			}
-		}
-		
-		switch(cmd)
-		{
-			case Read:
-				interface::Putch(pdi.ReadByte());
-				cmd = Idle;
-			break;
-			case Write:
-				pdi.Write(c);
-				interface::Putch(c);
-				cmd = Idle;
-			break;
-			case Idle:
-				pdi.Idle();
-			break;
-		}		
+		pdi.WriteByte(Pdi::CMD_STCS | Pdi::CTRL_REG);
+		pdi.WriteByte(0x3);
+
+		pdi.WriteByte(Pdi::CMD_LDCS | Pdi::RESET_REG);
+		uint8_t c = pdi.ReadByte();
+		IO::Portb::Write(c);
+		interface::Putch(c);
+
+		pdi.Break();
+		pdi.WriteByte(Pdi::CMD_LDCS | Pdi::CTRL_REG);
+		c = pdi.ReadByte();
+		IO::Portb::Write(c);
+		interface::Putch(c);
+
+		pdi.Break();
+		pdi.WriteByte(Pdi::CMD_LDCS | Pdi::STATUS_REG);
+		c = pdi.ReadByte();
+		IO::Portb::Write(c);
+		interface::Putch(c);
+
+		pdi.Break();
+		_delay_ms(10);
 	}
 	return 0;
 }

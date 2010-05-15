@@ -33,7 +33,7 @@ ComPort::ComPort(wchar_t *portName, unsigned int baund)
     dcb.DCBlength = sizeof(DCB);
     GetCommState(hCOM, &dcb);
 
-    dcb.BaudRate = CBR_115200;
+    dcb.BaudRate = baund;
     dcb.ByteSize = 8;
     dcb.Parity = NOPARITY;
     dcb.StopBits = ONESTOPBIT;
@@ -79,6 +79,8 @@ bool ComPort::ReadBuffer(void *buffer, unsigned int size)
     DWORD nb, Errors;
     COMSTAT ComState;
     ClearCommError(hCOM, &Errors, &ComState);
+    if(Errors)
+        std::cout << "Error = " << Errors << std::endl;
    //if(ComState.cbInQue < size)
     //{
     //    return false;
@@ -95,7 +97,7 @@ unsigned int ComPort::BytesAvailable()
     return ComState.cbInQue;
 }
 
-ComPort port;
+ComPort port(L"COM1", 115200);
 
         enum
         {
@@ -127,7 +129,7 @@ ComPort port;
 
 void WriteCmd(uint8_t cmd)
 {
-    port.WriteBuffer("SW", 2);
+    //port.WriteBuffer("SW", 2);
     port.WriteBuffer(&cmd, 1);
 }
 
@@ -142,11 +144,11 @@ void WriteCmd(uint8_t cmd, T value)
 uint8_t Read()
 {
     int16_t value=0;
-    port.WriteBuffer("SR", 2);
     if(!port.ReadBuffer(&value, 1))
         std::cout << "timeout" << std::endl;
     else
-        std::cout << value << std::endl;
+        std::cout << "value = " << value << std::endl;
+    port.Purge();
     return value;
 }
 
@@ -156,10 +158,8 @@ int main(int argc, char *argv[])
     uint8_t cmd = 0;
     for(;;)
     {
-       WriteCmd(CMD_STCS | CTRL_REG, uint8_t(3));
-       WriteCmd(CMD_LDCS | CTRL_REG);
+       //WriteCmd('A');
        Read();
-
        Sleep(10);
     }
 
