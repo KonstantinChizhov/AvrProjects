@@ -14,23 +14,28 @@ using namespace MkII;
 using namespace IO;
 
 
-typedef Usart<16, 32> interface;
-
+typedef Usart<16, 32> CommInterface;
+typedef Pdi::PdiSoftwarePhisical<Pc1, Pc0> PdiInterface;
 typedef MkIIProtocol
 	<
-		interface, 
-		Pdi::PdiSoftwarePhisical<Pd5, Pd6>
+		CommInterface, 
+		PdiInterface
 	> Protocol;
 
 
 ISR(USART_UDRE_vect)
 {
-	interface::TxHandler();
+	CommInterface::TxHandler();
 }
 
 ISR(USART_RXC_vect)
 {
-	interface::RxHandler();
+	CommInterface::RxHandler();
+}
+
+ISR(TIMER0_OVF_vect)
+{
+	PdiInterface::TimerHandler();
 }
 
 Protocol protocol;
@@ -38,7 +43,7 @@ Protocol protocol;
 __attribute__ ((OS_main))
 int main()
 {
-	interface::Init(19200);
+	CommInterface::Init(19200);
 	sei();
 
 	IO::Portb::DirWrite(0xff);

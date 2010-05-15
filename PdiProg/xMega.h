@@ -100,10 +100,6 @@ namespace XMega
 			switch(memType)
 			{
 				case SIGN_JTAG:
-				//	Comm::Putch(0x1E);
-				//	Comm::Putch(0x97);
-				//	Comm::Putch(0x4C);
-					break;
 				case IO_SHADOW:
 				case SRAM:
 				case EEPROM:

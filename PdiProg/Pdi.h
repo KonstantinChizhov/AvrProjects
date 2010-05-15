@@ -2,6 +2,7 @@
 #include <util/delay.h>
 #include "util.h"
 #include "ProgInterface.h"
+#include "timer.h"
 
 namespace Pdi
 {
@@ -33,221 +34,140 @@ namespace Pdi
 		POINTER_DIRECT        = 0x2
 	};
 
+	struct PdiSoftwareData
+	{
+		uint16_t data;
+		uint8_t bitsCount;
+		bool isSending;
+	};
 
-	template<class DATA, class CLK>
+	template<class DataPin, class ClockPin, class Timer=Timer0>
 	class PdiSoftwarePhisical :public ProgInterface
 	{
 		public:
-		PdiSoftwarePhisical()
-		{
-			_isEnabled = false;
-		}
+		enum {FrameLength = 12};
 
 		void Enable()
 		{
-			CLK::SetDirWrite();
-			DATA::SetDirWrite();
-			DATA::Set();
+			ClockPin::SetDirWrite();
+			DataPin::SetDirWrite();
+			DataPin::Set();
 			_delay_us(1);
-
-			SendFrame(0xffff, 16);
-			Break();
-			Break();
-			_isEnabled = true;
-		}
-
-		void Disable()
-		{
-			_isEnabled = false;
-			DATA::Clear();
-			DATA::SetDirRead();
-			CLK::SetDirRead();
-		}
-	
-		void WriteByte(uint8_t c)
-		{
-			DATA::SetDirWrite();
-			uint16_t value = c << 2 | 0x1801; //start bit, 8 data bits and 2 stop bits
-			if(CountOfOnes(c) & 1)//upend parity bit
-				value |= 0x0400;
-		
-			SendFrame(value, 12);
-		}
-
-		uint8_t ReadByte()
-		{
-			DATA::SetDirRead();
-			DATA::Clear();
-			do
-			{
-				uint8_t guardCycles=0;
-				CLK::Clear();
-				if(guardCycles++ < 250) //error
-					return 0;
-				CLK::Set();	
-			}while(DATA::IsSet());
-
-			uint8_t data=0;
-
-			for(uint8_t i = 0; i < 8; i++)
-			{
-				CLK::Clear();
-				data >>= 1;
-				CLK::Set();
-				if(DATA::IsSet())
-					data |= (1<<7);
-			}
-			//parity and stop bits
-			for(uint8_t i = 0; i < 3; )
-			{	
-				CLK::Clear();
-				i++;
-				CLK::Set();
-			}
-			return data;
-		}
-
-		void Reset()
-		{
-			DATA::Clear();
-			DATA::SetDirRead();
-			CLK::SetDirWrite();
-			CLK::Set();
-			_delay_ms(10);
-			CLK::Clear();
-			_delay_us(10);
-			CLK::Set();
-		}
-
-		void Break()
-		{
-			DATA::SetDirWrite();
-			SendFrame(0xC003, 16);
-
-		}
-
-		void Idle()
-		{
-			DATA::SetDirWrite();
-			SendFrame(0xffff, 12);
-		}
-
-	protected:
-		uint8_t _isEnabled;
-		void SendFrame(uint16_t frame, uint8_t bits)
-		{
-			for(uint8_t i = 0; i < bits; i++)
-			{
-				CLK::Clear();
-				DATA::Set(frame & 0x01);
-				CLK::Set();
-				frame >>=1;
-			}
-		}
-	};
-
-//====================================================================
-
-//====================================================================
-
-	template<class DATA, class CLK>
-	class PdiTimerBasedPhisical :public ProgInterface
-	{
-		public:
-		void Enable()
-		{
-			CLK::SetDirWrite();
-			DATA::SetDirWrite();
-			DATA::Set();
-			_delay_us(1);
-
-			SendFrame(0xffff, 16);
+			Timer::Start(Timer::Ck8);
+			Timer::EnableOverflowInterrupt();
 			Break();
 			Break();
 		}
 
 		void Disable()
 		{
-			DATA::Clear();
-			DATA::SetDirRead();
-			CLK::SetDirRead();
+			Timer::Stop();
+			DataPin::Clear();
+			DataPin::SetDirRead();
+			ClockPin::SetDirRead();
 		}
 	
 		void WriteByte(uint8_t c)
 		{
-			DATA::SetDirWrite();
-			uint16_t value = c << 2 | 0x1801; //start bit, 8 data bits and 2 stop bits
-			if(CountOfOnes(c) & 1)//upend parity bit
-				value |= 0x0400;
-		
-			SendFrame(value, 12);
+			if(!(_data.isSending))
+			{
+				DataPin::Set();
+				DataPin::SetDirWrite();
+				_data.isSending = true;
+			}
+
+			uint16_t value = (0x0e << 9) | (uint16_t(c) << 1) | (0 << 0);
+
+			uint8_t parity    = c;
+			while (parity)
+			{
+				value ^= (1 << 9);
+				parity   &= (parity - 1);
+			}
+
+			while (_data.bitsCount);
+
+			_data.data = value;
+			_data.bitsCount = FrameLength;
 		}
 
 		uint8_t ReadByte()
 		{
-			DATA::SetDirRead();
-			DATA::Clear();
-			do
+			if (_data.isSending)
 			{
-				uint8_t guardCycles=0;
-				CLK::Clear();
-				if(guardCycles++ < 250) //error
-					return 0;
-				CLK::Set();	
-			}while(DATA::IsSet());
-
-			uint8_t data=0;
-
-			for(uint8_t i = 0; i < 8; i++)
-			{
-				CLK::Clear();
-				data >>= 1;
-				CLK::Set();
-				if(DATA::IsSet())
-					data |= (1<<7);
+				while (_data.bitsCount);
+				DataPin::SetDirRead();
+				DataPin::Clear();
+				_data.isSending = false;
 			}
-			//parity and stop bits
-			for(uint8_t i = 0; i < 3; )
-			{	
-				CLK::Clear();
-				i++;
-				CLK::Set();
-			}
-			return data;
+
+			_data.bitsCount = FrameLength;
+			while (_data.bitsCount);
+	
+			return (uint8_t)_data.data;
 		}
 
 		void Reset()
 		{
-			DATA::Clear();
-			DATA::SetDirRead();
-			CLK::SetDirWrite();
-			CLK::Set();
+			DataPin::Clear();
+			DataPin::SetDirRead();
+			ClockPin::SetDirWrite();
+			ClockPin::Set();
 			_delay_ms(10);
-			CLK::Clear();
+			ClockPin::Clear();
 			_delay_us(10);
-			CLK::Set();
+			ClockPin::Set();
 		}
 
 		void Break()
 		{
-			DATA::SetDirWrite();
-			SendFrame(0xC003, 16);
+			if (!(_data.isSending))
+			{
+				DataPin::Set();
+				DataPin::SetDirWrite();
+				_data.isSending = true;
+			}
 
+			while (_data.bitsCount);
+
+			_data.data     = 0x0FFF;
+			_data.bitsCount = FrameLength;
 		}
 
-		void Idle()
+		static void TimerHandler()
 		{
-			
+			Timer::Set(255-51);
+			ClockPin::Clear();
+			if(_data.isSending)
+			{
+				if(_data.bitsCount)
+				{
+					DataPin::Set(_data.data & 1);
+					_data.data >>= 1;
+					_data.bitsCount--;
+				}
+				else
+					DataPin::Set();
+			}
+			ClockPin::Set();
+			if(!_data.isSending)
+			{
+				if((_data.bitsCount == FrameLength) && DataPin::IsSet())
+					return;
+
+				if(DataPin::IsSet())
+				  _data.data |= (1 << (FrameLength - 1));
+
+				_data.data >>= 1;
+				_data.bitsCount--;
+			}
 		}
 
 	protected:
-		void SendFrame(uint16_t frame, uint8_t bits)
-		{
-		
-		}
-
-		static uint16_t _data;
-		static uint8_t _reciving;
+		static volatile PdiSoftwareData _data;
 	};
+
+	template<class DataPin, class ClockPin, class Timer>
+	volatile PdiSoftwareData PdiSoftwarePhisical<DataPin, ClockPin, Timer>::_data;
 
 }

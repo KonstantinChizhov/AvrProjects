@@ -62,12 +62,13 @@ namespace MkII
 		void SetMode(EmulatorMode mode)
 		{
 			//IO::Portb::Write(mode);
+			_progIface->Disable();
 			switch(mode)
 			{
 				case PDI_XMEGA:
-				//	_progIface = &_pdi;
-				//	_target = &_xmega;
-				//	break;
+					_progIface = &_pdi;
+					_target = &_xmega;
+					break;
 				case JTAG_XMEGA:
 				case Spi:		//To be impemented
 				case JTAG_Mega:	//To be impemented	
@@ -78,6 +79,7 @@ namespace MkII
 					_progIface = &_nullProg;
 					_target = &_nullTarget;
 			}
+			_progIface->Enable();
 			_target->SetProgInterface(_progIface);
 		}
 
@@ -146,26 +148,17 @@ namespace MkII
 		{
 			uint8_t ch;
 			if(interface::Getch(ch))
-			{
-				_progIface->Idle();
 				return;
-			}
-
-			if(ch != MessageStart)
-			{
-				_progIface->Idle();
-				return;
-			}
 			
+			if(ch != MessageStart)
+				return;
+		
 			_header.seqNumber = interface::ReadU16();
 			
 			_header.messageLen = interface::ReadU32();
 
 			if(interface::Read() != Token)
-			{
-				_progIface->Idle();
 				return;
-			}
 
 			_header.messageId = interface::Read();
 		

@@ -9,7 +9,6 @@ public:
 	virtual uint8_t ReadByte()=0;
 	virtual void Reset()=0;
 	virtual void Break()=0;
-	virtual void Idle()=0;
 	
 	template<class T>
 	void Write(const T &value)
@@ -49,5 +48,4 @@ class NullProgInterface :public ProgInterface
 	virtual uint8_t ReadByte(){return 0xff;}
 	virtual void Reset(){}
 	virtual void Break(){}
-	virtual void Idle(){}
 };

@@ -44,23 +44,10 @@ public:
 
 	virtual void ReadMem(uint8_t memType, uint32_t size, uint32_t address)
 	{
-		switch(memType)
-			{
-				case SIGN_JTAG:
-					Comm::Write(uint8_t(0x1E));
-					Comm::Write(uint8_t(0x97));
-					Comm::Write(uint8_t(0x4C));
-					break;
-				default:
-					Comm::Write(uint8_t(0x1E));
-					Comm::Write(uint8_t(0x97));
-					Comm::Write(uint8_t(0x4C));
-				//	for(uint32_t i=0; i<size; i++)
-					//{
-					//	Comm::Write(0xff);
-				//	}
-				break;
-			}
+		for(uint32_t i=0; i<size; i++)
+		{
+			Comm::Write(0xff);
+		}
 	}
 
 	virtual void WriteMem(uint8_t memType, uint32_t size, uint32_t address)
