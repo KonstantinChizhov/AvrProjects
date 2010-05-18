@@ -128,6 +128,35 @@ namespace XMega
 			}
 		}
 
+		virtual bool ReadMem(uint8_t memType, uint8_t *buffer, uint32_t size, uint32_t address)
+		{
+			if (!(WaitWhileControllerBusy()))
+				return false;
+
+			_progIface->WriteByte(Pdi::CMD_STS | (Pdi::DATSIZE_4BYTES << 2));
+
+			_progIface->Write(_progParams->PDI_NVM_Offset | REG_CMD);
+
+			_progIface->WriteByte(CMD_READNVM);
+
+			_progIface->WriteByte(Pdi::CMD_ST | (Pdi::POINTER_DIRECT << 2) | Pdi::DATSIZE_4BYTES);
+			_progIface->Write(address);
+
+			_progIface->WriteByte(Pdi::CMD_REPEAT | Pdi::DATSIZE_1BYTE);
+			_progIface->WriteByte(size - 1);
+
+			_progIface->WriteByte(Pdi::CMD_LD | (Pdi::POINTER_INDIRECT_PI << 2) | Pdi::DATSIZE_1BYTE);
+
+			for(uint32_t i=0; i<size; i++)
+			{
+				uint8_t c = _progIface->ReadByte();
+				buffer[i] = c;
+			}
+
+			return true;
+		}
+
+
 		virtual void WriteMem(uint8_t memType, uint32_t size, uint32_t address)
 		{
 			uint8_t c;
@@ -176,7 +205,8 @@ namespace XMega
 			_progIface->WriteByte(size - 1);
 
 			_progIface->WriteByte(Pdi::CMD_LD | (Pdi::POINTER_INDIRECT_PI << 2) | Pdi::DATSIZE_1BYTE);
-			while (size--)
+
+			for(uint32_t i=0; i<size; i++)
 			{
 				uint8_t c = _progIface->ReadByte();
 				Comm::Write(c);
@@ -184,6 +214,7 @@ namespace XMega
 
 			return true;
 		}
+
 
 		bool WaitWhileBusBusy()
 		{

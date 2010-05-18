@@ -10,7 +10,7 @@
 #include "DeviceDescriptor.h"
 #include "CheckSummUpdater.h"
 #include "ProgrammerParameters.h"
-
+#include "containers.h"
 
 namespace MkII
 {
@@ -48,6 +48,7 @@ namespace MkII
 		ProgParameters _params;
 		DeviceDescriptor _deviceDescriptor;
 		MessageHeader _header;
+		Array<256> _pageBuffer;
 
 	public:
 
@@ -325,7 +326,7 @@ namespace MkII
 				break;
 
 				case CMND_READ_MEMORY:
-					ReadMem();
+					ReadMemBuffered();
 				break;
 				
 				case CMND_SET_DEVICE_DESCRIPTOR:
@@ -375,7 +376,7 @@ namespace MkII
 			SendResponse(RSP_OK);
 		}
 
-		void ReadMem()
+		void ReadMemStreamed()
 		{
 			uint8_t memType = interface::Read();
 			uint32_t size = interface::ReadU32();
@@ -389,6 +390,29 @@ namespace MkII
 			SendMessageHeader(size+1, RSP_MEMORY);
 			_target->ReadMem(memType, size, address);
 			interface::EndTxFrame();
+		}
+
+		void ReadMemBuffered()
+		{
+			uint8_t memType = interface::Read();
+			uint32_t size = interface::ReadU32();
+			uint32_t address = interface::ReadU32();
+			Int32 i;
+			i.Dword = address;
+			//IO::Portb::Write(memType);
+			//IO::Portb::Write(size);
+			//IO::Portb::Write(i.Bytes[0]);
+			
+			if(_target->ReadMem(memType, _pageBuffer, size, address))
+			{
+				SendMessageHeader(size+1, RSP_MEMORY);
+				interface::Write(_pageBuffer, size);
+				interface::EndTxFrame();
+			}
+			else
+			{
+				SendResponse(RSP_FAILED);
+			}
 		}
 	};
 
