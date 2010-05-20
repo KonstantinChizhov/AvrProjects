@@ -76,8 +76,9 @@ namespace XMega
 			_progIface->WriteByte(Pdi::CMD_STCS | Pdi::RESET_REG);	
 			_progIface->WriteByte(Pdi::RESET_KEY);
 
-			//_progIface->Write(Pdi::CMD_STCS | Pdi::CTRL_REG);	
-			//_progIface->Write(0x04);
+			_progIface->WriteByte(Pdi::CMD_STCS | Pdi::CTRL_REG);	
+			_progIface->WriteByte(0x05);
+
 			_progIface->WriteByte(Pdi::CMD_KEY);
 			long long key = 0x1289AB45CDD888FFll;
 			_progIface->Write(key);
@@ -97,28 +98,6 @@ namespace XMega
 
 		virtual void ReadMem(uint8_t memType, uint32_t size, uint32_t address)
 		{
-			switch(memType)
-			{
-				case SIGN_JTAG:
-				case IO_SHADOW:
-				case SRAM:
-				case EEPROM:
-				case EVENT:
-				case SPM:
-				case FLASH_PAGE:
-				case EEPROM_PAGE:
-				case FUSE_BITS:
-				case LOCK_BITS:
-				case OSCCAL_BYTE:
-				case CAN:
-				case XMEGA_APPLICATION_FLASH:
-				case XMEGA_BOOT_FLASH:
-				case XMEGA_CALIBRATION_SIGNATURE:
-				case XMEGA_USER_SIGNATURE:
-				default:
-				break;
-			}
-
 			if(!ReadMemory(address, size))
 			{
 				for(uint32_t i=0; i<size; i++)
@@ -130,12 +109,13 @@ namespace XMega
 
 		virtual bool ReadMem(uint8_t memType, uint8_t *buffer, uint32_t size, uint32_t address)
 		{
+
 			if (!(WaitWhileControllerBusy()))
 				return false;
 
 			_progIface->WriteByte(Pdi::CMD_STS | (Pdi::DATSIZE_4BYTES << 2));
 
-			_progIface->Write(_progParams->PDI_NVM_Offset | REG_CMD);
+			_progIface->Write<uint32_t>(_progParams->PDI_NVM_Offset | REG_CMD);
 
 			_progIface->WriteByte(CMD_READNVM);
 
@@ -150,6 +130,7 @@ namespace XMega
 			for(uint32_t i=0; i<size; i++)
 			{
 				uint8_t c = _progIface->ReadByte();
+				IO::Portb::Write(i);
 				buffer[i] = c;
 			}
 
@@ -194,7 +175,7 @@ namespace XMega
 
 			_progIface->WriteByte(Pdi::CMD_STS | (Pdi::DATSIZE_4BYTES << 2));
 
-			_progIface->Write(_progParams->PDI_NVM_Offset | REG_CMD);
+			_progIface->Write<uint32_t>(_progParams->PDI_NVM_Offset | REG_CMD);
 
 			_progIface->WriteByte(CMD_READNVM);
 
@@ -208,6 +189,7 @@ namespace XMega
 
 			for(uint32_t i=0; i<size; i++)
 			{
+				IO::Portb::Write(i);
 				uint8_t c = _progIface->ReadByte();
 				Comm::Write(c);
 			}
@@ -237,9 +219,9 @@ namespace XMega
 			while (timeout--)
 			{
 				_progIface->Write(Pdi::CMD_LDS | (Pdi::DATSIZE_4BYTES << 2));
-				_progIface->Write<uint32_t>(XMega::REG_STATUS);
+				_progIface->Write<uint32_t>(XMega::REG_STATUS | _progParams->PDI_NVM_Offset);
 
-				if (!(_progIface->ReadByte() & (1 << 7)))
+				if(!(_progIface->ReadByte() & (1 << 7)))
 				{
 					return true;
 				}

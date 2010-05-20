@@ -136,27 +136,37 @@ namespace Pdi
 
 		static void TimerHandler()
 		{
-			Timer::Set(255-51);
-			ClockPin::Clear();
-			if(_data.isSending)
-			{
-				if(_data.bitsCount)
-				{
-					DataPin::Set(_data.data & 1);
-					_data.data >>= 1;
-					_data.bitsCount--;
-				}
-				else
-					DataPin::Set();
-			}
-			ClockPin::Set();
-			if(!_data.isSending)
-			{
-				if((_data.bitsCount == FrameLength) && DataPin::IsSet())
-					return;
+			Timer::Set(255-20);
 
+			ClockPin::Togle();
+
+			if(!(_data.bitsCount))
+			  return;
+
+			if(ClockPin::IsSet())
+			{
+				if(_data.isSending)
+				  return;
+		  
+				if((_data.bitsCount == FrameLength) && DataPin::IsSet())
+				  return;
+	
+				/* Shift in the bit one less than the frame size in position, so that the start bit will eventually
+				 * be discarded leaving the data to be byte-aligned for quick access */
 				if(DataPin::IsSet())
 				  _data.data |= (1 << (FrameLength - 1));
+
+				_data.data >>= 1;
+				_data.bitsCount--;
+			}
+			else
+			{
+				/* If at falling clock edge and we are in receive mode, abort */
+				if (!_data.isSending)
+				  return;
+
+				/* Set the data line to the next bit value */
+				  DataPin::Set(_data.data & 0x01);
 
 				_data.data >>= 1;
 				_data.bitsCount--;
