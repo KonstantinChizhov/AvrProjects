@@ -22,6 +22,7 @@ public:
 	virtual void ReadMem(uint8_t memType, uint32_t size, uint32_t address) = 0;
 	virtual bool ReadMem(uint8_t memType, uint8_t *buffer, uint32_t size, uint32_t address) = 0;
 	virtual void WriteMem(uint8_t memType, uint32_t size, uint32_t address) = 0;
+	virtual bool Erase(uint8_t memType, uint32_t address)= 0;
 protected:
 	ProgInterface *_progIface;
 	DeviceDescriptor *_deviceDescriptor;
@@ -57,5 +58,8 @@ public:
 	}
 
 	virtual void WriteMem(uint8_t memType, uint32_t size, uint32_t address)
+	{}
+
+	virtual bool Erase(uint8_t memType, uint32_t address)
 	{}
 };

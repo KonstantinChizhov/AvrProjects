@@ -290,7 +290,7 @@ namespace MkII
 
 		void ProcessCommand()
 		{
-			IO::Portb::Write(_header.messageId);
+			//IO::Portb::Write(_header.messageId);
 			switch(_header.messageId)
 			{
 				case CMND_SIGN_OFF:
@@ -327,6 +327,7 @@ namespace MkII
 
 				case CMND_READ_MEMORY:
 					ReadMemBuffered();
+					//ReadMemStreamed();
 				break;
 				
 				case CMND_SET_DEVICE_DESCRIPTOR:
@@ -335,6 +336,10 @@ namespace MkII
 				break;
 				case CMND_CLEAR_EVENTS:
 					SendResponse(RSP_OK);
+				break;
+
+				case CMND_XMEGA_ERASE:
+					Erase();
 				break;
 
 				case CMND_WRITE_PC:
@@ -359,7 +364,6 @@ namespace MkII
 				case CMND_JTAG_SAB_READ:
 				case CMND_JTAG_BLOCK_READ:
 				case CMND_JTAG_BLOCK_WRITE:
-				case CMND_XMEGA_ERASE:
 
 				default:
 					//IO::Portb::Write(_header.messageId);
@@ -400,9 +404,9 @@ namespace MkII
 			Int32 i;
 			i.Dword = address;
 			//IO::Portb::Write(memType);
-			//IO::Portb::Write(size);
+			//IO::Portb::Write(size>>8);
 			//IO::Portb::Write(i.Bytes[0]);
-			
+
 			if(_target->ReadMem(memType, _pageBuffer, size, address))
 			{
 				SendMessageHeader(size+1, RSP_MEMORY);
@@ -413,7 +417,24 @@ namespace MkII
 			{
 				SendResponse(RSP_FAILED);
 			}
+			
 		}
+
+		void Erase()
+		{
+			uint8_t memType = interface::Read();
+			uint32_t address = interface::ReadU32();
+
+			if(_target->Erase(memType, address))
+			{
+				SendResponse(RSP_OK);
+			}
+			else
+			{
+				SendResponse(RSP_FAILED);
+			}
+		}
+
 	};
 
 }

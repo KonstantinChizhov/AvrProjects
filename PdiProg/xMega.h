@@ -166,6 +166,65 @@ namespace XMega
 					}
 			}
 		}
+
+		virtual bool Erase(uint8_t memType, uint32_t address)
+		{
+			uint8_t eraseCmd;
+			switch(memType)
+			{
+				case XMEGA_ERASE_CHIP:
+					eraseCmd = CMD_CHIPERASE;
+				break;
+				case XMEGA_ERASE_APP:
+					eraseCmd = CMD_ERASEAPPSEC;
+				break;
+				case XMEGA_ERASE_BOOT:
+					eraseCmd = CMD_ERASEBOOTSEC;
+				break;
+				case XMEGA_ERASE_EEPROM:
+					eraseCmd = CMD_ERASEEEPROM;
+				break;
+				case XMEGA_ERASE_APP_PAGE:
+					eraseCmd = CMD_ERASEAPPSECPAGE;
+				break;
+				case XMEGA_ERASE_BOOT_PAGE:
+					eraseCmd = CMD_ERASEBOOTSECPAGE;
+				break;
+				case XMEGA_ERASE_EEPROM_PAGE:
+					eraseCmd = CMD_ERASEEEPROMPAGE;
+				break;
+				case XMEGA_ERASE_USERSIG:
+					eraseCmd = CMD_ERASEUSERSIG;
+				break;
+				default:
+					return false;
+			}
+			if (!(WaitWhileControllerBusy()))
+				return false;
+
+
+			_progIface->WriteByte(Pdi::CMD_STS | (Pdi::DATSIZE_4BYTES << 2));
+			_progIface->Write<uint32_t>(_progParams->PDI_NVM_Offset | REG_CMD);
+			_progIface->WriteByte(eraseCmd);
+	
+			if (eraseCmd == CMD_CHIPERASE)
+			{
+				_progIface->WriteByte(Pdi::CMD_STS | (Pdi::DATSIZE_4BYTES << 2));
+				_progIface->Write<uint32_t>(_progParams->PDI_NVM_Offset | REG_CTRLA);
+				_progIface->WriteByte(1 << 0);		
+			}
+			else
+			{
+				_progIface->WriteByte(Pdi::CMD_STS | (Pdi::DATSIZE_4BYTES << 2));
+				_progIface->Write<uint32_t>(address);
+				_progIface->WriteByte(0x00);
+			}
+	
+			if (!(WaitWhileBusBusy()))
+			  return false;
+	  
+			return true;
+		}
 	protected:
 
 		bool ReadMemory(uint32_t readAddress, uint16_t size)
