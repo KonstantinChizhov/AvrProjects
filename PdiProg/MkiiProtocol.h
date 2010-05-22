@@ -376,7 +376,16 @@ namespace MkII
 			uint8_t memType = interface::Read();
 			uint32_t size = interface::ReadU32();
 			uint32_t address = interface::ReadU32();
-			_target->WriteMem(memType, size, address);
+
+			//if(size > _pageBuffer.Size())
+			//{
+			//	SendResponse(RSP_ILLEGAL_MEMORY_RANGE);
+			//	return;
+			//}
+			
+			interface::Read(_pageBuffer, size);
+
+			_target->WriteMem(memType, _pageBuffer, size, address);
 			SendResponse(RSP_OK);
 		}
 
@@ -406,6 +415,11 @@ namespace MkII
 			//IO::Portb::Write(memType);
 			//IO::Portb::Write(size>>8);
 			//IO::Portb::Write(i.Bytes[0]);
+			//if(size > _pageBuffer.Size())
+			//{
+			//	SendResponse(RSP_ILLEGAL_MEMORY_RANGE);
+			//	return;
+			//}
 
 			if(_target->ReadMem(memType, _pageBuffer, size, address))
 			{

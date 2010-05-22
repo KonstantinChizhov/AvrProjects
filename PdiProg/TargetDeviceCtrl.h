@@ -21,7 +21,7 @@ public:
 	virtual uint32_t GetJTAGID()=0;
 	virtual void ReadMem(uint8_t memType, uint32_t size, uint32_t address) = 0;
 	virtual bool ReadMem(uint8_t memType, uint8_t *buffer, uint32_t size, uint32_t address) = 0;
-	virtual void WriteMem(uint8_t memType, uint32_t size, uint32_t address) = 0;
+	virtual bool WriteMem(uint8_t memType, uint8_t *buffer, uint32_t size, uint32_t address) = 0;
 	virtual bool Erase(uint8_t memType, uint32_t address)= 0;
 protected:
 	ProgInterface *_progIface;
@@ -57,7 +57,7 @@ public:
 		return false;
 	}
 
-	virtual void WriteMem(uint8_t memType, uint32_t size, uint32_t address)
+	virtual bool WriteMem(uint8_t memType, uint8_t *buffer, uint32_t size, uint32_t address)
 	{}
 
 	virtual bool Erase(uint8_t memType, uint32_t address)
