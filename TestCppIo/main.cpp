@@ -1,5 +1,7 @@
 #include "ports.h"
-
+#include <util/delay.h>
+using namespace IO;
+/*
 void TestOnePortNonConstValue()
 {
 	uint8_t nonConstValue = Portc::PinRead();
@@ -97,7 +99,7 @@ void FullPortRndOrderRead()
 {
  	typedef PinList<Pa1, Pa0, Pa4, Pa6, Pa3, Pa2, Pa7, Pa5> pins;
 	uint8_t value;
-	pins::Read(value);
+	value = pins::Read();
 	Portc::Write(value);
 }
 
@@ -105,7 +107,7 @@ void FullPortOrderRead()
 {
  	typedef PinList<Pa0, Pa1, Pa2, Pa3, Pa4, Pa5, Pa6, Pa7> pins;
 	uint8_t value;
-	pins::Read(value);
+	value = pins::Read();
 	Portc::Write(value);
 }
 
@@ -114,17 +116,18 @@ void RndOrderRead()
 {
  	typedef PinList<Pa1, Pa3, Pb2, Pc3, Pd4, Pa5, Pb6, Pc7> pins;
 	uint8_t value;
-	pins::Read(value);
+	value = pins::Read();
 	Portc::Write(value);
 }
-
+*/
 int main()
 {
-	WriteTests();
-
+	//WriteTests();
+	PORTA.DIR = 0xff;
 	while(1)
 	{	
-	
+		PORTA.OUT ^= 0x55;
+		_delay_ms(200);
 	}
 
 }

@@ -277,7 +277,6 @@ namespace MkII
 		{
 			uint8_t baund = interface::Read();
 			HwInterface::Disable();
-			SendResponse(RSP_OK); 
 			switch(baund)
 			{
 				case 0x05: HwInterface::Init(38400);break;
@@ -286,6 +285,7 @@ namespace MkII
 				case 0x04:
 				default: HwInterface::Init(19200);break;
 			}
+			SendResponse(RSP_OK); 
 		}
 
 		void ProcessCommand()

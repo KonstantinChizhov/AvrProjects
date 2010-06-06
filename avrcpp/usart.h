@@ -74,6 +74,14 @@ struct CLASS_NAME\
 	{\
 		_UCSRB_ |= (1 << UDRIE);\
 	}\
+	static inline void Disable()\
+	{\
+		_UCSRA_ = 0;\
+		_UCSRB_ = 0;\
+		_UCSRC_ = ursel | 0;\
+		_UBRRL_ = 0;\
+		_UBRRH_ = 0;\
+	}\
 };\
 
 #ifdef UDR //the one usart

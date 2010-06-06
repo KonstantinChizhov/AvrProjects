@@ -2,7 +2,7 @@
 	<MANAGEMENT>
 		<ProjectName>TestCppIo</ProjectName>
 		<Created>24-Mar-2010 17:18:37</Created>
-		<LastEdit>19-May-2010 23:14:45</LastEdit>
+		<LastEdit>22-May-2010 00:15:31</LastEdit>
 		<ICON>241</ICON>
 		<ProjectType>0</ProjectType>
 		<Created>24-Mar-2010 17:18:37</Created>
@@ -29,7 +29,7 @@
 		<FILES>
 			<SOURCEFILE>main.cpp</SOURCEFILE><HEADERFILE>..\avrcpp\ports.h</HEADERFILE><OTHERFILE>default\TestCppIo.lss</OTHERFILE><OTHERFILE>default\TestCppIo.map</OTHERFILE></FILES>
 		<CONFIGS>
-			<CONFIG><NAME>default</NAME><USESEXTERNALMAKEFILE>NO</USESEXTERNALMAKEFILE><EXTERNALMAKEFILE></EXTERNALMAKEFILE><PART>atxmega128a1</PART><HEX>1</HEX><LIST>1</LIST><MAP>1</MAP><OUTPUTFILENAME>TestCppIo.elf</OUTPUTFILENAME><OUTPUTDIR>default\</OUTPUTDIR><ISDIRTY>1</ISDIRTY><OPTIONS><OPTION><FILE>main.cpp</FILE><OPTIONLIST></OPTIONLIST></OPTION></OPTIONS><INCDIRS><INCLUDE>..\avrcpp\</INCLUDE></INCDIRS><LIBDIRS/><LIBS/><LINKOBJECTS/><OPTIONSFORALL>-Wall -gdwarf-2 -std=gnu99 -DF_CPU=32000000UL -Os -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums</OPTIONSFORALL><LINKEROPTIONS></LINKEROPTIONS><SEGMENTS/></CONFIG></CONFIGS>
+			<CONFIG><NAME>default</NAME><USESEXTERNALMAKEFILE>NO</USESEXTERNALMAKEFILE><EXTERNALMAKEFILE></EXTERNALMAKEFILE><PART>atxmega128a1</PART><HEX>1</HEX><LIST>1</LIST><MAP>1</MAP><OUTPUTFILENAME>TestCppIo.elf</OUTPUTFILENAME><OUTPUTDIR>default\</OUTPUTDIR><ISDIRTY>1</ISDIRTY><OPTIONS><OPTION><FILE>main.cpp</FILE><OPTIONLIST></OPTIONLIST></OPTION></OPTIONS><INCDIRS><INCLUDE>..\avrcpp\</INCLUDE></INCDIRS><LIBDIRS/><LIBS/><LINKOBJECTS/><OPTIONSFORALL>-Wall -gdwarf-2 -std=gnu99   -DF_CPU=2000000UL -Os -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums</OPTIONSFORALL><LINKEROPTIONS></LINKEROPTIONS><SEGMENTS/></CONFIG></CONFIGS>
 		<LASTCONFIG>default</LASTCONFIG>
 		<USES_WINAVR>1</USES_WINAVR><GCC_LOC>C:\WinAVR-20100110\bin\avr-gcc.exe</GCC_LOC><MAKE_LOC>C:\WinAVR-20100110\utils\bin\make.exe</MAKE_LOC></AVRGCCPLUGIN>
-	<ProjectFiles><Files><Name>E:\Projects\AvrProjects\TestCppIo\..\avrcpp\ports.h</Name><Name>D:\Projects\AvrProjects\avrcpp\XMegaPorts.h</Name><Name>D:\Projects\AvrProjects\avrcpp\AvrPorts.h</Name><Name>E:\Projects\AvrProjects\TestCppIo\main.cpp</Name></Files></ProjectFiles><IOView><usergroups/><sort sorted="0" column="0" ordername="1" orderaddress="1" ordergroup="1"/></IOView><Files><File00000><FileId>00000</FileId><FileName>main.cpp</FileName><Status>1</Status></File00000></Files><Events><Bookmarks></Bookmarks></Events><Trace><Filters></Filters></Trace></AVRStudio>
+	<IOView><usergroups/><sort sorted="0" column="0" ordername="0" orderaddress="0" ordergroup="0"/></IOView><Files><File00000><FileId>00000</FileId><FileName>main.cpp</FileName><Status>1</Status></File00000></Files><Events><Bookmarks></Bookmarks></Events><Trace><Filters></Filters></Trace></AVRStudio>
