@@ -17,6 +17,24 @@ public:
 		Write(rawData, sizeof(T));
 	}
 
+	void Write(uint16_t value)
+	{
+		Int16 i;
+		i.Word = value;
+		WriteByte(i.Bytes[0]);
+		WriteByte(i.Bytes[1]);
+	}
+
+	void Write(uint32_t value)
+	{
+		Int32 i;
+		i.Dword = value;
+		WriteByte(i.Bytes[0]);
+		WriteByte(i.Bytes[1]);
+		WriteByte(i.Bytes[2]);
+		WriteByte(i.Bytes[3]);
+	}
+
 	void Write(const uint8_t *value, const size_t size)
 	{
 		for(uint8_t i=0; i<size; ++i)
