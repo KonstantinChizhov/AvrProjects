@@ -7,7 +7,7 @@
 
 namespace XMega
 {
-	enum 
+	enum Commands
 	{
 		CMD_NOOP                   = 0x00,
 		CMD_READNVM                = 0x43,
@@ -45,7 +45,7 @@ namespace XMega
 		CMD_ERASEWRITEEEPROMPAGE   = 0x35
 	};
 
-	enum
+	enum Registers
 	{
 		REG_ADDR0                  = 0x00,
 		REG_ADDR1                  = 0x01,
@@ -69,7 +69,7 @@ namespace XMega
 		Xmega(ProgParameters *progParams, DeviceDescriptor *deviceDescroptor)
 			:TargetDeviceCtrl(progParams, deviceDescroptor)
 		{
-			_progParams->PDI_NVM_Offset = 0x010001C0;		
+			_progParams->PDI_NVM_Offset = 0x010001C0;
 		}
 
 		virtual void EnterProgMode()
@@ -95,33 +95,17 @@ namespace XMega
 
 		virtual uint32_t GetJTAGID()
 		{
-			return 0x0974C03F;
-		}
-
-		virtual void ReadMem(uint8_t memType, uint32_t size, uint32_t address)
-		{
-			if(!ReadMemory(address, size))
-			{
-				for(uint32_t i=0; i<size; i++)
-				{
-					Comm::Write(0x00);
-				}
-			}
+			return 0;//0x0974C03F;
 		}
 
 		virtual bool ReadMem(uint8_t memType, uint8_t *buffer, uint32_t size, uint32_t address)
 		{
 
-			if (!WaitWhileControllerBusy())
+			if(!Command(CMD_READNVM))
 				return false;
-			
-			_progIface->WriteByte(Pdi::CMD_STS | (Pdi::DATSIZE_4BYTES << 2));
-			_progIface->Write<uint32_t>(_progParams->PDI_NVM_Offset | REG_CMD);
-			_progIface->WriteByte(CMD_READNVM);
 
-			_progIface->WriteByte(Pdi::CMD_ST | (Pdi::POINTER_DIRECT << 2) | Pdi::DATSIZE_4BYTES);
-			_progIface->Write(address);
-
+			Address(Pdi::CMD_ST | (Pdi::POINTER_DIRECT << 2) | Pdi::DATSIZE_4BYTES, address);
+		
 			_progIface->WriteByte(Pdi::CMD_REPEAT | Pdi::DATSIZE_1BYTE);
 			_progIface->WriteByte(size - 1);
 
@@ -183,29 +167,21 @@ namespace XMega
 			switch(memType)
 			{
 				case XMEGA_ERASE_CHIP:
-					EraseSection(CMD_CHIPERASE);
-				break;
+					return EraseSection(CMD_CHIPERASE);
 				case XMEGA_ERASE_APP:
-					ErasePage(CMD_ERASEAPPSEC, address);
-				break;
+					return ErasePage(CMD_ERASEAPPSEC, address);
 				case XMEGA_ERASE_BOOT:
-					ErasePage(CMD_ERASEBOOTSEC, address);
-				break;
+					return ErasePage(CMD_ERASEBOOTSEC, address);
 				case XMEGA_ERASE_EEPROM:
-					ErasePage(CMD_ERASEEEPROM, address);
-				break;
+					return ErasePage(CMD_ERASEEEPROM, address);
 				case XMEGA_ERASE_APP_PAGE:
-					ErasePage(CMD_ERASEAPPSECPAGE, address);
-				break;
+					return ErasePage(CMD_ERASEAPPSECPAGE, address);
 				case XMEGA_ERASE_BOOT_PAGE:
-					ErasePage(CMD_ERASEBOOTSECPAGE, address);
-				break;
+					return ErasePage(CMD_ERASEBOOTSECPAGE, address);
 				case XMEGA_ERASE_EEPROM_PAGE:
-					ErasePage(CMD_ERASEEEPROMPAGE, address);
-				break;
+					return ErasePage(CMD_ERASEEEPROMPAGE, address);
 				case XMEGA_ERASE_USERSIG:
-					ErasePage(CMD_ERASEUSERSIG, address);
-				break;
+					return ErasePage(CMD_ERASEUSERSIG, address);
 				default:
 					return false;
 			}
@@ -214,49 +190,35 @@ namespace XMega
 
 		bool PageWrite(uint8_t writeCmd, uint32_t address)
 		{
-		
-			if(!WaitWhileControllerBusy())
-			  return false;
+			if (!Command(writeCmd))
+				return false;
 
-			_progIface->WriteByte(Pdi::CMD_STS | (Pdi::DATSIZE_4BYTES << 2));
-			_progIface->Write<uint32_t>(_progParams->PDI_NVM_Offset | REG_CMD);
-			_progIface->WriteByte(writeCmd);
-		
-			_progIface->WriteByte(Pdi::CMD_STS | (Pdi::DATSIZE_4BYTES << 2));
-			_progIface->Write<uint32_t>(address);
+			Address(Pdi::CMD_STS | (Pdi::DATSIZE_4BYTES << 2), address);
+
 			_progIface->WriteByte(0x00);
+			return true;
 		}
 
 		bool EraseSection(uint8_t eraseCmd)
 		{
-			if (!(WaitWhileControllerBusy()))
+			if (!Command(eraseCmd))
 				return false;
-
-			_progIface->WriteByte(Pdi::CMD_STS | (Pdi::DATSIZE_4BYTES << 2));
-			_progIface->Write<uint32_t>(_progParams->PDI_NVM_Offset | REG_CMD);
-   			_progIface->WriteByte(eraseCmd);
 				
-			_progIface->WriteByte(Pdi::CMD_STS | (Pdi::DATSIZE_4BYTES << 2));
-			_progIface->Write<uint32_t>(_progParams->PDI_NVM_Offset | REG_CTRLA);
-			_progIface->WriteByte(1 << 0);		
+			WriteNvmReg(REG_CTRLA, 1 << 0);
 	
-			if (!(WaitWhileBusBusy()))
-			  return false;
+			if(!WaitWhileBusBusy())
+				return false;
 	  
 			return true;
 		}
 
 		bool ErasePage(uint8_t eraseCmd, uint32_t address)
 		{
-			if (!(WaitWhileControllerBusy()))
+			if (!Command(eraseCmd))
 				return false;
-
-			_progIface->WriteByte(Pdi::CMD_STS | (Pdi::DATSIZE_4BYTES << 2));
-			_progIface->Write<uint32_t>(_progParams->PDI_NVM_Offset | REG_CMD);
-   			_progIface->WriteByte(eraseCmd);
 				
-			_progIface->WriteByte(Pdi::CMD_STS | (Pdi::DATSIZE_4BYTES << 2));
-			_progIface->Write<uint32_t>(address);
+			Address(Pdi::CMD_STS | (Pdi::DATSIZE_4BYTES << 2), address);
+
 			_progIface->WriteByte(0x00);
 	
 			if (!(WaitWhileBusBusy()))
@@ -269,15 +231,10 @@ namespace XMega
 		{
 			if (size)
 			{
-				if (!WaitWhileControllerBusy())
+				if (!Command(bufferCommand))
 				  return false;
 
-				_progIface->WriteByte(Pdi::CMD_STS | (Pdi::DATSIZE_4BYTES << 2));
-				_progIface->Write<uint32_t>(_progParams->PDI_NVM_Offset | REG_CMD);
-				_progIface->WriteByte(bufferCommand);
-
-				_progIface->WriteByte(Pdi::CMD_ST | (Pdi::POINTER_DIRECT << 2) | Pdi::DATSIZE_4BYTES);
-				_progIface->Write<uint32_t>(address);
+				Address(Pdi::CMD_ST | (Pdi::POINTER_DIRECT << 2) | Pdi::DATSIZE_4BYTES, address);
 
 				_progIface->WriteByte(Pdi::CMD_REPEAT | Pdi::DATSIZE_1BYTE);
 				_progIface->WriteByte(size - 1);
@@ -286,53 +243,19 @@ namespace XMega
 				for (uint16_t i = 0; i < size; i++)
 				  _progIface->WriteByte(*(buffer++));
 			}
+			return true;
 		}
 
 		bool WriteLockOrFuse(uint8_t command, uint8_t *buffer, uint32_t address)
 		{
-			if (!WaitWhileControllerBusy())
+			if (!Command(command))
 				return false;
 
-			_progIface->WriteByte(Pdi::CMD_STS | (Pdi::DATSIZE_4BYTES << 2));
-			_progIface->Write<uint32_t>(_progParams->PDI_NVM_Offset | REG_CMD);
-			_progIface->WriteByte(command);
+			Address(Pdi::CMD_STS | (Pdi::DATSIZE_4BYTES << 2), address);
 
-			_progIface->WriteByte(Pdi::CMD_STS | (Pdi::DATSIZE_4BYTES << 2));
-			_progIface->Write<uint32_t>(address);
 			_progIface->WriteByte(*buffer);
-
 			return true;
 		}
-
-		bool ReadMemory(uint32_t readAddress, uint16_t size)
-		{
-			if (!WaitWhileControllerBusy())
-				return false;
-
-			_progIface->WriteByte(Pdi::CMD_STS | (Pdi::DATSIZE_4BYTES << 2));
-
-			_progIface->Write<uint32_t>(_progParams->PDI_NVM_Offset | REG_CMD);
-
-			_progIface->WriteByte(CMD_READNVM);
-
-			_progIface->WriteByte(Pdi::CMD_ST | (Pdi::POINTER_DIRECT << 2) | Pdi::DATSIZE_4BYTES);
-			_progIface->Write(readAddress);
-
-			_progIface->WriteByte(Pdi::CMD_REPEAT | Pdi::DATSIZE_1BYTE);
-			_progIface->WriteByte(size - 1);
-
-			_progIface->WriteByte(Pdi::CMD_LD | (Pdi::POINTER_INDIRECT_PI << 2) | Pdi::DATSIZE_1BYTE);
-
-			for(uint32_t i=0; i<size; i++)
-			{
-				IO::Portb::Write(i);
-				uint8_t c = _progIface->ReadByte();
-				Comm::Write(c);
-			}
-
-			return true;
-		}
-
 
 		bool WaitWhileBusBusy()
 		{
@@ -363,6 +286,29 @@ namespace XMega
 				}
 			}
 			return false;
+		}
+
+		bool Command(uint8_t command)
+		{
+			return WriteNvmReg(REG_CMD, command);
+		}
+
+		bool WriteNvmReg(Registers reg, uint8_t value)
+		{
+			if (!WaitWhileControllerBusy())
+				return false;
+
+			Address(Pdi::CMD_STS | (Pdi::DATSIZE_4BYTES << 2),
+				_progParams->PDI_NVM_Offset | reg);
+		
+			_progIface->WriteByte(value);
+			return true;
+		}
+
+		void Address(uint8_t command, uint32_t address)
+		{
+			_progIface->WriteByte(command);
+			_progIface->Write(address);
 		}
 	};
 }//namespace XMega
