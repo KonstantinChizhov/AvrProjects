@@ -112,7 +112,6 @@ namespace XMega
 			for(uint32_t i=0; i<size; i++)
 			{
 				uint8_t c = _progIface->ReadByte();
-				IO::Portb::Write(i);
 				buffer[i] = c;
 			}
 
@@ -130,21 +129,22 @@ namespace XMega
 
 				case XMEGA_APPLICATION_FLASH:
 					FillPageBuffer(CMD_LOADFLASHPAGEBUFF, buffer, size, address);
-					return PageWrite(CMD_WRITEAPPSECPAGE, address);
+					return //ErasePage(CMD_ERASEAPPSECPAGE, address) &&
+					 PageWrite(CMD_WRITEAPPSECPAGE, address);
 
 				case XMEGA_BOOT_FLASH:
 					FillPageBuffer(CMD_LOADFLASHPAGEBUFF, buffer, size, address);
 					return PageWrite(CMD_WRITEBOOTSECPAGE, address);
-				case XMEGA_CALIBRATION_SIGNATURE:
 
+				case EEPROM:
+					FillPageBuffer(CMD_LOADEEPROMPAGEBUFF, buffer, size, address);
+					return PageWrite(CMD_ERASEWRITEEEPROMPAGE, address);
 
 				case XMEGA_USER_SIGNATURE:
-
-
+				case XMEGA_CALIBRATION_SIGNATURE:
 				case SIGN_JTAG:
 				case IO_SHADOW:
 				case SRAM:
-				case EEPROM:
 				case EVENT:
 				case SPM:
 				case FLASH_PAGE:
@@ -171,7 +171,6 @@ namespace XMega
 					break;
 				case XMEGA_ERASE_EEPROM:
 					eraseCmd = CMD_ERASEEEPROM;
-					break;
 				case XMEGA_ERASE_APP_PAGE:
 					eraseCmd = CMD_ERASEAPPSECPAGE;
 					break;
@@ -219,6 +218,8 @@ namespace XMega
 				return false;
 				
 			Address(Pdi::CMD_STS | (Pdi::DATSIZE_4BYTES << 2), address, 0x00);
+
+			//WriteNvmReg(REG_CTRLA, 1 << 0);
 
 			if (!(WaitWhileBusBusy()))
 			  return false;

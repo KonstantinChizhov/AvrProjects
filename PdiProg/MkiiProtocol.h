@@ -385,7 +385,8 @@ namespace MkII
 			
 			interface::Read(_pageBuffer, size);
 
-			_target->WriteMem(memType, _pageBuffer, size, address);
+			if(!_target->WriteMem(memType, _pageBuffer, size, address))
+				SendResponse(RSP_FAILED);
 			SendResponse(RSP_OK);
 		}
 
