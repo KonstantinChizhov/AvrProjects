@@ -123,22 +123,23 @@ namespace XMega
 			switch(memType)
 			{
 				case FUSE_BITS:
-					return WriteLockOrFuse(CMD_WRITEFUSE, buffer, address);
+					return WriteTriggeredCommand(CMD_WRITEFUSE, address, *buffer);
 				case LOCK_BITS:
-					return WriteLockOrFuse(CMD_WRITELOCK, buffer, address);
+					return WriteTriggeredCommand(CMD_WRITELOCK, address, *buffer);
 
 				case XMEGA_APPLICATION_FLASH:
 					FillPageBuffer(CMD_LOADFLASHPAGEBUFF, buffer, size, address);
-					return //ErasePage(CMD_ERASEAPPSECPAGE, address) &&
-					 PageWrite(CMD_WRITEAPPSECPAGE, address);
+
+					return WriteTriggeredCommand(CMD_ERASEFLASHPAGE, address) &&
+					 WriteTriggeredCommand(CMD_WRITEAPPSECPAGE, address);
 
 				case XMEGA_BOOT_FLASH:
 					FillPageBuffer(CMD_LOADFLASHPAGEBUFF, buffer, size, address);
-					return PageWrite(CMD_WRITEBOOTSECPAGE, address);
+					return WriteTriggeredCommand(CMD_WRITEBOOTSECPAGE, address);
 
 				case EEPROM:
 					FillPageBuffer(CMD_LOADEEPROMPAGEBUFF, buffer, size, address);
-					return PageWrite(CMD_ERASEWRITEEEPROMPAGE, address);
+					return WriteTriggeredCommand(CMD_ERASEWRITEEEPROMPAGE, address);
 
 				case XMEGA_USER_SIGNATURE:
 				case XMEGA_CALIBRATION_SIGNATURE:
@@ -162,7 +163,7 @@ namespace XMega
 			switch(memType)
 			{
 				case XMEGA_ERASE_CHIP:
-					return EraseSection(CMD_CHIPERASE);
+					return ActionTriggeredCommand(CMD_CHIPERASE);
 				case XMEGA_ERASE_APP:
 					eraseCmd = CMD_ERASEAPPSEC;
 					break;
@@ -186,46 +187,10 @@ namespace XMega
 				default:
 					return false;
 			}
-			return ErasePage(eraseCmd, address);
+			return WriteTriggeredCommand(eraseCmd, address);
 		}
 	protected:
 
-		bool PageWrite(uint8_t writeCmd, uint32_t address)
-		{
-			if (!Command(writeCmd))
-				return false;
-
-			Address(Pdi::CMD_STS | (Pdi::DATSIZE_4BYTES << 2), address, 0x00);
-			return true;
-		}
-
-		bool EraseSection(uint8_t eraseCmd)
-		{
-			if (!Command(eraseCmd))
-				return false;
-				
-			WriteNvmReg(REG_CTRLA, 1 << 0);
-	
-			if(!WaitWhileBusBusy())
-				return false;
-	  
-			return true;
-		}
-
-		bool ErasePage(uint8_t eraseCmd, uint32_t address)
-		{
-			if (!Command(eraseCmd))
-				return false;
-				
-			Address(Pdi::CMD_STS | (Pdi::DATSIZE_4BYTES << 2), address, 0x00);
-
-			//WriteNvmReg(REG_CTRLA, 1 << 0);
-
-			if (!(WaitWhileBusBusy()))
-			  return false;
-	  
-			return true;
-		}
 
 		bool FillPageBuffer(uint8_t bufferCommand, uint8_t *buffer, uint16_t size, uint32_t address)
 		{
@@ -245,16 +210,6 @@ namespace XMega
 			return true;
 		}
 
-		bool WriteLockOrFuse(uint8_t command, uint8_t *buffer, uint32_t address)
-		{
-			if (!Command(command))
-				return false;
-
-			Address(Pdi::CMD_STS | (Pdi::DATSIZE_4BYTES << 2), address, *buffer);
-
-			return true;
-		}
-
 		bool WaitWhileBusBusy()
 		{
 			uint16_t timeout=500;
@@ -266,7 +221,6 @@ namespace XMega
 					return true;
 				}
 			}
-
 			return false;
 		}
 
@@ -291,6 +245,28 @@ namespace XMega
 			return WriteNvmReg(REG_CMD, command);
 		}
 
+		bool WriteTriggeredCommand(uint8_t command, uint32_t address, uint8_t value=0)
+		{
+			if(WriteNvmReg(REG_CMD, command))
+				return false;
+			Address(Pdi::CMD_STS | (Pdi::DATSIZE_4BYTES << 2), address, value);
+			return true;
+		}
+
+		bool ActionTriggeredCommand(uint8_t command)
+		{
+			if (!Command(command))
+				return false;
+				
+			WriteNvmReg(REG_CTRLA, 1 << 0);
+	
+			if(!WaitWhileBusBusy())
+				return false;
+	  
+			return true;
+		}
+
+
 		bool WriteNvmReg(Registers reg, uint8_t value)
 		{
 			if (!WaitWhileControllerBusy())
@@ -311,8 +287,7 @@ namespace XMega
 
 		void Address(uint8_t command, uint32_t address, uint8_t value)
 		{
-			_progIface->WriteByte(command);
-			_progIface->Write(address);
+			Address(command, address);
 			_progIface->WriteByte(value);
 		}
 
