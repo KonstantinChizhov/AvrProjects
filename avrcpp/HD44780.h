@@ -1,6 +1,18 @@
 #ifndef HD44780_HPP
 #define HD44780_HPP
 
+//*****************************************************************************
+//
+// Title		: C++ LCD HD44780 compatible display
+// Author		: Konstantin Chizhov
+// Date			: 2010
+// Target MCU	: Atmel mega AVR, TINY avr AND Xmega Series
+//
+//       This code is distributed under the GNU Public License
+//       which can be found at http://www.gnu.org/licenses/gpl.txt
+//
+//*****************************************************************************
+
 #include "ports.h"
 #include <util/delay.h>
 #include "static_assert.h"

@@ -2,6 +2,18 @@
 #ifndef UTIL_HPP
 #define UTIL_HPP
 
+//*****************************************************************************
+//
+// Title		: C++ utility classes and functions for ATMEL AVR
+// Author		: Konstantin Chizhov
+// Date			: 2010
+// Target MCU	: Atmel mega AVR, TINY avr AND Xmega Series
+//
+//       This code is distributed under the GNU Public License
+//       which can be found at http://www.gnu.org/licenses/gpl.txt
+//
+//*****************************************************************************
+
 #include <stdlib.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
