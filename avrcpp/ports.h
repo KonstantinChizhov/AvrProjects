@@ -1,5 +1,18 @@
 #pragma once
 
+//*****************************************************************************
+//
+// Title		: C++ IO for ATMEL AVR
+// Author		: Konstantin Chizhov
+// Date			: 2010
+// Target MCU	: Atmel mega AVR, TINY avr AND Xmega Series
+//
+//       This code is distributed under the GNU Public License
+//       which can be found at http://www.gnu.org/licenses/gpl.txt
+//
+//*****************************************************************************
+
+
 #ifndef PORTS_HPP
 #define PORTS_HPP
 #include <avr/io.h>
@@ -712,7 +725,7 @@ class NullType{};
 
 ////////////////////////////////////////////////////////////////////////////////
 // class template PinList
-// Represents generic set of IO pins htet could be used like a separete port.
+// Represents generic set of IO pins that could be used like a virtual port.
 // It can be composed from any number of pins from 1 to 16 from any IO port present in selected device
 // (the last T17 type in PinList is a end of list marker).
 // It can be used like this:
