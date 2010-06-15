@@ -1,7 +1,7 @@
 #include "ports.h"
 #include <util/delay.h>
 using namespace IO;
-/*
+
 void TestOnePortNonConstValue()
 {
 	uint8_t nonConstValue = Portc::PinRead();
@@ -119,15 +119,14 @@ void RndOrderRead()
 	value = pins::Read();
 	Portc::Write(value);
 }
-*/
+
 int main()
 {
-	//WriteTests();
-	PORTA.DIR = 0xff;
+	WriteTests();
+	
 	while(1)
 	{	
-		PORTA.OUT ^= 0x55;
-		_delay_ms(200);
+		
 	}
 
 }
