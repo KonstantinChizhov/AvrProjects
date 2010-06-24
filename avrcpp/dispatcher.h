@@ -1,11 +1,7 @@
-#include <avr/io.h>
-#include "containers.h"
-#include <avr/interrupt.h>
-#include "util.h"
 
 //*****************************************************************************
 //
-// Title		: C++ simple task dispatcher for ATMEL AVR
+// Title		: C++ simple task dispatcher
 // Author		: Konstantin Chizhov
 // Date			: 2010
 // Target MCU	: Atmel mega AVR, TINY avr AND Xmega Series
@@ -14,6 +10,9 @@
 //       which can be found at http://www.gnu.org/licenses/gpl.txt
 //
 //*****************************************************************************
+
+#include "containers.h"
+#include "util.h"
 
 typedef void (*task_t)();
 

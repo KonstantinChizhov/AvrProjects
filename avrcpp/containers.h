@@ -5,10 +5,9 @@
 
 //*****************************************************************************
 //
-// Title		: C++ containers for ATMEL AVR
+// Title		: C++ containers for embedded systems
 // Author		: Konstantin Chizhov
 // Date			: 2010
-// Target MCU	: Atmel mega AVR, TINY avr AND Xmega Series
 //
 //       This code is distributed under the GNU Public License
 //       which can be found at http://www.gnu.org/licenses/gpl.txt
