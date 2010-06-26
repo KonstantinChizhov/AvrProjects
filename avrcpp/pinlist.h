@@ -22,16 +22,16 @@ namespace IO
 	namespace IoPrivate
 	{
 
-		template<bool Short> struct SelectSizeT;
+		template<bool Short> struct SelectSize;
 
 		template<> 
-		struct SelectSizeT<false>
+		struct SelectSize<false>
 		{
 			typedef unsigned int Result;
 		};
 
 		template<> 
-		struct SelectSizeT<true>
+		struct SelectSize<true>
 		{
 			typedef unsigned char Result;
 		};
@@ -80,6 +80,31 @@ class NullType{};
         {
             enum { value = 1 + Length<U>::value };
         };
+
+////////////////////////////////////////////////////////////////////////////////
+// class template TypeAt
+// Finds the type at a given index in a typelist
+// Invocation (TList is a typelist and index is a compile-time integral 
+//     constant):
+// TypeAt<TList, index>::Result
+// returns the type in position 'index' in TList
+// If you pass an out-of-bounds index, the result is a compile-time error
+////////////////////////////////////////////////////////////////////////////////
+
+        template <class TList, unsigned int index> struct TypeAt;
+        
+        template <class Head, class Tail>
+        struct TypeAt<Typelist<Head, Tail>, 0>
+        {
+            typedef Head Result;
+        };
+
+        template <class Head, class Tail, unsigned int i>
+        struct TypeAt<Typelist<Head, Tail>, i>
+        {
+            typedef typename TypeAt<Tail, i - 1>::Result Result;
+        };
+
 ////////////////////////////////////////////////////////////////////////////////
 // class template Erase
 // Erases the first occurence, if any, of a type in a typelist
@@ -246,14 +271,14 @@ class NullType{};
 		template <class TList> struct PinWriteIterator;
         template <> struct PinWriteIterator<NullType>
         {
-			template<class DATA_T>
-			static uint8_t UppendValue(const DATA_T &value)
+			template<class DataType>
+			static uint8_t UppendValue(const DataType &value)
 			{
 				return 0; 
 			}
 
-			template<class DATA_T>
-			static inline DATA_T UppendReadValue(uint8_t portValue, DATA_T)
+			template<class DataType>
+			static inline DataType UppendReadValue(uint8_t portValue, DataType)
 			{
 				return 0;
 			}
@@ -262,8 +287,8 @@ class NullType{};
         template <class Head, class Tail>
         struct PinWriteIterator< Typelist<Head, Tail> >
         {
-			template<class DATA_T>
-			static inline uint8_t UppendValue(const DATA_T &value)
+			template<class DataType>
+			static inline uint8_t UppendValue(const DataType &value)
 			{
 				if(IsSerial<Typelist<Head, Tail> >::value)
 				{
@@ -286,10 +311,10 @@ class NullType{};
 				return result | PinWriteIterator<Tail>::UppendValue(value);
 			}
 
-			template<class DATA_T>
-			static inline DATA_T UppendReadValue(uint8_t portValue, DATA_T dummy)
+			template<class DataType>
+			static inline DataType UppendReadValue(uint8_t portValue, DataType dummy)
 			{
-				DATA_T value=0;
+				DataType value=0;
 				if((int)Head::Position == (int)Head::Pin::Number)
 					value |= portValue & (1 << Head::Position);
 				else 
@@ -310,36 +335,41 @@ class NullType{};
 		template <class PortList, class PinList> struct PortWriteIterator;
         template <class PinList> struct PortWriteIterator<NullType, PinList>
         {
-			template<class DATA_T>
-			static void Write(DATA_T value)
+			template<class DataType>
+			static void Write(DataType value)
 			{   }
 
-			template<class DATA_T>
-			static void Set(DATA_T value)
+			template<class DataType>
+			static void Set(DataType value)
 			{   }
 
-			template<class DATA_T>
-			static void Clear(DATA_T value)
+			template<class DataType>
+			static void Clear(DataType value)
 			{   }
 
-			template<class DATA_T>
-			static DATA_T Read(DATA_T)
+			template<class DataType>
+			static DataType PinRead(DataType)
 			{   
 				return 0;
 			}
 			
-			template<class DATA_T>
-			static void DirWrite(DATA_T value)
+			template<class DataType>
+			static void DirWrite(DataType value)
 			{	}
 
-			template<class DATA_T>
-			static void DirSet(DATA_T value)
+			template<class DataType>
+			static void DirSet(DataType value)
 			{   }
 
-			template<class DATA_T>
-			static void DirClear(DATA_T value)
+			template<class DataType>
+			static void DirClear(DataType value)
 			{   }
 
+			template<class DataType>
+			static DataType OutRead(DataType dummy)
+			{
+				return 0;	
+			}
         };
 
         template <class Head, class Tail, class PinList>
@@ -350,20 +380,20 @@ class NullType{};
 			enum{Mask = GetMask<Pins>::value};
 			typedef Head Port; //Head points to current port i the list.
 			
-			template<class DATA_T>
-			static void Write(DATA_T value)
+			template<class DataType>
+			static void Write(DataType value)
 			{   
 				uint8_t result = PinWriteIterator<Pins>::UppendValue(value);
 				if((int)Length<Pins>::value == (int)Port::Width)// whole port		
 					Port::Write(result);
 				else
-					Port::Write((Port::Read() & ~Mask) | result) ;
+					Port::Write((Port::Read() & ~Mask) | result);
 
 				PortWriteIterator<Tail, PinList>::Write(value);
 			}
 
-			template<class DATA_T>
-			static void Set(DATA_T value)
+			template<class DataType>
+			static void Set(DataType value)
 			{   
 				uint8_t result = PinWriteIterator<Pins>::UppendValue(value);
 				Port::Set(result);
@@ -371,8 +401,8 @@ class NullType{};
 				PortWriteIterator<Tail, PinList>::Set(value);
 			}
 
-			template<class DATA_T>
-			static void Clear(DATA_T value)
+			template<class DataType>
+			static void Clear(DataType value)
 			{   
 				uint8_t result = PinWriteIterator<Pins>::UppendValue(value);
 				Port::Clear(result);
@@ -380,8 +410,8 @@ class NullType{};
 				PortWriteIterator<Tail, PinList>::Clear(value);
 			}
 
-			template<class DATA_T>
-			static void DirWrite(DATA_T value)
+			template<class DataType>
+			static void DirWrite(DataType value)
 			{   
 				uint8_t result = PinWriteIterator<Pins>::UppendValue(value);
 				if((int)Length<Pins>::value == (int)Port::Width)
@@ -392,8 +422,8 @@ class NullType{};
 				PortWriteIterator<Tail, PinList>::DirWrite(value);
 			}
 
-			template<class DATA_T>
-			static void DirSet(DATA_T value)
+			template<class DataType>
+			static void DirSet(DataType value)
 			{   
 				uint8_t result = PinWriteIterator<Pins>::UppendValue(value);
 				Port::DirSet(result);
@@ -401,8 +431,8 @@ class NullType{};
 				PortWriteIterator<Tail, PinList>::DirSet(value);
 			}
 
-			template<class DATA_T>
-			static void DirClear(DATA_T value)
+			template<class DataType>
+			static void DirClear(DataType value)
 			{   
 				uint8_t result = PinWriteIterator<Pins>::UppendValue(value);
 				Port::DirClear(result);
@@ -410,12 +440,20 @@ class NullType{};
 				PortWriteIterator<Tail, PinList>::DirClear(value);
 			}
 			
-			template<class DATA_T>
-			static DATA_T Read(DATA_T dummy)
+			template<class DataType>
+			static DataType PinRead(DataType dummy)
 			{   
 				uint8_t portValue = Port::PinRead();
-				DATA_T value = PinWriteIterator<Pins>::UppendReadValue(portValue, dummy);	
-				return value | PortWriteIterator<Tail, PinList>::Read(dummy);
+				DataType value = PinWriteIterator<Pins>::UppendReadValue(portValue, dummy);	
+				return value | PortWriteIterator<Tail, PinList>::PinRead(dummy);
+			}
+
+			template<class DataType>
+			static DataType OutRead(DataType dummy)
+			{   
+				uint8_t portValue = Port::Read();
+				DataType value = PinWriteIterator<Pins>::UppendReadValue(portValue, dummy);	
+				return value | PortWriteIterator<Tail, PinList>::OutRead(dummy);
 			}
 
         };
@@ -435,40 +473,50 @@ class NullType{};
 			typedef typename NoDuplicates<PinsToPorts>::Result Ports; 
 		public:
 			enum{Length = Length<PINS>::value};
-			typedef typename IoPrivate::SelectSizeT<Length < 8>::Result DATA_T;
+			typedef typename IoPrivate::SelectSize<Length < 8>::Result DataType;
 
-			static void Write(DATA_T value)
+			template<uint8_t PIN>
+			class Pin :public TypeAt<PINS, PIN>::Result::Pin
+			{
+			};
+
+			static void Write(DataType value)
 			{
 				PortWriteIterator<Ports, PINS>::Write(value);
 			}
 
-			static void Set(DATA_T value)
+			static DataType Read()
+			{	
+				typedef PortWriteIterator<Ports, PINS> iter;
+				return iter::OutRead(DataType(0));
+			}
+			static void Set(DataType value)
 			{
 				PortWriteIterator<Ports, PINS>::Set(value);
 			}
 
-			static void Clear(DATA_T value)
+			static void Clear(DataType value)
 			{
 				PortWriteIterator<Ports, PINS>::Clear(value);
 			}
 
-			static DATA_T Read()
+			static DataType PinRead()
 			{	
 				typedef PortWriteIterator<Ports, PINS> iter;
-				return iter::Read(DATA_T(0));
+				return iter::PinRead(DataType(0));
 			}
 
-			static void DirWrite(DATA_T value)
+			static void DirWrite(DataType value)
 			{
 				PortWriteIterator<Ports, PINS>::DirWrite(value);
 			}
 			
-			static void DirSet(DATA_T value)
+			static void DirSet(DataType value)
 			{
 				PortWriteIterator<Ports, PINS>::DirSet(value);
 			}
 
-			static void DirClear(DATA_T value)
+			static void DirClear(DataType value)
 			{
 				PortWriteIterator<Ports, PINS>::DirClear(value);
 			}
