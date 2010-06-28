@@ -30,9 +30,14 @@ class LcdBase
 
 
 
-template<class RS, class RW, class E, class DATA_BUS, uint8_t LINE_WIDTH=8, uint8_t LINES=2>
+template<class BUS, uint8_t LINE_WIDTH=8, uint8_t LINES=2>
 class Lcd: public LcdBase
 {
+	typedef typename BUS::template Pin<0> RS;
+	typedef typename BUS::template Pin<1> RW;
+	typedef typename BUS::template Pin<2> E;
+	typedef typename BUS::template Slice<3, 4> DATA_BUS;
+
 public:
 	static uint8_t LineWidth()
 	{
@@ -46,10 +51,7 @@ public:
 
 	static void Init()
 	{
-		E::SetDirWrite();
-		RW::SetDirWrite();
-		RS::SetDirWrite();
-		DATA_BUS::DirSet(0x0f);
+		BUS::DirSet(0x7f);
 		RW::Clear();
 		RS::Clear();
 		DATA_BUS::Write(0x03); 
@@ -114,6 +116,7 @@ public:
 
 	static void Putch(char c)
 	{
+		while(Busy());
 		RS::Set();
 		Write(c);
 	}
