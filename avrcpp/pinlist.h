@@ -286,26 +286,52 @@ class NullType{};
 			enum{value = ((PinNumber == I::PinNumber - 1) && I::value) || I::EndOfList};
         };
 ////////////////////////////////////////////////////////////////////////////////
-// class template Slice
-// Gets a slice from typelist.
-// Invocation: Slice<Typelist, From, To>::Result
+// Returns first Num elements from Typelist
 ////////////////////////////////////////////////////////////////////////////////
-/*
-		template <class Pinlist, unsigned int From, unsigned int To> struct Slice;
+		template <class TList, uint8_t Num> struct TakeFirst;
 
-		template <class Head, class Tail, unsigned int To>
-        struct Slice<Typelist<Head, Tail>, 0, To>
-        {
-            typedef typename TypeAt<Tail, i - 1>::Result Result;
-        };
+		template <>
+		struct TakeFirst<NullType, 0>
+		{
+			typedef NullType Result;
+		};
 
-		template <class Head, class Tail, unsigned int From, unsigned int To>
-        struct Slice<Typelist<Head, Tail>, From, To>
-        {
-            typedef typename Slice<Tail, i - 1>::Result Result;
-        };
+		template <class Head, class Tail>
+		struct TakeFirst<Typelist<Head, Tail>, 0>
+		{
+			typedef NullType Result;
+		};
 
-*/
+		template <class Head, class Tail, uint8_t Num>
+		struct TakeFirst<Typelist<Head, Tail>, Num>
+		{
+			typedef Typelist<Head, 
+						typename TakeFirst<Tail, Num-1>::Result
+						>Result;
+		};
+////////////////////////////////////////////////////////////////////////////////
+// Skip Num first elements from tipelist
+////////////////////////////////////////////////////////////////////////////////
+		template <class TList, uint8_t Num> struct SkipFirst;
+
+		template <>
+		struct SkipFirst<NullType, 0>
+		{
+			typedef NullType Result;
+		};
+
+		template <class Head, class Tail>
+		struct SkipFirst<Typelist<Head, Tail>, 0>
+		{
+			typedef Typelist<Head, Tail> Result;
+		};
+
+		template <class Head, class Tail, uint8_t Num>
+		struct SkipFirst<Typelist<Head, Tail>, Num>
+		{
+			typedef typename SkipFirst<Tail, Num-1>::Result Result;
+		};
+
 ////////////////////////////////////////////////////////////////////////////////
 // class template PinWriteIterator
 // Iterates througth pin list to compute value to write to their port
@@ -527,15 +553,34 @@ class NullType{};
 		{
 		private:
 			typedef typename GetPorts<PINS>::Result PinsToPorts;
-			typedef typename NoDuplicates<PinsToPorts>::Result Ports; 
 		public:
+			typedef PINS PinTypeList;
+			typedef typename NoDuplicates<PinsToPorts>::Result Ports; 
 			enum{Length = Length<PINS>::value};
 			typedef typename IoPrivate::SelectSize<Length < 8>::Result DataType;
 
+			template<uint8_t Num>
+			class Take: public PinSet< typename TakeFirst<PINS, Num>::Result >
+			{};
+
+			template<uint8_t Num>
+			class Skip: public PinSet< typename SkipFirst<PINS, Num>::Result >
+			{};
+
+			template<uint8_t StartIndex, uint8_t Size>
+			class Slice: public PinSet
+					< 
+						typename SkipFirst<
+							typename TakeFirst<PINS, StartIndex + Size>::Result, 
+							StartIndex>::Result 
+					>
+			{
+				BOOST_STATIC_ASSERT(StartIndex + Size <= Length);
+			};
+
 			template<uint8_t PIN>
 			class Pin :public TypeAt<PINS, PIN>::Result::Pin
-			{
-			};
+			{};
 
 			static void Write(DataType value)
 			{
