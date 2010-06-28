@@ -224,20 +224,41 @@ class NullType{};
         };
 
 ////////////////////////////////////////////////////////////////////////////////
-// class template GetMask
-// Computes bit mask for pin list
+// class template GetPortMask
+// Computes port bit mask for pin list
 // Assume that TList is type list of PW (pin wrapper) types.
 ////////////////////////////////////////////////////////////////////////////////
 
-		template <class TList> struct GetMask;
-        template <> struct GetMask<NullType>
+		template <class TList> struct GetPortMask;
+
+        template <> struct GetPortMask<NullType>
         {
             enum{value = 0};
         };
+
         template <class Head, class Tail>
-        struct GetMask< Typelist<Head, Tail> >
+        struct GetPortMask< Typelist<Head, Tail> >
         {
-			enum{value = (1 << Head::Pin::Number) | GetMask<Tail>::value};
+			enum{value = (1 << Head::Pin::Number) | GetPortMask<Tail>::value};
+        };
+
+////////////////////////////////////////////////////////////////////////////////
+// class template GetValueMask
+// Computes value bit mask for pin list
+// Assume that TList is type list of PW (pin wrapper) types.
+////////////////////////////////////////////////////////////////////////////////
+
+		template <class TList> struct GetValueMask;
+
+        template <> struct GetValueMask<NullType>
+        {
+            enum{value = 0};
+        };
+
+        template <class Head, class Tail>
+        struct GetValueMask< Typelist<Head, Tail> >
+        {
+			enum{value = (1 << Head::Position) | GetValueMask<Tail>::value};
         };
 ////////////////////////////////////////////////////////////////////////////////
 // class template IsSerial
@@ -246,6 +267,7 @@ class NullType{};
 ////////////////////////////////////////////////////////////////////////////////
 
 		template <class TList> struct IsSerial;
+
         template <> struct IsSerial<NullType>
         {
             enum{value = 1};
@@ -253,6 +275,7 @@ class NullType{};
 			enum{EndOfList = 1};
         };
         template <class Head, class Tail>
+
         struct IsSerial< Typelist<Head, Tail> >
         {	
 		//private:
@@ -261,7 +284,28 @@ class NullType{};
 			enum{EndOfList = 0};
 		//public:
 			enum{value = ((PinNumber == I::PinNumber - 1) && I::value) || I::EndOfList};
-        };		
+        };
+////////////////////////////////////////////////////////////////////////////////
+// class template Slice
+// Gets a slice from typelist.
+// Invocation: Slice<Typelist, From, To>::Result
+////////////////////////////////////////////////////////////////////////////////
+/*
+		template <class Pinlist, unsigned int From, unsigned int To> struct Slice;
+
+		template <class Head, class Tail, unsigned int To>
+        struct Slice<Typelist<Head, Tail>, 0, To>
+        {
+            typedef typename TypeAt<Tail, i - 1>::Result Result;
+        };
+
+		template <class Head, class Tail, unsigned int From, unsigned int To>
+        struct Slice<Typelist<Head, Tail>, From, To>
+        {
+            typedef typename Slice<Tail, i - 1>::Result Result;
+        };
+
+*/
 ////////////////////////////////////////////////////////////////////////////////
 // class template PinWriteIterator
 // Iterates througth pin list to compute value to write to their port
@@ -269,6 +313,7 @@ class NullType{};
 ////////////////////////////////////////////////////////////////////////////////
 
 		template <class TList> struct PinWriteIterator;
+
         template <> struct PinWriteIterator<NullType>
         {
 			template<class DataType>
@@ -285,6 +330,7 @@ class NullType{};
 
         };
         template <class Head, class Tail>
+
         struct PinWriteIterator< Typelist<Head, Tail> >
         {
 			template<class DataType>
@@ -294,10 +340,10 @@ class NullType{};
 				{
 					if((int)Head::Position > (int)Head::Pin::Number)
 						return (value >> ((int)Head::Position - (int)Head::Pin::Number)) & 
-							GetMask<Typelist<Head, Tail> >::value;
+							GetPortMask<Typelist<Head, Tail> >::value;
 					else
 						return (value << ((int)Head::Pin::Number - (int)Head::Position)) & 
-							GetMask<Typelist<Head, Tail> >::value;
+							GetPortMask<Typelist<Head, Tail> >::value;
 				}
 				
 				uint8_t result=0;
@@ -314,6 +360,16 @@ class NullType{};
 			template<class DataType>
 			static inline DataType UppendReadValue(uint8_t portValue, DataType dummy)
 			{
+				if(IsSerial<Typelist<Head, Tail> >::value)
+				{
+					if((int)Head::Position > (int)Head::Pin::Number)
+						return (portValue >> ((int)Head::Position - (int)Head::Pin::Number)) & 
+							GetValueMask<Typelist<Head, Tail> >::value;
+					else
+						return (portValue << ((int)Head::Pin::Number - (int)Head::Position)) & 
+							GetValueMask<Typelist<Head, Tail> >::value;
+				}
+
 				DataType value=0;
 				if((int)Head::Position == (int)Head::Pin::Number)
 					value |= portValue & (1 << Head::Position);
@@ -333,6 +389,7 @@ class NullType{};
 ////////////////////////////////////////////////////////////////////////////////
 
 		template <class PortList, class PinList> struct PortWriteIterator;
+
         template <class PinList> struct PortWriteIterator<NullType, PinList>
         {
 			template<class DataType>
@@ -377,7 +434,7 @@ class NullType{};
         {
 			//pins on current port
 			typedef typename GetPinsWithPort<PinList, Head>::Result Pins;
-			enum{Mask = GetMask<Pins>::value};
+			enum{Mask = GetPortMask<Pins>::value};
 			typedef Head Port; //Head points to current port i the list.
 			
 			template<class DataType>

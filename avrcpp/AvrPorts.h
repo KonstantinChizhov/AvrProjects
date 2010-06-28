@@ -12,6 +12,8 @@
 
 #pragma once
 #include <avr/io.h>
+#include "iopin.h"
+
 namespace IO
 {
 
@@ -80,7 +82,10 @@ namespace IO
 				return pin();\
 			}\
 			enum{Id = ID};\
-			enum{Width=8};\
+			enum{Width=sizeof(DataT)*8};\
+			template<uint8_t PIN>\
+			class Pin :public TPin<className, PIN>\
+			{};\
 		};
 
 	#ifdef PORTA
