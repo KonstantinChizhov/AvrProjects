@@ -1,21 +1,31 @@
-#include "ioports.h"
-#include "HD44780.h"
-#include "pinlist.h"
+
 #include "iopins.h"
+#include "pinlist.h"
+#include <avr/delay.h>
 
 using namespace IO;
 
-typedef PinList<Pa1, Pa2, Pb0, Pb3, Pc5, Pc6, Pc7> pins;
-//typedef PinList<Pa0, Pa1, Pa2, Pa3, Pa4, Pa5, Pa6> pins;
-typedef Lcd<pins> Lcd1;
+typedef Pa1 Led1;
+typedef Pa2 Led2;
+
+template <class Led>
+void Blink()
+{
+	Led::Set();
+	_delay_ms(100);
+	Led::Clear();
+	_delay_ms(100);
+}
 
 int main()
 {
+	Led1::SetDirWrite();
+	Led2::SetDirWrite();
 
-	Lcd1::Init();
 	while(1)
 	{	
-		
+		Blink<Led1>();
+		Blink<Led2>();
 	}
 }
 

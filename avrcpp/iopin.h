@@ -13,7 +13,7 @@
 #pragma once
 
 #include "static_assert.h"
-
+#include <stdint.h>
 namespace IO
 {
 
