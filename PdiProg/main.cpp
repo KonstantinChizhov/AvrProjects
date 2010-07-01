@@ -6,8 +6,8 @@
 #include "Crc16.h"
 #include "MkiiProtocol.h"
 #include "Pdi.h"
-#include "ports.h"
-
+#include "ioports.h"
+#include "iopins.h"
 //#include "UsbFifo.h"
 
 using namespace MkII;
