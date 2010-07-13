@@ -15,6 +15,7 @@
 #pragma once
 
 #include "iopin.h"
+#include "loki\Typelist.h"
 
 namespace IO
 {
@@ -38,125 +39,8 @@ namespace IO
 
 	}
 
-// TypeList and corresponding stuff are borrowed from Loki library
-// http://sourceforge.net/projects/loki-lib/
-
-// class template NullType - marks the end of type list
-class NullType{};
-
-////////////////////////////////////////////////////////////////////////////////
-// class template Typelist
-// The building block of typelists of any length
-// Use it through the LOKI_TYPELIST_NN macros
-// Defines nested types:
-//     Head (first element, a non-typelist type by convention)
-//     Tail (second element, can be another typelist)
-////////////////////////////////////////////////////////////////////////////////
-
-    template <class T, class U>
-    struct Typelist
-    {
-       typedef T Head;
-       typedef U Tail;
-    };
-
-////////////////////////////////////////////////////////////////////////////////
-// class template Length
-// Computes the length of a typelist
-// Invocation (TList is a typelist):
-// Length<TList>::value
-// returns a compile-time constant containing the length of TList, not counting
-//     the end terminator (which by convention is NullType)
-////////////////////////////////////////////////////////////////////////////////
-
-        template <class TList> struct Length;
-        template <> struct Length<NullType>
-        {
-            enum { value = 0 };
-        };
-        
-        template <class T, class U>
-        struct Length< Typelist<T, U> >
-        {
-            enum { value = 1 + Length<U>::value };
-        };
-
-////////////////////////////////////////////////////////////////////////////////
-// class template TypeAt
-// Finds the type at a given index in a typelist
-// Invocation (TList is a typelist and index is a compile-time integral 
-//     constant):
-// TypeAt<TList, index>::Result
-// returns the type in position 'index' in TList
-// If you pass an out-of-bounds index, the result is a compile-time error
-////////////////////////////////////////////////////////////////////////////////
-
-        template <class TList, unsigned int index> struct TypeAt;
-        
-        template <class Head, class Tail>
-        struct TypeAt<Typelist<Head, Tail>, 0>
-        {
-            typedef Head Result;
-        };
-
-        template <class Head, class Tail, unsigned int i>
-        struct TypeAt<Typelist<Head, Tail>, i>
-        {
-            typedef typename TypeAt<Tail, i - 1>::Result Result;
-        };
-
-////////////////////////////////////////////////////////////////////////////////
-// class template Erase
-// Erases the first occurence, if any, of a type in a typelist
-// Invocation (TList is a typelist and T is a type):
-// Erase<TList, T>::Result
-// returns a typelist that is TList without the first occurence of T
-////////////////////////////////////////////////////////////////////////////////
-
-        template <class TList, class T> struct Erase;
-        
-        template <class T>                         // Specialization 1
-        struct Erase<NullType, T>
-        {
-            typedef NullType Result;
-        };
-
-        template <class T, class Tail>             // Specialization 2
-        struct Erase<Typelist<T, Tail>, T>
-        {
-            typedef Tail Result;
-        };
-
-        template <class Head, class Tail, class T> // Specialization 3
-        struct Erase<Typelist<Head, Tail>, T>
-        {
-            typedef Typelist<Head, 
-                    typename Erase<Tail, T>::Result>
-                Result;
-        };
-////////////////////////////////////////////////////////////////////////////////
-// class template NoDuplicates
-// Removes all duplicate types in a typelist
-// Invocation (TList is a typelist):
-// NoDuplicates<TList, T>::Result
-////////////////////////////////////////////////////////////////////////////////
-
-        template <class TList> struct NoDuplicates;
-        
-        template <> struct NoDuplicates<NullType>
-        {
-            typedef NullType Result;
-        };
-
-        template <class Head, class Tail>
-        struct NoDuplicates< Typelist<Head, Tail> >
-        {
-        private:
-            typedef typename NoDuplicates<Tail>::Result L1;
-            typedef typename Erase<L1, Head>::Result L2;
-        public:
-            typedef Typelist<Head, L2> Result;
-        };
+	using namespace Loki;
+	using namespace Loki::TL;
 
 ////////////////////////////////////////////////////////////////////////////////
 // class template PW. Pin wrapper
