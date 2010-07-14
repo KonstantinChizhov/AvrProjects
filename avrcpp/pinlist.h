@@ -382,7 +382,7 @@ namespace IO
 			{   
 				uint8_t result = PinWriteIterator<Pins>::UppendValue(value);
 				if((int)Length<Pins>::value == (int)Port::Width)
-					Port::dir() = result;
+					Port::DirWrite(result);
 				else
 					Port::DirWrite((Port::DirRead() & ~Mask) | result);
 
