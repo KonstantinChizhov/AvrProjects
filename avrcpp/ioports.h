@@ -12,8 +12,14 @@
 
 #pragma once
 
-#if defined(PORTCFG_MPCMASK) //XMega family
+#ifndef IOPORTS_HPP
+#define IOPORTS_HPP
+
+#include <avr/io.h>
+#if defined(PORTCFG_MPCMASK) //XMega family 
 #include "XMegaPorts.h"
 #else
 #include "AvrPorts.h"
+#endif
+
 #endif

@@ -33,18 +33,53 @@ union Int16
 	uint8_t Bytes[2];
 };
 
+//integer part of decimal logarithm
+template <unsigned long Arg>
+struct Log10
+{
+        enum { value = Log10<Arg/10>::value + 1};
+};
 
-template<int num, int pow> 
+template <>
+struct Log10<1>
+{
+        enum { value = 0 };
+};
+
+template <>
+struct Log10<0>
+{
+        enum { value = -1 };
+};
+
+
+template<unsigned num, unsigned pow> 
 struct Pow 
 {
 	enum { value = num * Pow<num, pow-1>::value };
 };
 
-template<int num> 
+template<unsigned num> 
 struct Pow<num, 0> 
 {
 	enum { value = 1 };
 };
+
+// returns true if T is signed integral type
+template<class T>
+bool TestSigned()
+{
+	return T(-1) < 0;
+}
+
+template<class T>
+T MaxValue()
+{
+	if(TestSigned<T>())
+		return Pow<2, sizeof(T)*8-1>::value - 1;
+	else
+		return Pow<2, sizeof(T)*8>::value - 1;
+}
 
 //utility functions
 template<class T>

@@ -11,7 +11,11 @@
 //*****************************************************************************
 
 #pragma once
-#include <avr/io.h>
+
+#ifndef IOPORTS_HPP
+#error "Do not include this file directly. Use ioports.h instead."
+#endif
+
 #include "iopin.h"
 
 namespace IO

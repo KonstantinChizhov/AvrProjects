@@ -1,22 +1,15 @@
 
 #include "iopins.h"
 #include "pinlist.h"
-#include <avr/delay.h>
-#include "LedDisplay.h"
+#include "util.h"
 
 using namespace IO;
 
-typedef PinList<Pa1, Pa2, Pb4, Pb5, Pc0, Pa0, Pa3> MyPins;
-
+typedef PinList<Pa1, Pa2, Pa3, Pb3, Pb4, Pb5> pins;
 
 int main()
 {
-
-	MyPins::DirWrite(0xff);
-	while(1)
-	{	
-		MyPins::Write(0x55);
-	}
+	pins::Write(PORTC);
 }
 
 

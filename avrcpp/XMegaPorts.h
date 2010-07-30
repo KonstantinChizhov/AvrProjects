@@ -12,8 +12,8 @@
 //
 //*****************************************************************************
 
-#ifndef PORTS_HPP
-#error "Do not include this file directly. Use ports.h instead."
+#ifndef IOPORTS_HPP
+#error "Do not include this file directly. Use ioports.h instead."
 #endif
 
 //Port definitions for XMega A families.

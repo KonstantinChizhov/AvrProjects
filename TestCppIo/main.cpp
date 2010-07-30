@@ -1,5 +1,8 @@
-#include "ports.h"
-#include <util/delay.h>
+
+#include "ioports.h"
+#include "iopins.h"
+#include "pinlist.h"
+
 using namespace IO;
 
 void TestOnePortNonConstValue()
