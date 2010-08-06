@@ -27,6 +27,11 @@
 		{\
 			portName.OUT = value;\
 		}\
+		static void ClearAndSet(DataT clearMask, DataT value)\
+		{\
+			Clear(clearMask);\
+			Set(value);\
+		}\
 		static DataT Read()\
 		{\
 			return portName.OUT;\

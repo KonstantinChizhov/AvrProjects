@@ -2,13 +2,29 @@
 #include "HD44780.h"
 #include "iopins.h"
 #include "pinlist.h"
+#include "latch.h"
 
 using namespace IO;
 
-typedef Lcd<PinList<Pa0, Pa1, Pa2, Pa3, Pa4, Pa5, Pa6> > Lcd1;
+typedef ThreePinLatch<Pb0, Pb1, Pb2, 'L'> Latch1;
+
+	typedef TPin<Latch1, 0> L0;
+	typedef TPin<Latch1, 1> L1;
+	typedef TPin<Latch1, 2> L2;
+	typedef TPin<Latch1, 3> L3;
+	typedef TPin<Latch1, 4> L4;
+	typedef TPin<Latch1, 5> L5;
+	typedef TPin<Latch1, 6> L6;
+	typedef TPin<Latch1, 7> L7;
+
+//typedef Lcd<PinList<Pa0, Pa1, Pa2, Pa3, Pa4, Pa5, Pa6> > Lcd1;
+
+typedef Lcd<PinList<L0, L1, L2, L3, L4, L5, L6> > Lcd1;
+
 
 int main()
 {
+	
 	Lcd1::Init();
  	Lcd1::Puts("1234567890abcdef", 16);
 	while(1)

@@ -351,10 +351,14 @@ namespace IO
 			static void Write(DataType value)
 			{   
 				uint8_t result = PinWriteIterator<Pins>::UppendValue(value);
-				if((int)Length<Pins>::value == (int)Port::Width)// whole port		
+				if((int)Length<Pins>::value == (int)Port::Width)// whole port
 					Port::Write(result);
 				else
-					Port::Write((Port::Read() & ~Mask) | result);
+				{
+					Port::ClearAndSet(Mask, result);
+					//Port::Clear(Mask);
+					//Port::Set(result);
+				}
 
 				PortWriteIterator<Tail, PinList>::Write(value);
 			}
@@ -384,7 +388,10 @@ namespace IO
 				if((int)Length<Pins>::value == (int)Port::Width)
 					Port::DirWrite(result);
 				else
-					Port::DirWrite((Port::DirRead() & ~Mask) | result);
+				{
+					Port::DirClear(Mask);
+					Port::DirSet(result);
+				}
 
 				PortWriteIterator<Tail, PinList>::DirWrite(value);
 			}

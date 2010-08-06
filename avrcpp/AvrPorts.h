@@ -16,8 +16,6 @@
 #error "Do not include this file directly. Use ioports.h instead."
 #endif
 
-#include "iopin.h"
-
 namespace IO
 {
 
@@ -44,6 +42,10 @@ namespace IO
 			static void Write(DataT value)\
 			{\
 				data() = value;\
+			}\
+			static void ClearAndSet(DataT clearMask, DataT value)\
+			{\
+				data() = (data() & ~clearMask) | value;\
 			}\
 			static DataT Read()\
 			{\
@@ -87,9 +89,6 @@ namespace IO
 			}\
 			enum{Id = ID};\
 			enum{Width=sizeof(DataT)*8};\
-			template<uint8_t PIN>\
-			class Pin :public TPin<className, PIN>\
-			{};\
 		};
 
 	#ifdef PORTA

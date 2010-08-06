@@ -3,109 +3,76 @@
 #define LATCH_H
 
 
-	template<uint8_t StartBit, uint8_t Size>
-	struct BitMask
+//serial-in, parallel-out shift register with output latches, somthing like like 74HC595
+
+	template<class ClockPin, class DataPin, class LatchPin, unsigned ID, class T = uint8_t>
+	class ThreePinLatch
 	{
+		public:
 		
-	};
+		typedef T DataT;
+		enum{Id = ID};
+		enum{Width=sizeof(DataT)*8};
 
-	template<class Derived, class T>
-	class LatchBase
-	{
-		protected:
-			LatchBase()
-			{
-				_currentValue = 0;
-			}
-			void Write(T value)
-			{
-				Derived::Write(value);
-			}
-
-			T _currentValue;
-		public:
-			static void Set(T value)
-			{
-				Write(_currentValue |= value);
-			}
-
-			static void Clear(T value)
-			{
-				Write(_currentValue &= ~value);
-			}
-
-			static void Togle(T value)
-			{
-				Write(_currentValue ^= value);
-			}
-
-			template<uint8_t PIN>
-			class Pin
-			{
-				typedef Derived Port;
-				enum{Number = PIN};
-
-				static void Set()
-				{
-					Port::Set(1 << PIN);
-				}
-
-				static void Set(uint8_t val)
-				{
-					if(val)
-						Set();
-					else Clear();
-				}
-
-				static void Clear()
-				{
-					Port::Clear(1 << PIN);
-				}
-
-				static void Togle()
-				{
-					Port::Togle(1 << PIN);
-				}
-			};
-
-			template<uint8_t StartIndex, uint8_t Size>
-			class Slice
-			{
-				public:
-					static void Set(T value)
-					{
-						Write(_currentValue |= value);
-					}
-
-					static void Clear(T value)
-					{
-						Write(_currentValue &= ~value);
-					}
-
-					static void Togle(T value)
-					{
-						Write(_currentValue ^= value);
-					}
-			};
-	};
-
-	template<class ClockPin, class DataPin, class ResetPin, class T = uint8_t>
-	class ThreePinLatch : public LatchBase<ThreePinLatch<ClockPin, DataPin, ResetPin, T>, T >
-	{
-		public:
-		enum {BitsNumber = sizeof(T)*8};
-
-		void Write(T value)
-		{
-			ResetPin::Set();
-			ResetPin::Clear();			
-			for(uint8_t i=0; i < BitsNumber; ++i)
+		static void Write(T value)
+		{	
+			_currentValue = value;
+			for(uint8_t i=0; i < Width; ++i)
 			{
 				DataPin::Set(value & 1);
 				ClockPin::Set();
 				value >>= 1;
 				ClockPin::Clear();
 			}
+			LatchPin::Set();
+			LatchPin::Clear();
 		}
+		static DataT Read()
+		{
+				return _currentValue;
+		}
+		static void ClearAndSet(DataT clearMask, DataT value)
+		{
+			Write(_currentValue = (_currentValue & ~clearMask) | value);
+		}
+		static void Set(DataT value)
+		{
+			Write(_currentValue |= value);
+		}
+		static void Clear(DataT value)
+		{
+			Write(_currentValue &= ~value);
+		}
+		static void Togle(DataT value)
+		{
+			Write(_currentValue ^= value);
+		}
+
+		static void DirWrite(DataT value)
+		{
+			
+		}
+		static DataT DirRead()
+		{
+			return 0xff;
+		}
+		static void DirSet(DataT value)
+		{
+			
+		}
+		static void DirClear(DataT value)
+		{
+			
+		}
+		static void DirTogle(DataT value)
+		{
+			
+		}
+		protected:
+		static DataT _currentValue;
 	};
+
+	template<class ClockPin, class DataPin, class LatchPin, unsigned ID, class T>
+	T ThreePinLatch<ClockPin, DataPin, LatchPin, ID, T>::_currentValue = 0;
+
 #endif

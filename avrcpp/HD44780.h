@@ -75,23 +75,19 @@ public:
 
 	static void Clear(void)
 	{
-		while(Busy());
 		RS::Clear();
 		Write(0x01); 
-		while(Busy());
 		Write(0x02);
 	}
 
 	static void Goto(uint8_t pos)
 	{
-		while(Busy());
 		RS::Clear();
 		Write(0x80+pos);
 	}
 
 	static void Goto(uint8_t x, uint8_t y)
 	{
-		while(Busy());
 		RS::Clear();
 		if(y == 1)
 			x += 0x40;
@@ -100,14 +96,12 @@ public:
 
 	static void Home(void)
 	{
-		while(Busy());
 		RS::Clear();
 		Write(0x02);
 	}
 
 	static void Puts(const char *s, uint8_t len)
 	{
-		while(Busy());
 		RS::Set(); // write characters 
 		while(len-- && *s){
 			Write(*s++);
@@ -116,7 +110,6 @@ public:
 
 	static void Putch(char c)
 	{
-		while(Busy());
 		RS::Set();
 		Write(c);
 	}
