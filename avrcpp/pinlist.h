@@ -448,7 +448,7 @@ namespace IO
 			typedef PINS PinTypeList;
 			typedef typename NoDuplicates<PinsToPorts>::Result Ports; 
 			enum{Length = Length<PINS>::value};
-			typedef typename IoPrivate::SelectSize<Length < 8>::Result DataType;
+			typedef typename IoPrivate::SelectSize<Length <= 8>::Result DataType;
 
 			template<uint8_t Num>
 			class Take: public PinSet< typename TakeFirst<PINS, Num>::Result >
