@@ -17,16 +17,19 @@ typedef ThreePinLatch<Pb0, Pb1, Pb2, 'L'> Latch1;
 	typedef TPin<Latch1, 6> L6;
 	typedef TPin<Latch1, 7> L7;
 
-//typedef Lcd<PinList<Pa0, Pa1, Pa2, Pa3, Pa4, Pa5, Pa6> > Lcd1;
+typedef Lcd<PinList<Pa0, Pa1, Pa2, Pa3, Pa4, Pa5, Pa6> > Lcd1;
 
-typedef Lcd<PinList<L0, L1, L2, L3, L4, L5, L6> > Lcd1;
+typedef Lcd<PinList<L0, L1, L2, L3, L4, L5, L6> > Lcd2;
 
 
 int main()
 {
 	
 	Lcd1::Init();
- 	Lcd1::Puts("1234567890abcdef", 16);
+ 	Lcd1::Puts("Hello world!", 12);
+
+	Lcd2::Init();
+ 	Lcd2::Puts("Hello world!", 12);
 	while(1)
 	{	
 	
