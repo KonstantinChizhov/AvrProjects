@@ -45,6 +45,51 @@ namespace IO
 					typename StaticIf<LessOrEq16, uint16_t, uint32_t>::Result>
 					::Result Result;
 		};
+		
+		
+		template<unsigned BitsToShift>
+		struct ShiftLeft
+		{
+			template<class T>
+			static T Shift(T value)
+			{
+				return value << BitsToShift;
+			}
+		};
+
+		template<unsigned BitsToShift>
+		struct ShiftRight
+		{
+			template<class T>
+			static T Shift(T value)
+			{
+				return value >> BitsToShift;
+			}
+		};
+
+		enum MapDirection{PortToValue = 0 , ValueToPort = 1};
+
+		template<unsigned First, unsigned Second, MapDirection mapDirection>
+		class Shifter
+		{
+			typedef ShiftRight<First - Second> RightShifter1;
+			typedef ShiftRight<Second - First> RightShifter2;
+
+			typedef ShiftLeft<First - Second> LeftShifter1;
+			typedef ShiftLeft<Second - First> LeftShifter2;
+
+			typedef typename StaticIf<mapDirection, LeftShifter1, RightShifter1>::Result FirstShifter;
+			typedef typename StaticIf<mapDirection, LeftShifter2, RightShifter2>::Result SecondShifter;
+
+			enum{ShiftDirection = First > Second};
+			typedef typename StaticIf<ShiftDirection, FirstShifter, SecondShifter>::Result ActualShifter;
+		public:
+			template<class T>
+			static T Shift(T value)
+			{
+				return ActualShifter::Shift(value);
+			}
+		};
 	}
 
 	using namespace Loki;
@@ -254,14 +299,14 @@ namespace IO
 			template<class DataType>
 			static inline uint8_t UppendValue(const DataType &value)
 			{
+				using namespace IoPrivate;
 				if(IsSerial<Typelist<Head, Tail> >::value)
-				{
-					if((int)Head::Position > (int)Head::Pin::Number)
-						return (value >> ((int)Head::Position - (int)Head::Pin::Number)) & 
-							GetPortMask<Typelist<Head, Tail> >::value;
-					else
-						return (value << ((int)Head::Pin::Number - (int)Head::Position)) & 
-							GetPortMask<Typelist<Head, Tail> >::value;
+				{					
+					return Shifter<
+							Head::Pin::Number, 	//bit position in port
+							Head::Position, 	//bit position in value
+							ValueToPort>::Shift(value) & 
+						GetPortMask<Typelist<Head, Tail> >::value;
 				}
 				
 				uint8_t result=0;
@@ -278,14 +323,16 @@ namespace IO
 			template<class DataType>
 			static inline DataType UppendReadValue(uint8_t portValue, DataType dummy)
 			{
+				using namespace IoPrivate;
 				if(IsSerial<Typelist<Head, Tail> >::value)
 				{
-					if((int)Head::Position > (int)Head::Pin::Number)
-						return (portValue << ((int)Head::Position - (int)Head::Pin::Number)) & 
-							GetValueMask<Typelist<Head, Tail> >::value;
-					else
-						return (portValue >> ((int)Head::Pin::Number - (int)Head::Position)) & 
-							GetValueMask<Typelist<Head, Tail> >::value;
+					typedef Shifter<
+							Head::Pin::Number, 	//bit position in port
+							Head::Position, 	//bit position in value
+							PortToValue> AtctualShifter; 
+
+					return AtctualShifter::Shift(DataType(portValue)) & 
+						GetValueMask<Typelist<Head, Tail> >::value;
 				}
 
 				DataType value=0;
