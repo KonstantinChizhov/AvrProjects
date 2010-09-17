@@ -23,20 +23,28 @@ namespace IO
 	namespace IoPrivate
 	{
 
-		template<bool Short> struct SelectSize;
-
-		template<> 
-		struct SelectSize<false>
+		template<bool condition, class TypeIfTrue, class TypeIfFale>
+		struct StaticIf
 		{
-			typedef unsigned int Result;
+			typedef TypeIfTrue Result;
 		};
 
-		template<> 
-		struct SelectSize<true>
+		template<class TypeIfTrue, class TypeIfFale>
+		struct StaticIf<false, TypeIfTrue, TypeIfFale>
 		{
-			typedef unsigned char Result;
+			 typedef TypeIfFale Result;
 		};
 
+		template<unsigned sizeBits>
+		struct SelectSize
+		{
+			enum{LessOrEq8 = sizeBits <= 8, LessOrEq16 = sizeBits <= 16};
+			typedef typename StaticIf<
+					LessOrEq8,
+					uint8_t,
+					typename StaticIf<LessOrEq16, uint16_t, uint32_t>::Result>
+					::Result Result;
+		};
 	}
 
 	using namespace Loki;
@@ -239,8 +247,8 @@ namespace IO
 			}
 
         };
+		
         template <class Head, class Tail>
-
         struct PinWriteIterator< Typelist<Head, Tail> >
         {
 			template<class DataType>
@@ -273,10 +281,10 @@ namespace IO
 				if(IsSerial<Typelist<Head, Tail> >::value)
 				{
 					if((int)Head::Position > (int)Head::Pin::Number)
-						return (portValue >> ((int)Head::Position - (int)Head::Pin::Number)) & 
+						return (portValue << ((int)Head::Position - (int)Head::Pin::Number)) & 
 							GetValueMask<Typelist<Head, Tail> >::value;
 					else
-						return (portValue << ((int)Head::Pin::Number - (int)Head::Position)) & 
+						return (portValue >> ((int)Head::Pin::Number - (int)Head::Position)) & 
 							GetValueMask<Typelist<Head, Tail> >::value;
 				}
 
@@ -448,7 +456,7 @@ namespace IO
 			typedef PINS PinTypeList;
 			typedef typename NoDuplicates<PinsToPorts>::Result Ports; 
 			enum{Length = Length<PINS>::value};
-			typedef typename IoPrivate::SelectSize<Length <= 8>::Result DataType;
+			typedef typename IoPrivate::SelectSize<Length>::Result DataType;
 
 			template<uint8_t Num>
 			class Take: public PinSet< typename TakeFirst<PINS, Num>::Result >
@@ -529,7 +537,12 @@ namespace IO
             typename T7  = NullType, typename T8  = NullType, typename T9  = NullType,
             typename T10 = NullType, typename T11 = NullType, typename T12 = NullType,
             typename T13 = NullType, typename T14 = NullType, typename T15 = NullType,
-            typename T16 = NullType, typename T17 = NullType
+            typename T16 = NullType, typename T17 = NullType, typename T18 = NullType,
+			typename T19 = NullType, typename T20 = NullType, typename T21 = NullType,
+			typename T22 = NullType, typename T23 = NullType, typename T24 = NullType,
+			typename T25 = NullType, typename T26 = NullType, typename T27 = NullType,
+			typename T28 = NullType, typename T29 = NullType, typename T30 = NullType,
+			typename T31 = NullType, typename T32 = NullType, typename T33 = NullType			
         > 
         struct MakePinList
         {
@@ -542,7 +555,12 @@ namespace IO
                 T8 , T9 , T10, 
                 T11, T12, T13,
                 T14, T15, T16, 
-                T17
+                T17, T18, T19,
+				T20, T21, T22,
+				T23, T24, T25,
+				T26, T27, T28,
+				T29, T30, T31,
+				T32, T33
             >
             ::Result TailResult;
 			enum{PositionInList = Position};
@@ -575,7 +593,12 @@ namespace IO
             typename T7  = NullType, typename T8  = NullType, typename T9  = NullType,
             typename T10 = NullType, typename T11 = NullType, typename T12 = NullType,
             typename T13 = NullType, typename T14 = NullType, typename T15 = NullType,
-            typename T16 = NullType, typename T17 = NullType
+            typename T16 = NullType, typename T17 = NullType, typename T18 = NullType,
+			typename T19 = NullType, typename T20 = NullType, typename T21 = NullType,
+			typename T22 = NullType, typename T23 = NullType, typename T24 = NullType,
+			typename T25 = NullType, typename T26 = NullType, typename T27 = NullType,
+			typename T28 = NullType, typename T29 = NullType, typename T30 = NullType,
+			typename T31 = NullType, typename T32 = NullType, typename T33 = NullType
         > 
         struct PinList: public PinSet
 			<
@@ -586,7 +609,12 @@ namespace IO
                 	T8 , T9 , T10, 
                 	T11, T12, T13,
                 	T14, T15, T16, 
-                	T17
+                	T17, T18, T19,
+					T20, T21, T22,
+					T23, T24, T25,
+					T26, T27, T28,
+					T29, T30, T31,
+					T32, T33
 				>::Result
 			>
         {	};
