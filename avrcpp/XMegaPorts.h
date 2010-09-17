@@ -139,7 +139,7 @@ MAKE_PORT(PORTR, Portr, 'R')
 #endif
 
 
-#define MAKE_VIRTUAL_PORT(portName, className, ID) \
+#define MAKE_VIRTUAL_PORT(portName, className, VPCTRL, VPMAP_enum, ID) \
 	class className{\
 	public:\
 		typedef uint8_t DataT;\
@@ -190,21 +190,25 @@ MAKE_PORT(PORTR, Portr, 'R')
 		}\
 		enum{Id = ID};\
 		enum{Width=8};\
+		static void Map(VPMAP_enum value)\
+		{\
+			VPCTRL |= value;\
+		}\
 	};
 
 
 #ifdef VPORT0
-	MAKE_VIRTUAL_PORT(VPORT0, VPort0, 'V0')
+	MAKE_VIRTUAL_PORT(VPORT0, VPort0, PORTCFG.VPCTRLA, PORTCFG_VP0MAP_enum, 'V0')
 #endif
 
 #ifdef VPORT1
-	MAKE_VIRTUAL_PORT(VPORT1, VPort1, 'V1')
+	MAKE_VIRTUAL_PORT(VPORT1, VPort1, PORTCFG.VPCTRLA, PORTCFG_VP0MAP_enum, 'V1')
 #endif
 
 #ifdef VPORT2
-	MAKE_VIRTUAL_PORT(VPORT2, VPort2, 'V2')
+	MAKE_VIRTUAL_PORT(VPORT2, VPort2, PORTCFG.VPCTRLB, PORTCFG_VP0MAP_enum, 'V2')
 #endif
 
 #ifdef VPORT3
-	MAKE_VIRTUAL_PORT(VPORT3, VPort3, 'V3')
+	MAKE_VIRTUAL_PORT(VPORT3, VPort3, PORTCFG.VPCTRLB, PORTCFG_VP0MAP_enum, 'V3')
 #endif
