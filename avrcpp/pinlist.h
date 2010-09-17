@@ -10,6 +10,14 @@
 //       This code is distributed under the GNU Public License
 //       which can be found at http://www.gnu.org/licenses/gpl.txt
 //
+// As a special exception, you may use this file as part of a free software
+// library without restriction. Specifically, if other files instantiate
+// templates or use macros or inline functions from this file, or you compile
+// this file and link it with other files to produce an executable, this
+// file does not by itself cause the resulting executable to be covered by
+// the GNU General Public License. This exception does not however
+// invalidate any other reasons why the executable file might be covered by
+// the GNU General Public License.
 //*****************************************************************************
 
 #pragma once
@@ -279,14 +287,16 @@ namespace IO
 
         template <> struct PinWriteIterator<NullType>
         {
+			typedef uint8_t PortDataType;
+
 			template<class DataType>
-			static uint8_t UppendValue(const DataType &value)
+			static PortDataType UppendValue(DataType value)
 			{
 				return 0; 
 			}
 
 			template<class DataType>
-			static inline DataType UppendReadValue(uint8_t portValue, DataType)
+			static inline DataType UppendReadValue(PortDataType portValue, DataType)
 			{
 				return 0;
 			}
@@ -296,8 +306,10 @@ namespace IO
         template <class Head, class Tail>
         struct PinWriteIterator< Typelist<Head, Tail> >
         {
+			typedef typename Head::Pin::Port::DataT PortDataType;
+
 			template<class DataType>
-			static inline uint8_t UppendValue(const DataType &value)
+			static inline PortDataType UppendValue(DataType value)
 			{
 				using namespace IoPrivate;
 				if(IsSerial<Typelist<Head, Tail> >::value)
@@ -321,7 +333,7 @@ namespace IO
 			}
 
 			template<class DataType>
-			static inline DataType UppendReadValue(uint8_t portValue, DataType dummy)
+			static inline DataType UppendReadValue(PortDataType portValue, DataType dummy)
 			{
 				using namespace IoPrivate;
 				if(IsSerial<Typelist<Head, Tail> >::value)
