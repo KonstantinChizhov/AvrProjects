@@ -24,7 +24,13 @@
 #error "Do not include this file directly. Use ioports.h instead."
 #endif
 
+#ifndef XMEGA_PORTS_H
+#define XMEGA_PORTS_H
 //Port definitions for XMega A families.
+
+
+namespace IO
+{
 
 #define MAKE_PORT(portName, className, ID) \
 	class className{\
@@ -85,56 +91,56 @@
 	};
 
 
-#ifdef PORTA
+#ifdef USE_PORTA
 MAKE_PORT(PORTA, Porta, 'A')
 #endif
 
 
-#ifdef PORTB
+#ifdef USE_PORTB
 MAKE_PORT(PORTB, Portb, 'B')
 #endif
 
 
-#ifdef PORTC
+#ifdef USE_PORTC
 MAKE_PORT(PORTC, Portc, 'C')
 #endif
 
 
-#ifdef PORTD
+#ifdef USE_PORTD
 MAKE_PORT(PORTD, Portd, 'D')
 #endif
 
 
-#ifdef PORTE
+#ifdef USE_PORTE
 MAKE_PORT(PORTE, Porte, 'E')
 #endif
 
 
-#ifdef PORTF
+#ifdef USE_PORTF
 MAKE_PORT(PORTF, Portf, 'F')
 #endif
 
-#ifdef PORTG
+#ifdef USE_PORTG
 MAKE_PORT(PORTG, Portg, 'G')
 #endif
 
-#ifdef PORTH
+#ifdef USE_PORTH
 MAKE_PORT(PORTH, Porth, 'H')
 #endif
 
-#ifdef PORTJ
+#ifdef USE_PORTJ
 MAKE_PORT(PORTJ, Portj, 'J')
 #endif
 
-#ifdef PORTK
+#ifdef USE_PORTK
 MAKE_PORT(PORTK, Portk, 'K')
 #endif
 
-#ifdef PORTQ
+#ifdef USE_PORTQ
 MAKE_PORT(PORTQ, Portq, 'Q')
 #endif
 
-#ifdef PORTR
+#ifdef USE_PORTR
 MAKE_PORT(PORTR, Portr, 'R')
 #endif
 
@@ -197,18 +203,22 @@ MAKE_PORT(PORTR, Portr, 'R')
 	};
 
 
-#ifdef VPORT0
-	MAKE_VIRTUAL_PORT(VPORT0, VPort0, PORTCFG.VPCTRLA, PORTCFG_VP0MAP_enum, 'V0')
+#ifdef USE_VPORT0
+	MAKE_VIRTUAL_PORT(VPORT0, VPort0, PORTCFG.VPCTRLA, PORTCFG_VP0MAP_t, 'V0')
 #endif
 
-#ifdef VPORT1
-	MAKE_VIRTUAL_PORT(VPORT1, VPort1, PORTCFG.VPCTRLA, PORTCFG_VP0MAP_enum, 'V1')
+#ifdef USE_VPORT1
+	MAKE_VIRTUAL_PORT(VPORT1, VPort1, PORTCFG.VPCTRLA, PORTCFG_VP1MAP_t, 'V1')
 #endif
 
-#ifdef VPORT2
-	MAKE_VIRTUAL_PORT(VPORT2, VPort2, PORTCFG.VPCTRLB, PORTCFG_VP0MAP_enum, 'V2')
+#ifdef USE_VPORT2
+	MAKE_VIRTUAL_PORT(VPORT2, VPort2, PORTCFG.VPCTRLB, PORTCFG_VP2MAP_t, 'V2')
 #endif
 
-#ifdef VPORT3
-	MAKE_VIRTUAL_PORT(VPORT3, VPort3, PORTCFG.VPCTRLB, PORTCFG_VP0MAP_enum, 'V3')
+#ifdef USE_VPORT3
+	MAKE_VIRTUAL_PORT(VPORT3, VPort3, PORTCFG.VPCTRLB, PORTCFG_VP3MAP_t, 'V3')
+#endif
+          
+}//namespace IO
+
 #endif

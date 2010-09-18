@@ -24,6 +24,9 @@
 #error "Do not include this file directly. Use ioports.h instead."
 #endif
 
+#ifndef AVR_PORTS_H
+#define AVR_PORTS_H
+
 namespace IO
 {
 
@@ -99,37 +102,39 @@ namespace IO
 			enum{Width=sizeof(DataT)*8};\
 		};
 
-	#ifdef PORTA
+	#ifdef USE_PORTA
 	MAKE_PORT(PORTA, DDRA, PINA, Porta, 'A')
 	#endif
 
 
-	#ifdef PORTB
+	#ifdef USE_PORTB
 	MAKE_PORT(PORTB, DDRB, PINB, Portb, 'B')
 	#endif
 
 
-	#ifdef PORTC
+	#ifdef USE_PORTC
 	MAKE_PORT(PORTC, DDRC, PINC, Portc, 'C')
 	#endif
 
 
-	#ifdef PORTD
+	#ifdef USE_PORTD
 	MAKE_PORT(PORTD, DDRD, PIND, Portd, 'D')
 	#endif
 
 
-	#ifdef PORTE
+	#ifdef USE_PORTE
 	MAKE_PORT(PORTE, DDRE, PINE, Porte, 'E')
 	#endif
 
 
-	#ifdef PORTF
+	#ifdef USE_PORTF
 	MAKE_PORT(PORTF, DDRF, PINF, Portf, 'F')
 	#endif
 
-	#ifdef PORTG
+	#ifdef USE_PORTG
 	MAKE_PORT(PORTG, DDRG, PING, Portg, 'G')
 	#endif
 
 }
+
+#endif

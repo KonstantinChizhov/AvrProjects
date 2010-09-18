@@ -23,13 +23,12 @@
 
 #include "iopin.h"
 #include "ioports.h"
-#include <avr/io.h>
+//#include <avr/io.h>
 
 namespace IO
 {
-
 	//Short pin definations 
-	#ifdef PORTA
+	#ifdef USE_PORTA
 	typedef TPin<Porta, 0> Pa0;
 	typedef TPin<Porta, 1> Pa1;
 	typedef TPin<Porta, 2> Pa2;
@@ -40,7 +39,7 @@ namespace IO
 	typedef TPin<Porta, 7> Pa7;
 	#endif
 
-	#ifdef PORTB
+	#ifdef USE_PORTB
 	typedef TPin<Portb, 0> Pb0;
 	typedef TPin<Portb, 1> Pb1;
 	typedef TPin<Portb, 2> Pb2;
@@ -51,7 +50,7 @@ namespace IO
 	typedef TPin<Portb, 7> Pb7;
 	#endif
 
-	#ifdef PORTC
+	#ifdef USE_PORTC
 	typedef TPin<Portc, 0> Pc0;
 	typedef TPin<Portc, 1> Pc1;
 	typedef TPin<Portc, 2> Pc2;
@@ -62,7 +61,7 @@ namespace IO
 	typedef TPin<Portc, 7> Pc7;
 	#endif
 
-	#ifdef PORTD
+	#ifdef USE_PORTD
 	typedef TPin<Portd, 0> Pd0;
 	typedef TPin<Portd, 1> Pd1;
 	typedef TPin<Portd, 2> Pd2;
@@ -73,7 +72,7 @@ namespace IO
 	typedef TPin<Portd, 7> Pd7;
 	#endif
 
-	#ifdef PORTE
+	#ifdef USE_PORTE
 	typedef TPin<Porte, 0> Pe0;
 	typedef TPin<Porte, 1> Pe1;
 	typedef TPin<Porte, 2> Pe2;
@@ -84,7 +83,7 @@ namespace IO
 	typedef TPin<Porte, 7> Pe7;
 	#endif
 
-	#ifdef PORTF
+	#ifdef USE_PORTF
 	typedef TPin<Portf, 0> Pf0;
 	typedef TPin<Portf, 1> Pf1;
 	typedef TPin<Portf, 2> Pf2;
@@ -95,7 +94,7 @@ namespace IO
 	typedef TPin<Portf, 7> Pf7;
 	#endif
 
-	#ifdef PORTG
+	#ifdef USE_PORTG
 	typedef TPin<Portg, 0> Pg0;
 	typedef TPin<Portg, 1> Pg1;
 	typedef TPin<Portg, 2> Pg2;
@@ -106,7 +105,7 @@ namespace IO
 	typedef TPin<Portg, 7> Pg7;
 	#endif
 
-	#ifdef PORTH
+	#ifdef USE_PORTH
 	typedef TPin<Porth, 0> Ph0;
 	typedef TPin<Porth, 1> Ph1;
 	typedef TPin<Porth, 2> Ph2;
@@ -117,7 +116,7 @@ namespace IO
 	typedef TPin<Porth, 7> Ph7;
 	#endif
 
-	#ifdef PORTJ
+	#ifdef USE_PORTJ
 	typedef TPin<Portj, 0> Pj0;
 	typedef TPin<Portj, 1> Pj1;
 	typedef TPin<Portj, 2> Pj2;
@@ -128,7 +127,7 @@ namespace IO
 	typedef TPin<Portj, 7> Pj7;
 	#endif
 
-	#ifdef PORTK
+	#ifdef USE_PORTK
 	typedef TPin<Portk, 0> Pk0;
 	typedef TPin<Portk, 1> Pk1;
 	typedef TPin<Portk, 2> Pk2;
@@ -139,7 +138,7 @@ namespace IO
 	typedef TPin<Portk, 7> Pk7;
 	#endif
 
-	#ifdef PORTQ
+	#ifdef USE_PORTQ
 	typedef TPin<Portq, 0> Pq0;
 	typedef TPin<Portq, 1> Pq1;
 	typedef TPin<Portq, 2> Pq2;
@@ -150,7 +149,7 @@ namespace IO
 	typedef TPin<Portq, 7> Pq7;
 	#endif
 
-	#ifdef PORTR
+	#ifdef USE_PORTR
 	typedef TPin<Portr, 0> Pr0;
 	typedef TPin<Portr, 1> Pr1;
 	typedef TPin<Portr, 2> Pr2;
