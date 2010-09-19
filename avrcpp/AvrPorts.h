@@ -36,67 +36,54 @@ namespace IO
 		class className{\
 		public:\
 			typedef uint8_t DataT;\
-		private:\
-			static volatile DataT &data()\
-			{\
-				return portName;\
-			}\
-			static volatile DataT &dir()\
-			{\
-				return ddrName;\
-			}\
-			static volatile DataT &pin()\
-			{\
-				return pinName;\
-			}\
 		public:\
 			static void Write(DataT value)\
 			{\
-				data() = value;\
+				portName = value;\
 			}\
 			static void ClearAndSet(DataT clearMask, DataT value)\
 			{\
-				data() = (data() & ~clearMask) | value;\
+				portName = (portName & ~clearMask) | value;\
 			}\
 			static DataT Read()\
 			{\
-				return data();\
+				return portName;\
 			}\
 			static void DirWrite(DataT value)\
 			{\
-				dir() = value;\
+				ddrName = value;\
 			}\
 			static DataT DirRead()\
 			{\
-				return dir();\
+				return ddrName;\
 			}\
 			static void Set(DataT value)\
 			{\
-				data() |= value;\
+				portName |= value;\
 			}\
 			static void Clear(DataT value)\
 			{\
-				data() &= ~value;\
+				portName &= ~value;\
 			}\
 			static void Togle(DataT value)\
 			{\
-				data() ^= value;\
+				portName ^= value;\
 			}\
 			static void DirSet(DataT value)\
 			{\
-				dir() |= value;\
+				ddrName |= value;\
 			}\
 			static void DirClear(DataT value)\
 			{\
-				dir() &= ~value;\
+				ddrName &= ~value;\
 			}\
 			static void DirTogle(DataT value)\
 			{\
-				dir() ^= value;\
+				ddrName ^= value;\
 			}\
 			static DataT PinRead()\
 			{\
-				return pin();\
+				return pinName;\
 			}\
 			enum{Id = ID};\
 			enum{Width=sizeof(DataT)*8};\
