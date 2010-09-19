@@ -202,7 +202,7 @@ MAKE_PORT(PORTR, Portr, 'R')
 		}\
 	};
 
-
+#ifndef __IAR_SYSTEMS_ICC__//PORTCFG_VP0MAP_t is undefined for some strange reason
 #ifdef USE_VPORT0
 	MAKE_VIRTUAL_PORT(VPORT0, VPort0, PORTCFG.VPCTRLA, PORTCFG_VP0MAP_t, 'V0')
 #endif
@@ -218,7 +218,7 @@ MAKE_PORT(PORTR, Portr, 'R')
 #ifdef USE_VPORT3
 	MAKE_VIRTUAL_PORT(VPORT3, VPort3, PORTCFG.VPCTRLB, PORTCFG_VP3MAP_t, 'V3')
 #endif
-          
+#endif     
 }//namespace IO
 
 #endif
