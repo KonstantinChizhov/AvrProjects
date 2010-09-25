@@ -53,8 +53,8 @@ namespace IO
 					typename StaticIf<LessOrEq16, uint16_t, uint32_t>::Result>
 					::Result Result;
 		};
-		
-		
+
+
 		template<unsigned BitsToShift>
 		struct ShiftLeft
 		{
@@ -121,7 +121,7 @@ namespace IO
 ////////////////////////////////////////////////////////////////////////////////
 
  		template <class TList> struct GetPorts;
-       
+
         template <> struct GetPorts<NullType>
         {
             typedef NullType Result;
@@ -144,28 +144,28 @@ namespace IO
 // T - port type to select by.
 ////////////////////////////////////////////////////////////////////////////////
 
- 		template <class TList, class T> struct GetPinsWithPort;
+ 		template <class TList, class TPort> struct GetPinsWithPort;
 
-        template <class T>
-        struct GetPinsWithPort<NullType, T>
+        template <class TPort>
+        struct GetPinsWithPort<NullType, TPort>
         {
             typedef NullType Result;
         };
 
-        template <class T, class Tail, uint8_t N, uint8_t M>
-        struct GetPinsWithPort<Typelist<PW<TPin<T, N>, M>, Tail>, T>
+        template <class TPort, class Tail, uint8_t PortBitPosition, uint8_t ValueBitPosition>
+        struct GetPinsWithPort<Typelist<PW<TPin<TPort, PortBitPosition>, ValueBitPosition>, Tail>, TPort>
         {
             // Go all the way down the list removing the type
-           typedef Typelist<PW<TPin<T, N>, M>, 
-                    typename GetPinsWithPort<Tail, T>::Result>
+           typedef Typelist<PW<TPin<TPort, PortBitPosition>, ValueBitPosition>,
+                    typename GetPinsWithPort<Tail, TPort>::Result>
                 Result;
         };
 
-        template <class Head, class Tail, class T>
-        struct GetPinsWithPort<Typelist<Head, Tail>, T>
+        template <class Head, class Tail, class TPort>
+        struct GetPinsWithPort<Typelist<Head, Tail>, TPort>
         {
             // Go all the way down the list removing the type
-			 typedef typename GetPinsWithPort<Tail, T>::Result Result;
+			 typedef typename GetPinsWithPort<Tail, TPort>::Result Result;
         };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -222,7 +222,7 @@ namespace IO
         template <class Head, class Tail>
 
         struct IsSerial< Typelist<Head, Tail> >
-        {	
+        {
 		//private:
 			typedef IsSerial<Tail> I;
 			enum{PinNumber = Head::Pin::Number};
@@ -250,7 +250,7 @@ namespace IO
 		template <class Head, class Tail, uint8_t Num>
 		struct TakeFirst<Typelist<Head, Tail>, Num>
 		{
-			typedef Typelist<Head, 
+			typedef Typelist<Head,
 						typename TakeFirst<Tail, Num-1>::Result
 						>Result;
 		};
@@ -292,7 +292,7 @@ namespace IO
 			template<class DataType>
 			static PortDataType UppendValue(DataType value)
 			{
-				return 0; 
+				return 0;
 			}
 
 			template<class DataType>
@@ -302,7 +302,7 @@ namespace IO
 			}
 
         };
-		
+
         template <class Head, class Tail>
         struct PinWriteIterator< Typelist<Head, Tail> >
         {
@@ -313,19 +313,19 @@ namespace IO
 			{
 				using namespace IoPrivate;
 				if(IsSerial<Typelist<Head, Tail> >::value)
-				{					
+				{
 					return Shifter<
 							Head::Pin::Number, 	//bit position in port
 							Head::Position, 	//bit position in value
-							ValueToPort>::Shift(value) & 
+							ValueToPort>::Shift(value) &
 						GetPortMask<Typelist<Head, Tail> >::value;
 				}
-				
+
 				uint8_t result=0;
 
 				if((int)Head::Position == (int)Head::Pin::Number)
 					result |= value & (1 << Head::Position);
-				else 
+				else
 					if(value & (1 << Head::Position))
 						result |= (1 << Head::Pin::Number);
 
@@ -341,16 +341,16 @@ namespace IO
 					typedef Shifter<
 							Head::Pin::Number, 	//bit position in port
 							Head::Position, 	//bit position in value
-							PortToValue> AtctualShifter; 
+							PortToValue> AtctualShifter;
 
-					return AtctualShifter::Shift(DataType(portValue)) & 
+					return AtctualShifter::Shift(DataType(portValue)) &
 						GetValueMask<Typelist<Head, Tail> >::value;
 				}
 
 				DataType value=0;
 				if((int)Head::Position == (int)Head::Pin::Number)
 					value |= portValue & (1 << Head::Position);
-				else 
+				else
 					if(portValue & (1 << Head::Pin::Number))
 						value |= (1 << Head::Position);
 
@@ -383,10 +383,10 @@ namespace IO
 
 			template<class DataType>
 			static DataType PinRead(DataType)
-			{   
+			{
 				return 0;
 			}
-			
+
 			template<class DataType>
 			static void DirWrite(DataType value)
 			{	}
@@ -402,7 +402,7 @@ namespace IO
 			template<class DataType>
 			static DataType OutRead(DataType dummy)
 			{
-				return 0;	
+				return 0;
 			}
         };
 
@@ -413,10 +413,10 @@ namespace IO
 			typedef typename GetPinsWithPort<PinList, Head>::Result Pins;
 			enum{Mask = GetPortMask<Pins>::value};
 			typedef Head Port; //Head points to current port i the list.
-			
+
 			template<class DataType>
 			static void Write(DataType value)
-			{   
+			{
 				uint8_t result = PinWriteIterator<Pins>::UppendValue(value);
 				if((int)Length<Pins>::value == (int)Port::Width)// whole port
 					Port::Write(result);
@@ -432,25 +432,25 @@ namespace IO
 
 			template<class DataType>
 			static void Set(DataType value)
-			{   
+			{
 				uint8_t result = PinWriteIterator<Pins>::UppendValue(value);
 				Port::Set(result);
-				
+
 				PortWriteIterator<Tail, PinList>::Set(value);
 			}
 
 			template<class DataType>
 			static void Clear(DataType value)
-			{   
+			{
 				uint8_t result = PinWriteIterator<Pins>::UppendValue(value);
 				Port::Clear(result);
-				
+
 				PortWriteIterator<Tail, PinList>::Clear(value);
 			}
 
 			template<class DataType>
 			static void DirWrite(DataType value)
-			{   
+			{
 				uint8_t result = PinWriteIterator<Pins>::UppendValue(value);
 				if((int)Length<Pins>::value == (int)Port::Width)
 					Port::DirWrite(result);
@@ -464,35 +464,35 @@ namespace IO
 
 			template<class DataType>
 			static void DirSet(DataType value)
-			{   
+			{
 				uint8_t result = PinWriteIterator<Pins>::UppendValue(value);
 				Port::DirSet(result);
-				
+
 				PortWriteIterator<Tail, PinList>::DirSet(value);
 			}
 
 			template<class DataType>
 			static void DirClear(DataType value)
-			{   
+			{
 				uint8_t result = PinWriteIterator<Pins>::UppendValue(value);
 				Port::DirClear(result);
-				
+
 				PortWriteIterator<Tail, PinList>::DirClear(value);
 			}
-			
+
 			template<class DataType>
 			static DataType PinRead(DataType dummy)
-			{   
+			{
 				uint8_t portValue = Port::PinRead();
-				DataType value = PinWriteIterator<Pins>::UppendReadValue(portValue, dummy);	
+				DataType value = PinWriteIterator<Pins>::UppendReadValue(portValue, dummy);
 				return value | PortWriteIterator<Tail, PinList>::PinRead(dummy);
 			}
 
 			template<class DataType>
 			static DataType OutRead(DataType dummy)
-			{   
+			{
 				uint8_t portValue = Port::Read();
-				DataType value = PinWriteIterator<Pins>::UppendReadValue(portValue, dummy);	
+				DataType value = PinWriteIterator<Pins>::UppendReadValue(portValue, dummy);
 				return value | PortWriteIterator<Tail, PinList>::OutRead(dummy);
 			}
 
@@ -501,7 +501,7 @@ namespace IO
 ////////////////////////////////////////////////////////////////////////////////
 // class template PinSet
 // Holds implimentation of pin list manipulations.
-// Pins from list are grouped by their port and group read/write operation is 
+// Pins from list are grouped by their port and group read/write operation is
 // performed on each port.
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -512,7 +512,7 @@ namespace IO
 			typedef typename GetPorts<PINS>::Result PinsToPorts;
 		public:
 			typedef PINS PinTypeList;
-			typedef typename NoDuplicates<PinsToPorts>::Result Ports; 
+			typedef typename NoDuplicates<PinsToPorts>::Result Ports;
 			enum{Length = Length<PINS>::value};
 			typedef typename IoPrivate::SelectSize<Length>::Result DataType;
 
@@ -526,10 +526,10 @@ namespace IO
 
 			template<uint8_t StartIndex, uint8_t Size>
 			class Slice: public PinSet
-					< 
+					<
 						typename SkipFirst<
-							typename TakeFirst<PINS, StartIndex + Size>::Result, 
-							StartIndex>::Result 
+							typename TakeFirst<PINS, StartIndex + Size>::Result,
+							StartIndex>::Result
 					>
 			{
 				BOOST_STATIC_ASSERT(StartIndex + Size <= Length);
@@ -545,7 +545,7 @@ namespace IO
 			}
 
 			static DataType Read()
-			{	
+			{
 				typedef PortWriteIterator<Ports, PINS> iter;
 				return iter::OutRead(DataType(0));
 			}
@@ -560,7 +560,7 @@ namespace IO
 			}
 
 			static DataType PinRead()
-			{	
+			{
 				typedef PortWriteIterator<Ports, PINS> iter;
 				return iter::PinRead(DataType(0));
 			}
@@ -569,7 +569,7 @@ namespace IO
 			{
 				PortWriteIterator<Ports, PINS>::DirWrite(value);
 			}
-			
+
 			static void DirSet(DataType value)
 			{
 				PortWriteIterator<Ports, PINS>::DirSet(value);
@@ -588,7 +588,7 @@ namespace IO
 ////////////////////////////////////////////////////////////////////////////////
 
 		template
-        <	
+        <
 			int Position,
             typename T1  = NullType, typename T2  = NullType, typename T3  = NullType,
             typename T4  = NullType, typename T5  = NullType, typename T6  = NullType,
@@ -600,19 +600,19 @@ namespace IO
 			typename T22 = NullType, typename T23 = NullType, typename T24 = NullType,
 			typename T25 = NullType, typename T26 = NullType, typename T27 = NullType,
 			typename T28 = NullType, typename T29 = NullType, typename T30 = NullType,
-			typename T31 = NullType, typename T32 = NullType, typename T33 = NullType			
-        > 
+			typename T31 = NullType, typename T32 = NullType, typename T33 = NullType
+        >
         struct MakePinList
         {
         private:
             typedef typename MakePinList
             <
 				Position + 1,
-                T2 , T3 , T4 , 
-                T5 , T6 , T7 , 
-                T8 , T9 , T10, 
+                T2 , T3 , T4 ,
+                T5 , T6 , T7 ,
+                T8 , T9 , T10,
                 T11, T12, T13,
-                T14, T15, T16, 
+                T14, T15, T16,
                 T17, T18, T19,
 				T20, T21, T22,
 				T23, T24, T25,
@@ -645,7 +645,7 @@ namespace IO
 ////////////////////////////////////////////////////////////////////////////////
 
 		template
-        <	
+        <
             typename T1  = NullType, typename T2  = NullType, typename T3  = NullType,
             typename T4  = NullType, typename T5  = NullType, typename T6  = NullType,
             typename T7  = NullType, typename T8  = NullType, typename T9  = NullType,
@@ -657,16 +657,16 @@ namespace IO
 			typename T25 = NullType, typename T26 = NullType, typename T27 = NullType,
 			typename T28 = NullType, typename T29 = NullType, typename T30 = NullType,
 			typename T31 = NullType, typename T32 = NullType, typename T33 = NullType
-        > 
+        >
         struct PinList: public PinSet
 			<
 				typename MakePinList
 				<	0,	T1,
-					T2 , T3 , T4 , 
-                	T5 , T6 , T7 , 
-                	T8 , T9 , T10, 
+					T2 , T3 , T4 ,
+                	T5 , T6 , T7 ,
+                	T8 , T9 , T10,
                 	T11, T12, T13,
-                	T14, T15, T16, 
+                	T14, T15, T16,
                 	T17, T18, T19,
 					T20, T21, T22,
 					T23, T24, T25,
