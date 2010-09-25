@@ -1,0 +1,9 @@
+lost+found/
+*.keep
+*.keep.*
+default
+[dD]ebug
+[Rr]elease
+settings
+*.dep
+*.aws
