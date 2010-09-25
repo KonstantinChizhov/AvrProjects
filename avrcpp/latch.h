@@ -35,6 +35,7 @@
 		{
 			Write(_currentValue = (_currentValue & ~clearMask) | value);
 		}
+	
 		static void Set(DataT value)
 		{
 			Write(_currentValue |= value);
@@ -48,26 +49,26 @@
 			Write(_currentValue ^= value);
 		}
 
-		static void DirWrite(DataT value)
-		{
-			
-		}
 		static DataT DirRead()
 		{
 			return 0xff;
 		}
+
+		static void DirClearAndSet(DataT clearMask, DataT value)
+		{	}
+
+		static void DirWrite(DataT value)
+		{	}
+
 		static void DirSet(DataT value)
-		{
-			
-		}
+		{	}
+
 		static void DirClear(DataT value)
-		{
-			
-		}
+		{	}
+
 		static void DirTogle(DataT value)
-		{
-			
-		}
+		{	}
+
 		protected:
 		static DataT _currentValue;
 	};

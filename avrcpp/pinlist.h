@@ -456,8 +456,7 @@ namespace IO
 					Port::DirWrite(result);
 				else
 				{
-					Port::DirClear(Mask);
-					Port::DirSet(result);
+					Port::DirClearAndSet(Mask, result);
 				}
 
 				PortWriteIterator<Tail, PinList>::DirWrite(value);

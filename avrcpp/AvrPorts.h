@@ -45,6 +45,10 @@ namespace IO
 			{\
 				portName = (portName & ~clearMask) | value;\
 			}\
+			static void DirClearAndSet(DataT clearMask, DataT value)\
+			{\
+				ddrName = (ddrName & ~clearMask) | value;\
+			}\
 			static DataT Read()\
 			{\
 				return portName;\

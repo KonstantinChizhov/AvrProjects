@@ -46,6 +46,11 @@ namespace IO
 			Clear(clearMask);\
 			Set(value);\
 		}\
+		static void DirClearAndSet(DataT clearMask, DataT value)\
+		{\
+			DirClear(clearMask);\
+			DirSet(value);\
+		}\
 		static DataT Read()\
 		{\
 			return portName.OUT;\
