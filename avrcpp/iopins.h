@@ -116,11 +116,11 @@ namespace IO
 	#endif
 
 	#ifdef USE_PORT1
-	DECLARE_PORT_PINS(Port1, P2_)
+	DECLARE_PORT_PINS(Port1, P1_)
 	#endif
 
 	#ifdef USE_PORT2
-	DECLARE_PORT_PINS(Port2, P4_)
+	DECLARE_PORT_PINS(Port2, P2_)
 	#endif
 
 	#ifdef USE_PORT3

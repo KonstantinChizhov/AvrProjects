@@ -3,7 +3,7 @@
 // Title		: C++ IO for ATMEL AVR
 // Author		: Konstantin Chizhov
 // Date			: 2010
-// Target MCU	: Atmel mega AVR, TINY avr AND Xmega Series
+// Target MCU	: paltform indepandent
 //
 //       This code is distributed under the GNU Public License
 //       which can be found at http://www.gnu.org/licenses/gpl.txt
@@ -77,8 +77,8 @@ namespace IO
 		static uint8_t IsSet()
 		{
 			return PORT::PinRead() & (uint8_t)(1 << PIN);
-		}	
-	
+		}
+
 		static void WaiteForSet()
 		{
 			while(IsSet()==0){}
@@ -88,5 +88,5 @@ namespace IO
 		{
 			while(IsSet()){}
 		}
-	}; 
+	};
 }

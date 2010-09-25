@@ -1,9 +1,9 @@
 //*****************************************************************************
 //
-// Title		: C++ IO for ATMEL AVR
+// Title		: C++ IO for MCU
 // Author		: Konstantin Chizhov
 // Date			: 2010
-// Target MCU	: Atmel mega AVR, TINY avr AND Xmega Series
+// Target MCU	: Atmel MEGA, TINY, XMega AVR, TI Msp430
 //
 //       This code is distributed under the GNU Public License
 //       which can be found at http://www.gnu.org/licenses/gpl.txt
@@ -24,75 +24,20 @@
 #define IOPORTS_HPP
 
 
-#ifdef PORTA
-#define USE_PORTA
-#endif
+#if defined(__ICC430__) || defined(__MSP430__)
+#include "Msp430Ports.h"
+#elif defined(__ICCAVR__) || defined(__AVR__)
 
-#ifdef PORTB
-#define USE_PORTB
-#endif
-
-
-#ifdef PORTC
-#define USE_PORTC
-#endif
-
-#ifdef PORTD
-#define USE_PORTD
-#endif
-
-#ifdef PORTE
-#define USE_PORTE
-#endif
-
-#ifdef PORTF
-#define USE_PORTF
-#endif
-
-#ifdef PORTG
-#define USE_PORTG
-#endif
-
-#ifdef PORTH
-#define USE_PORTH
-#endif
-
-#ifdef PORTJ
-#define USE_PORTJ
-#endif
-
-#ifdef PORTK
-#define USE_PORTK
-#endif
-
-#ifdef PORTQ
-#define USE_PORTQ
-#endif
-
-#ifdef PORTR
-#define USE_PORTR
-#endif
-
-#ifdef VPORT0
-#define USE_VPORT0
-#endif
-
-#ifdef VPORT1
-#define USE_VPORT1
-#endif
-
-#ifdef VPORT2
-#define USE_VPORT2
-#endif
-
-#ifdef VPORT3
-#define USE_VPORT3
-#endif
-
-#if defined(PORTCFG_MPCMASK) //XMega family 
+#if defined(PORTCFG_MPCMASK) //XMega family
 #include "XMegaPorts.h"
 #else
 #include "AvrPorts.h"
 #endif
 
+#else
+#error "Not supported arch."
+
 #endif
+
+
+#endif//IOPORTS_HPP

@@ -28,6 +28,70 @@
 #define XMEGA_PORTS_H
 //Port definitions for XMega A families.
 
+#ifdef PORTA
+#define USE_PORTA
+#endif
+
+#ifdef PORTB
+#define USE_PORTB
+#endif
+
+
+#ifdef PORTC
+#define USE_PORTC
+#endif
+
+#ifdef PORTD
+#define USE_PORTD
+#endif
+
+#ifdef PORTE
+#define USE_PORTE
+#endif
+
+#ifdef PORTF
+#define USE_PORTF
+#endif
+
+#ifdef PORTG
+#define USE_PORTG
+#endif
+
+#ifdef PORTH
+#define USE_PORTH
+#endif
+
+#ifdef PORTJ
+#define USE_PORTJ
+#endif
+
+#ifdef PORTK
+#define USE_PORTK
+#endif
+
+#ifdef PORTQ
+#define USE_PORTQ
+#endif
+
+#ifdef PORTR
+#define USE_PORTR
+#endif
+
+#ifdef VPORT0
+#define USE_VPORT0
+#endif
+
+#ifdef VPORT1
+#define USE_VPORT1
+#endif
+
+#ifdef VPORT2
+#define USE_VPORT2
+#endif
+
+#ifdef VPORT3
+#define USE_VPORT3
+#endif
 
 namespace IO
 {
@@ -207,7 +271,7 @@ MAKE_PORT(PORTR, Portr, 'R')
 		}\
 	};
 
-#ifndef __IAR_SYSTEMS_ICC__//PORTCFG_VP0MAP_t is undefined for some strange reason
+#ifndef __ICCAVR__//PORTCFG_VP0MAP_t is undefined for some strange reason
 #ifdef USE_VPORT0
 	MAKE_VIRTUAL_PORT(VPORT0, VPort0, PORTCFG.VPCTRLA, PORTCFG_VP0MAP_t, 'V0')
 #endif
