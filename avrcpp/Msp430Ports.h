@@ -87,11 +87,13 @@ namespace IO
 			}\
 			static void ClearAndSet(DataT clearMask, DataT value)\
 			{\
-				portName = (portName & ~clearMask) | value;\
+                portName &= ~clearMask;\
+				portName |= value;\
 			}\
 			static void DirClearAndSet(DataT clearMask, DataT value)\
 			{\
-				dirName = (dirName & ~clearMask) | value;\
+				dirName &= ~clearMask;\
+				dirName |= value;\
 			}\
 			static DataT Read()\
 			{\
