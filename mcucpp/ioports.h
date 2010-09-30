@@ -25,13 +25,13 @@
 
 
 #if defined(__ICC430__) || defined(__MSP430__)
-#include "Msp430Ports.h"
+#include "MSP430/Msp430Ports.h"
 #elif defined(__ICCAVR__) || defined(__AVR__)
 
 #if defined(PORTCFG_MPCMASK) //XMega family
-#include "XMegaPorts.h"
+#include "AVR/XMegaPorts.h"
 #else
-#include "AvrPorts.h"
+#include "AVR/AvrPorts.h"
 #endif
 
 #else

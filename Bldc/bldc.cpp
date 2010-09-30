@@ -1,10 +1,14 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
-#include "ports.h"
+#include "iopins.h"
+#include "pinlist.h"
+
 #include "comparator.h"
 #include "timer.h"
 
+using namespace IO;
+ 
 typedef PinList<Pa0, Pa1, Pa2, Pb0, Pb1, Pb2> ControlPins;
 typedef PinList<Pa5, Pa6, Pa7> SersorPins;
 
@@ -29,8 +33,8 @@ public:
 	
 	static void Init()
 	{
-		ControlPins::DdrSet(0xff);
-		SensorPins::DdrClear(0xff);
+		ControlPins::DirSet(0xff);
+		SensorPins::DirClear(0xff);
 		_phase = 0;
 		_dir = 0;
 	}
@@ -115,7 +119,7 @@ ISR(TIMER0_OVF0_vect)
 int main()
 {
 	boostPin::SetDirWrite();
-	SersorPins::DdrSet(0xf);
+	SersorPins::DirSet(0xf);
 	motor::Init();
 	//Timer0::Start(Timer0::Ck1024);
 	//Timer0::EnableOverflowInterrupt();

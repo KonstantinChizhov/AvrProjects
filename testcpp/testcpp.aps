@@ -2,7 +2,7 @@
 	<MANAGEMENT>
 		<ProjectName>testcpp</ProjectName>
 		<Created>18-Feb-2010 23:41:23</Created>
-		<LastEdit>30-Jul-2010 13:11:08</LastEdit>
+		<LastEdit>30-Sep-2010 17:11:13</LastEdit>
 		<ICON>241</ICON>
 		<ProjectType>0</ProjectType>
 		<Created>18-Feb-2010 23:41:23</Created>
@@ -13,7 +13,7 @@
 	<CODE_CREATION>
 		<ObjectFile>default\testcpp.elf</ObjectFile>
 		<EntryFile></EntryFile>
-		<SaveFolder>D:\Projects\AvrProjects\testcpp\</SaveFolder></CODE_CREATION>
+		<SaveFolder>D:\Projects\McuProjects\testcpp\</SaveFolder></CODE_CREATION>
 	<DEBUG_TARGET>
 		<CURRENT_TARGET>AVR Simulator</CURRENT_TARGET>
 		<CURRENT_PART>ATmega16</CURRENT_PART>
@@ -27,9 +27,9 @@
 		<modules><module></module></modules><Triggers><trigger clsid="{113824F1-C410-4699-A25E-867CC860C28E}" enabled="0" boundTo="0" hitCount="1" updateAndContinue="0" line="53" file="main.cpp" token="" offset="0"/><trigger clsid="{113824F1-C410-4699-A25E-867CC860C28E}" enabled="0" boundTo="0" hitCount="1" updateAndContinue="0" line="59" file="main.cpp" token="" offset="0"/></Triggers></Debugger>
 	<AVRGCCPLUGIN>
 		<FILES>
-			<SOURCEFILE>main.cpp</SOURCEFILE><HEADERFILE>..\avrcpp\HD44780.h</HEADERFILE><HEADERFILE>..\avrcpp\iopin.h</HEADERFILE><HEADERFILE>..\avrcpp\iopins.h</HEADERFILE><HEADERFILE>..\avrcpp\ioports.h</HEADERFILE><HEADERFILE>..\avrcpp\adc.h</HEADERFILE><HEADERFILE>..\avrcpp\AvrPorts.h</HEADERFILE><HEADERFILE>..\avrcpp\comparator.h</HEADERFILE><HEADERFILE>..\avrcpp\containers.h</HEADERFILE><HEADERFILE>..\avrcpp\dispatcher.h</HEADERFILE><HEADERFILE>..\avrcpp\LedDisplay.h</HEADERFILE><HEADERFILE>..\avrcpp\pinlist.h</HEADERFILE><HEADERFILE>..\avrcpp\static_assert.h</HEADERFILE><HEADERFILE>..\avrcpp\stepper.h</HEADERFILE><HEADERFILE>..\avrcpp\timer.h</HEADERFILE><HEADERFILE>..\avrcpp\usart.h</HEADERFILE><HEADERFILE>..\avrcpp\util.h</HEADERFILE><HEADERFILE>..\avrcpp\XMegaPorts.h</HEADERFILE><HEADERFILE>..\avrcpp\TextFormater.h</HEADERFILE><OTHERFILE>default\testcpp.lss</OTHERFILE><OTHERFILE>default\testcpp.map</OTHERFILE></FILES>
+			<SOURCEFILE>main.cpp</SOURCEFILE><OTHERFILE>default\testcpp.lss</OTHERFILE><OTHERFILE>default\testcpp.map</OTHERFILE></FILES>
 		<CONFIGS>
-			<CONFIG><NAME>default</NAME><USESEXTERNALMAKEFILE>NO</USESEXTERNALMAKEFILE><EXTERNALMAKEFILE></EXTERNALMAKEFILE><PART>atmega16</PART><HEX>1</HEX><LIST>1</LIST><MAP>1</MAP><OUTPUTFILENAME>testcpp.elf</OUTPUTFILENAME><OUTPUTDIR>default\</OUTPUTDIR><ISDIRTY>0</ISDIRTY><OPTIONS><OPTION><FILE>main.cpp</FILE><OPTIONLIST></OPTIONLIST></OPTION></OPTIONS><INCDIRS><INCLUDE>..\avrcpp\</INCLUDE></INCDIRS><LIBDIRS/><LIBS/><LINKOBJECTS/><OPTIONSFORALL>-Wall -gdwarf-2 -std=gnu99 -ffunction-sections       -DF_CPU=16000000UL -Os -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums</OPTIONSFORALL><LINKEROPTIONS></LINKEROPTIONS><SEGMENTS/></CONFIG></CONFIGS>
+			<CONFIG><NAME>default</NAME><USESEXTERNALMAKEFILE>NO</USESEXTERNALMAKEFILE><EXTERNALMAKEFILE></EXTERNALMAKEFILE><PART>atmega16</PART><HEX>1</HEX><LIST>1</LIST><MAP>1</MAP><OUTPUTFILENAME>testcpp.elf</OUTPUTFILENAME><OUTPUTDIR>default\</OUTPUTDIR><ISDIRTY>1</ISDIRTY><OPTIONS><OPTION><FILE>main.cpp</FILE><OPTIONLIST></OPTIONLIST></OPTION></OPTIONS><INCDIRS><INCLUDE>..\mcucpp\</INCLUDE></INCDIRS><LIBDIRS/><LIBS/><LINKOBJECTS/><OPTIONSFORALL>-Wall -gdwarf-2 -std=gnu99 -ffunction-sections         -DF_CPU=16000000UL -Os -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums</OPTIONSFORALL><LINKEROPTIONS></LINKEROPTIONS><SEGMENTS/></CONFIG></CONFIGS>
 		<LASTCONFIG>default</LASTCONFIG>
 		<USES_WINAVR>1</USES_WINAVR><GCC_LOC>C:\WinAVR-20100110\bin\avr-gcc.exe</GCC_LOC><MAKE_LOC>C:\WinAVR-20100110\utils\bin\make.exe</MAKE_LOC></AVRGCCPLUGIN>
 	<AVRSimulator>
@@ -42,4 +42,4 @@
 		<SimBoot>1</SimBoot>
 		<SimBootnew>1</SimBootnew>
 	</AVRSimulator>
-	<IOView><usergroups/><sort sorted="0" column="0" ordername="0" orderaddress="0" ordergroup="0"/></IOView><Files><File00000><FileId>00000</FileId><FileName>main.cpp</FileName><Status>259</Status></File00000><File00001><FileId>00001</FileId><FileName>D:\Projects\AvrProjects\avrcpp\pinlist.h</FileName><Status>257</Status></File00001><File00002><FileId>00002</FileId><FileName>D:\Projects\AvrProjects\avrcpp\HD44780.h</FileName><Status>1</Status></File00002><File00003><FileId>00003</FileId><FileName>default\testcpp.lss</FileName><Status>1</Status></File00003><File00004><FileId>00004</FileId><FileName>D:\Projects\AvrProjects\avrcpp\LedDisplay.h</FileName><Status>1</Status></File00004><File00005><FileId>00005</FileId><FileName>D:\Projects\AvrProjects\avrcpp\util.h</FileName><Status>1</Status></File00005><File00006><FileId>00006</FileId><FileName>D:\Projects\AvrProjects\avrcpp\stepper.h</FileName><Status>1</Status></File00006><File00007><FileId>00007</FileId><FileName>D:\Projects\AvrProjects\avrcpp\dispatcher.h</FileName><Status>1</Status></File00007><File00008><FileId>00008</FileId><FileName>D:\Projects\AvrProjects\avrcpp\usart.h</FileName><Status>1</Status></File00008><File00009><FileId>00009</FileId><FileName>D:\Projects\AvrProjects\avrcpp\XMegaPorts.h</FileName><Status>1</Status></File00009></Files><Events><Bookmarks></Bookmarks></Events><Trace><Filters></Filters></Trace></AVRStudio>
+	<IOView><usergroups/><sort sorted="0" column="0" ordername="1" orderaddress="1" ordergroup="1"/></IOView><Files><File00000><FileId>00000</FileId><FileName>main.cpp</FileName><Status>259</Status></File00000><File00001><FileId>00001</FileId><FileName>default\testcpp.lss</FileName><Status>1</Status></File00001></Files><Events><Bookmarks></Bookmarks></Events><Trace><Filters></Filters></Trace></AVRStudio>

@@ -1,7 +1,6 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
-#include "ioports.h"
 #include "iopins.h"
 #include "pinlist.h"
 #include "dispatcher.h"

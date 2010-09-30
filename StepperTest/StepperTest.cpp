@@ -1,5 +1,8 @@
+
 #include "stepper.h"
-#include "ports.h"
+#include <avr/io.h>
+#include "iopins.h"
+#include "pinlist.h"
 #include <util/delay.h>
 
 //SimpleStepper<PinList<Pa6, Pa1, Pa2, Pa3, Pa4, Pa5> > stepper;

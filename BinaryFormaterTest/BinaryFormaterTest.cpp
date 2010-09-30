@@ -1,6 +1,5 @@
 #include <usart.h>
 #include <util.h>
-#include <ports.h>
 
 typedef BinaryFormater< WaitAdapter < Usart<16, 32> > > usart;
 
@@ -19,7 +18,7 @@ int main()
 	usart::Init(115200);
 
 	uint32_t v ;
-	v = usart::Read<uint32_t>();
+	v = usart::ReadU32();
 	
 	usart::Write(v);
 	while(1)
