@@ -2,6 +2,12 @@ lost+found/
 *.keep
 *.keep.*
 default
-debug
-release
+[dD]ebug
+[Rr]elease
+settings
+*.dep
 *.aws
+bin
+obj
+*.depend
+*.layout
