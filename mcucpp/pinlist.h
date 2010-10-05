@@ -27,10 +27,12 @@
 
 namespace IO
 {
+	using namespace Loki;
+	using namespace Loki::TL;
 
 	namespace IoPrivate
 	{
-
+	
 		template<bool condition, class TypeIfTrue, class TypeIfFale>
 		struct StaticIf
 		{
@@ -75,7 +77,7 @@ namespace IO
 			}
 		};
 
-		enum MapDirection{PortToValue = 0 , ValueToPort = 1};
+		enum MapDirection{ValueToPort = 0 , PortToValue = 1};
 
 		template<unsigned First, unsigned Second, MapDirection mapDirection>
 		class Shifter
@@ -98,11 +100,27 @@ namespace IO
 				return ActualShifter::Shift(value);
 			}
 		};
-	}
+		
+		template<class PINS> struct GetLastBitPosition;
 
-	using namespace Loki;
-	using namespace Loki::TL;
+		template<>
+		struct GetLastBitPosition<NullType>
+		{
+		    enum {value = 0};
+		};
 
+		template<class Head>
+		struct GetLastBitPosition<Typelist<Head, NullType> >
+		{
+		    enum {value = Head::Position};
+		};
+
+		template<class Head, class Tail>
+		struct GetLastBitPosition<Typelist<Head, Tail> >
+		{
+		    enum {value = GetLastBitPosition<Tail>::value};
+		};
+	
 ////////////////////////////////////////////////////////////////////////////////
 // class template PW. Pin wrapper
 // Holds a Pin class and its bit position in value to read/write
@@ -321,7 +339,7 @@ namespace IO
 						GetPortMask<Typelist<Head, Tail> >::value;
 				}
 
-				uint8_t result=0;
+				PortDataType result=0;
 
 				if((int)Head::Position == (int)Head::Pin::Number)
 					result |= value & (1 << Head::Position);
@@ -417,7 +435,7 @@ namespace IO
 			template<class DataType>
 			static void Write(DataType value)
 			{
-				uint8_t result = PinWriteIterator<Pins>::UppendValue(value);
+				DataType result = PinWriteIterator<Pins>::UppendValue(value);
 				if((int)Length<Pins>::value == (int)Port::Width)// whole port
 					Port::Write(result);
 				else
@@ -433,7 +451,7 @@ namespace IO
 			template<class DataType>
 			static void Set(DataType value)
 			{
-				uint8_t result = PinWriteIterator<Pins>::UppendValue(value);
+				DataType result = PinWriteIterator<Pins>::UppendValue(value);
 				Port::Set(result);
 
 				PortWriteIterator<Tail, PinList>::Set(value);
@@ -442,7 +460,7 @@ namespace IO
 			template<class DataType>
 			static void Clear(DataType value)
 			{
-				uint8_t result = PinWriteIterator<Pins>::UppendValue(value);
+				DataType result = PinWriteIterator<Pins>::UppendValue(value);
 				Port::Clear(result);
 
 				PortWriteIterator<Tail, PinList>::Clear(value);
@@ -451,7 +469,7 @@ namespace IO
 			template<class DataType>
 			static void DirWrite(DataType value)
 			{
-				uint8_t result = PinWriteIterator<Pins>::UppendValue(value);
+				DataType result = PinWriteIterator<Pins>::UppendValue(value);
 				if((int)Length<Pins>::value == (int)Port::Width)
 					Port::DirWrite(result);
 				else
@@ -465,7 +483,7 @@ namespace IO
 			template<class DataType>
 			static void DirSet(DataType value)
 			{
-				uint8_t result = PinWriteIterator<Pins>::UppendValue(value);
+				DataType result = PinWriteIterator<Pins>::UppendValue(value);
 				Port::DirSet(result);
 
 				PortWriteIterator<Tail, PinList>::DirSet(value);
@@ -474,7 +492,7 @@ namespace IO
 			template<class DataType>
 			static void DirClear(DataType value)
 			{
-				uint8_t result = PinWriteIterator<Pins>::UppendValue(value);
+				DataType result = PinWriteIterator<Pins>::UppendValue(value);
 				Port::DirClear(result);
 
 				PortWriteIterator<Tail, PinList>::DirClear(value);
@@ -483,7 +501,7 @@ namespace IO
 			template<class DataType>
 			static DataType PinRead(DataType dummy)
 			{
-				uint8_t portValue = Port::PinRead();
+				typename Port::DataT portValue = Port::PinRead();
 				DataType value = PinWriteIterator<Pins>::UppendReadValue(portValue, dummy);
 				return value | PortWriteIterator<Tail, PinList>::PinRead(dummy);
 			}
@@ -491,13 +509,13 @@ namespace IO
 			template<class DataType>
 			static DataType OutRead(DataType dummy)
 			{
-				uint8_t portValue = Port::Read();
+				typename Port::DataT portValue = Port::Read();
 				DataType value = PinWriteIterator<Pins>::UppendReadValue(portValue, dummy);
 				return value | PortWriteIterator<Tail, PinList>::OutRead(dummy);
 			}
 
         };
-
+	}
 ////////////////////////////////////////////////////////////////////////////////
 // class template PinSet
 // Holds implimentation of pin list manipulations.
@@ -509,26 +527,28 @@ namespace IO
 		struct PinSet
 		{
 		private:
-			typedef typename GetPorts<PINS>::Result PinsToPorts;
+			typedef typename IoPrivate::GetPorts<PINS>::Result PinsToPorts;
 		public:
 			typedef PINS PinTypeList;
-			typedef typename NoDuplicates<PinsToPorts>::Result Ports;
+			typedef typename Loki::TL::NoDuplicates<PinsToPorts>::Result Ports;
 			enum{Length = Length<PINS>::value};
-			typedef typename IoPrivate::SelectSize<Length>::Result DataType;
+			enum{LastBitPosition = IoPrivate::GetLastBitPosition<PINS>::value};
+
+			typedef typename IoPrivate::SelectSize<LastBitPosition+1>::Result DataType;
 
 			template<uint8_t Num>
-			class Take: public PinSet< typename TakeFirst<PINS, Num>::Result >
+			class Take: public PinSet< typename IoPrivate::TakeFirst<PINS, Num>::Result >
 			{};
 
 			template<uint8_t Num>
-			class Skip: public PinSet< typename SkipFirst<PINS, Num>::Result >
+			class Skip: public PinSet< typename IoPrivate::SkipFirst<PINS, Num>::Result >
 			{};
 
 			template<uint8_t StartIndex, uint8_t Size>
 			class Slice: public PinSet
 					<
-						typename SkipFirst<
-							typename TakeFirst<PINS, StartIndex + Size>::Result,
+						typename IoPrivate::SkipFirst<
+							typename IoPrivate::TakeFirst<PINS, StartIndex + Size>::Result,
 							StartIndex>::Result
 					>
 			{
@@ -541,43 +561,43 @@ namespace IO
 
 			static void Write(DataType value)
 			{
-				PortWriteIterator<Ports, PINS>::Write(value);
+				IoPrivate::PortWriteIterator<Ports, PINS>::Write(value);
 			}
 
 			static DataType Read()
 			{
-				typedef PortWriteIterator<Ports, PINS> iter;
+				typedef IoPrivate::PortWriteIterator<Ports, PINS> iter;
 				return iter::OutRead(DataType(0));
 			}
 			static void Set(DataType value)
 			{
-				PortWriteIterator<Ports, PINS>::Set(value);
+				IoPrivate::PortWriteIterator<Ports, PINS>::Set(value);
 			}
 
 			static void Clear(DataType value)
 			{
-				PortWriteIterator<Ports, PINS>::Clear(value);
+				IoPrivate::PortWriteIterator<Ports, PINS>::Clear(value);
 			}
 
 			static DataType PinRead()
 			{
-				typedef PortWriteIterator<Ports, PINS> iter;
+				typedef IoPrivate::PortWriteIterator<Ports, PINS> iter;
 				return iter::PinRead(DataType(0));
 			}
 
 			static void DirWrite(DataType value)
 			{
-				PortWriteIterator<Ports, PINS>::DirWrite(value);
+				IoPrivate::PortWriteIterator<Ports, PINS>::DirWrite(value);
 			}
 
 			static void DirSet(DataType value)
 			{
-				PortWriteIterator<Ports, PINS>::DirSet(value);
+				IoPrivate::PortWriteIterator<Ports, PINS>::DirSet(value);
 			}
 
 			static void DirClear(DataType value)
 			{
-				PortWriteIterator<Ports, PINS>::DirClear(value);
+				IoPrivate::PortWriteIterator<Ports, PINS>::DirClear(value);
 			}
 		};
 
@@ -623,7 +643,7 @@ namespace IO
             ::Result TailResult;
 			enum{PositionInList = Position};
         public:
-            typedef Typelist< PW<T1, PositionInList>, TailResult> Result;
+            typedef Typelist< IoPrivate::PW<T1, PositionInList>, TailResult> Result;
 
         };
 
