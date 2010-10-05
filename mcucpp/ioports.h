@@ -39,5 +39,49 @@
 
 #endif
 
+namespace IO
+{
+	class NullPort
+	{
+          public:
+		typedef uint8_t DataT;
+		static void Write(DataT value)
+		{	}
+		static void ClearAndSet(DataT clearMask, DataT value)
+		{	}
+		static void DirClearAndSet(DataT clearMask, DataT value)
+		{	}
+		static DataT Read()
+		{
+			return 0;
+		}
+		static void DirWrite(DataT value)
+		{	}
+		static DataT DirRead()
+		{
+			return 0;
+		}
+		static void Set(DataT value)
+		{	}
+		static void Clear(DataT value)
+		{	}
+		static void Togle(DataT value)
+		{	}
+		static void DirSet(DataT value)
+		{	}
+		static void DirClear(DataT value)
+		{	}
+		static void DirTogle(DataT value)
+		{	}
+		static DataT PinRead()
+		{
+			return 0;
+		}
+		enum{Id = '-'};
+		enum{Width=sizeof(DataT)*8};
+	};
+	
+	typedef TPin<NullPort, 0> NullPin;
+}
 
 #endif//IOPORTS_HPP
