@@ -32,7 +32,7 @@ namespace IO
 
 	namespace IoPrivate
 	{
-	
+
 		template<bool condition, class TypeIfTrue, class TypeIfFale>
 		struct StaticIf
 		{
@@ -77,7 +77,7 @@ namespace IO
 			}
 		};
 
-		enum MapDirection{ValueToPort = 0 , PortToValue = 1};
+		enum MapDirection{ValueToPort = 1 , PortToValue = 0};
 
 		template<unsigned First, unsigned Second, MapDirection mapDirection>
 		class Shifter
@@ -100,7 +100,7 @@ namespace IO
 				return ActualShifter::Shift(value);
 			}
 		};
-		
+
 		template<class PINS> struct GetLastBitPosition;
 
 		template<>
@@ -120,7 +120,7 @@ namespace IO
 		{
 		    enum {value = GetLastBitPosition<Tail>::value};
 		};
-	
+
 ////////////////////////////////////////////////////////////////////////////////
 // class template PW. Pin wrapper
 // Holds a Pin class and its bit position in value to read/write
@@ -329,8 +329,7 @@ namespace IO
 			template<class DataType>
 			static inline PortDataType UppendValue(DataType value)
 			{
-				using namespace IoPrivate;
-				if(IsSerial<Typelist<Head, Tail> >::value)
+				if(IsSerial<Typelist<Head, Tail> >::value && Length<Typelist<Head, Tail> >::value > 1)
 				{
 					return Shifter<
 							Head::Pin::Number, 	//bit position in port
@@ -354,7 +353,7 @@ namespace IO
 			static inline DataType UppendReadValue(PortDataType portValue, DataType dummy)
 			{
 				using namespace IoPrivate;
-				if(IsSerial<Typelist<Head, Tail> >::value)
+				if(IsSerial<Typelist<Head, Tail> >::value && Length<Typelist<Head, Tail> >::value > 1)
 				{
 					typedef Shifter<
 							Head::Pin::Number, 	//bit position in port

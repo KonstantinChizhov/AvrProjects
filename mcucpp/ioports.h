@@ -35,8 +35,8 @@
 #endif
 
 #else
-#error "Not supported arch."
-
+#warning "Not supported arch. Test mode only."
+#include "TestPort.h"
 #endif
 
 namespace IO
