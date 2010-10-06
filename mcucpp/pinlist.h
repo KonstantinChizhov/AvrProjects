@@ -88,11 +88,11 @@ namespace IO
 			typedef ShiftLeft<First - Second> LeftShifter1;
 			typedef ShiftLeft<Second - First> LeftShifter2;
 
-			typedef typename StaticIf<mapDirection, LeftShifter1, RightShifter1>::Result FirstShifter;
-			typedef typename StaticIf<mapDirection, LeftShifter2, RightShifter2>::Result SecondShifter;
+            enum{ShiftDirection = First > Second};
+			typedef typename StaticIf<ShiftDirection, LeftShifter1, RightShifter2>::Result FirstShifter;
+			typedef typename StaticIf<ShiftDirection, RightShifter1, LeftShifter2>::Result SecondShifter;
 
-			enum{ShiftDirection = First > Second};
-			typedef typename StaticIf<ShiftDirection, FirstShifter, SecondShifter>::Result ActualShifter;
+			typedef typename StaticIf<mapDirection, FirstShifter, SecondShifter>::Result ActualShifter;
 		public:
 			template<class T>
 			static T Shift(T value)
