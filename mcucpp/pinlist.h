@@ -122,12 +122,11 @@ namespace IO
 		};
 
 ////////////////////////////////////////////////////////////////////////////////
-// class template PW. Pin wrapper
 // Holds a Pin class and its bit position in value to read/write
 ////////////////////////////////////////////////////////////////////////////////
 
 		template<class TPIN, uint8_t POSITION>
-		struct PW	//Pin wrapper
+		struct PinPositionHolder
 		{
 			typedef TPIN Pin;
 			enum{Position = POSITION};
@@ -158,7 +157,7 @@ namespace IO
 ////////////////////////////////////////////////////////////////////////////////
 // class template GetPinsWithPort
 // Selects pins types form pin list which have givven port
-// Assume that TList is type list of PW (pin wrapper) types.
+// Assume that TList is type list of PinPositionHolder types.
 // T - port type to select by.
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -171,10 +170,10 @@ namespace IO
         };
 
         template <class TPort, class Tail, uint8_t PortBitPosition, uint8_t ValueBitPosition>
-        struct GetPinsWithPort<Typelist<PW<TPin<TPort, PortBitPosition>, ValueBitPosition>, Tail>, TPort>
+        struct GetPinsWithPort<Typelist<PinPositionHolder<TPin<TPort, PortBitPosition>, ValueBitPosition>, Tail>, TPort>
         {
             // Go all the way down the list removing the type
-           typedef Typelist<PW<TPin<TPort, PortBitPosition>, ValueBitPosition>,
+           typedef Typelist<PinPositionHolder<TPin<TPort, PortBitPosition>, ValueBitPosition>,
                     typename GetPinsWithPort<Tail, TPort>::Result>
                 Result;
         };
@@ -189,7 +188,7 @@ namespace IO
 ////////////////////////////////////////////////////////////////////////////////
 // class template GetPortMask
 // Computes port bit mask for pin list
-// Assume that TList is type list of PW (pin wrapper) types.
+// Assume that TList is type list of PinPositionHolder types.
 ////////////////////////////////////////////////////////////////////////////////
 
 		template <class TList> struct GetPortMask;
@@ -208,7 +207,7 @@ namespace IO
 ////////////////////////////////////////////////////////////////////////////////
 // class template GetValueMask
 // Computes value bit mask for pin list
-// Assume that TList is type list of PW (pin wrapper) types.
+// Assume that TList is type list of PinPositionHolder types.
 ////////////////////////////////////////////////////////////////////////////////
 
 		template <class TList> struct GetValueMask;
@@ -226,7 +225,7 @@ namespace IO
 ////////////////////////////////////////////////////////////////////////////////
 // class template IsSerial
 // Computes if pin list is seqental
-// Assume that TList is type list of PW (pin wrapper) types.
+// Assume that TList is type list of PinPositionHolder types.
 ////////////////////////////////////////////////////////////////////////////////
 
 		template <class TList> struct IsSerial;
@@ -298,7 +297,7 @@ namespace IO
 ////////////////////////////////////////////////////////////////////////////////
 // class template PinWriteIterator
 // Iterates througth pin list to compute value to write to their port
-// Assume that TList is type list of PW (pin wrapper) types.
+// Assume that TList is type list of PinPositionHolder types.
 ////////////////////////////////////////////////////////////////////////////////
 
 		template <class TList> struct PinWriteIterator;
@@ -378,7 +377,7 @@ namespace IO
 ////////////////////////////////////////////////////////////////////////////////
 // class template PortWriteIterator
 // Iterates througth port list and write value to them
-// Assume that PinList is type list of PW (pin wrapper) types.
+// Assume that PinList is type list of PinPositionHolder types.
 // And PortList is type list of port types.
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -642,7 +641,7 @@ namespace IO
             ::Result TailResult;
 			enum{PositionInList = Position};
         public:
-            typedef Typelist< IoPrivate::PW<T1, PositionInList>, TailResult> Result;
+            typedef Typelist< IoPrivate::PinPositionHolder<T1, PositionInList>, TailResult> Result;
 
         };
 
