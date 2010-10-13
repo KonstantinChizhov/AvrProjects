@@ -1,14 +1,7 @@
+#include "static_assert.h"
+#include <stdint.h>
 
-#pragma once
-
-#ifdef _MSP43_TIMER_H
-#define _MSP43_TIMER_H
-
-namespace HAL
-{
-	namespace Timer
-	{
-		enum ClockSource
+enum ClockSource
 		{
 			SystemClock,
 			AuxiliaryClock,
@@ -34,7 +27,7 @@ namespace HAL
 		
 		
 		class Timer0
-		{
+		{		
 			public:
 			typedef uint16_t DataT;
 			void Stop()
@@ -43,19 +36,22 @@ namespace HAL
 			{
 			
 			}
-			void Start<ClockSource clockSource, ClockDivider divider>();
+			template<ClockSource clockSource, ClockDivider divider>
+			static void Start()
 			{
-				switch(clockSource)
-				{
-					
-				}
+				BOOST_STATIC_ASSERT(divider != Cs2);
+				BOOST_STATIC_ASSERT(divider != Cs512);
 			}
+
 			enum{CompareChannel = 2};
 			template<int CompreUnit> class CcUnit
 			{
 				
 			};
 		};
-	}
+
+int main()
+{
+	Timer0::Start<SystemClock, Cs4>();
+return 0;
 }
-#endif
