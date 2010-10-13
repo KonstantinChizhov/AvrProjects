@@ -23,14 +23,13 @@
 #ifndef HD44780_HPP
 #define HD44780_HPP
 
-#include <util/delay.h>
 #include "static_assert.h"
 
 class LcdBase
 {
 	protected:
 	LcdBase(){}
-	static void Delay()__attribute__ ((noinline))
+	static void Delay()
 	{
 		_delay_us(200); 
 	}
@@ -62,12 +61,12 @@ public:
 		BUS::DirSet(0x7f);
 		RW::Clear();
 		RS::Clear();
-		DATA_BUS::Write(0x03); 
+		DATA_BUS::Write(0x03<<3); 
 		Strobe();
 		Strobe();
 		Strobe();
 		_delay_ms(60);
-		DATA_BUS::Write(0x02); // set 4 bit mode 
+		DATA_BUS::Write(0x02<<3); // set 4 bit mode 
 		Strobe();
 		Write(0x28); // 4 bit mode, 1/16 duty, 5x8 font 
 	
@@ -140,10 +139,10 @@ protected:
 	static void Write(uint8_t c)//__attribute__ ((noinline))
 	{
 		RW::Clear();
-		DATA_BUS::DirSet(0x0f);
-		DATA_BUS::Write(c>>4);
+		DATA_BUS::DirSet(0x0f<<3);
+		DATA_BUS::Write(c>>1);
 		Strobe();
-		DATA_BUS::Write(c); 
+		DATA_BUS::Write(c<<3); 
 		Strobe();
 	}
 

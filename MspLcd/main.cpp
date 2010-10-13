@@ -1,55 +1,44 @@
 
 #include "io430.h"
-#include "../avrcpp/iopins.h"
-#include "../avrcpp/pinlist.h"
+#include "../mcucpp/iopins.h"
+#include "../mcucpp/pinlist.h"
+
+void delay_loop(unsigned long count)
+{
+  do{}while(count--);
+}
+
+inline void
+_delay_ms(unsigned __ms)
+{
+  delay_loop(__ms*1000);
+}
+
+inline void
+_delay_us(unsigned __us)
+{
+  delay_loop(__us);
+}
+
+
+#include "../mcucpp/HD44780.h"
 
 using namespace IO;
-
-void delay(unsigned count)
-{
-  for(unsigned i=0; i<count; i++)
-    for(volatile unsigned j=0; j<1000; j++);
-}
-
-void Blink(int count)
-{
-    for(int i=0; i<count; i++)
-    {
-      delay(20);
-      P1_0::Togle();
-      delay(20);
-      P1_6::Togle();
-    }
-}
+typedef PinList<P1_0, NullPin, P1_1, P1_2, P1_3, P1_4, P1_5> LcdBus;
+typedef Lcd<LcdBus> MyLcd;
 
 int main( void )
 {
   // Stop watchdog timer to prevent time out reset
   WDTCTL = WDTPW | WDTHOLD;
-  P1_0::SetDirWrite();
-  P1_6::SetDirWrite();
+    
+  MyLcd::Init();
+  MyLcd::Puts("Hello msp430", 8);
+  MyLcd::Goto(0x40);
+  MyLcd::Puts("Hello msp430"+8, 4);
   while(1)
   {    
-    BCSCTL1 = CALBC1_1MHZ;
-    DCOCTL = CALDCO_1MHZ;  
-    
-    Blink(5);
-    
-    BCSCTL1 = CALBC1_8MHZ;                  
-    DCOCTL = CALDCO_8MHZ;                   
-
-     Blink(5*8);
-
-    BCSCTL1 = CALBC1_12MHZ;                   
-    DCOCTL = CALDCO_12MHZ;
-    
-    Blink(5*12);
-
-    BCSCTL1 = CALBC1_16MHZ;                 
-    DCOCTL = CALDCO_16MHZ;  
-    
-     Blink(5*16);
-
+   
   }
   return 0;
 }
