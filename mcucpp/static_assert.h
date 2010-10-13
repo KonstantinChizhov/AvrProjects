@@ -11,8 +11,12 @@ namespace boost
 
 #define BOOST_STATIC_ASSERT_BOOL_CAST(x) (bool)(x)
 
+#define CONCAT2(First, Second) (First ## Second)
+#define CONCAT(First, Second) CONCAT2(First, Second)
+
+
 #define BOOST_STATIC_ASSERT( B ) \
    typedef ::boost::static_assert_test<\
       sizeof(::boost::STATIC_ASSERTION_FAILURE< BOOST_STATIC_ASSERT_BOOL_CAST( B ) >)>\
-         (boost_static_assert_typedef_ ## __LINE__)
+         (CONCAT(boost_static_assert_typedef_, __LINE__))
 
