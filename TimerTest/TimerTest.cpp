@@ -1,7 +1,9 @@
 #include "static_assert.h"
+#include "static_switch.h"
 #include <stdint.h>
+#include <avr/io.h>
 
-enum ClockSource
+		enum class ClockSource
 		{
 			SystemClock,
 			AuxiliaryClock,
@@ -29,18 +31,45 @@ enum ClockSource
 		class Timer0
 		{		
 			public:
-			typedef uint16_t DataT;
+			typedef uint8_t DataT;
+			enum NativeClockDivider
+			{
+				NativeCkStop=0, Native1=1, Native8=2, Native64=3, Native256=4, Native1024=5, NativeExtFalling=6, NativeExtRising=7
+			};
+
 			void Stop()
-			{}
+			{
+			
+			}
+
 			void Clear()
 			{
 			
 			}
-			template<ClockSource clockSource, ClockDivider divider>
+
+			template<ClockDivider divider>
 			static void Start()
 			{
-				BOOST_STATIC_ASSERT(divider != Cs2);
-				BOOST_STATIC_ASSERT(divider != Cs512);
+				StaticSwitchValue
+				<
+					divider,
+					Loki::TL::MakeTypelist
+					<
+						CaseValue<Cs1, Native1>,
+						CaseValue<Cs8, Native8>,
+						CaseValue<Cs64, Native1>,
+						CaseValue<Cs256, Native1>,
+						CaseValue<Cs1024, Native1>,
+						CaseValue<NativeExtFalling, Native1>,
+						CaseValue<NativeExtRising, Native1>
+					>::Result,
+					-1
+				>::Value;
+			}
+
+			static void Start(NativeClockDivider divider)
+			{
+				TCCR0 = (divider&0x07 << CS00);
 			}
 
 			enum{CompareChannel = 2};
@@ -52,6 +81,6 @@ enum ClockSource
 
 int main()
 {
-	Timer0::Start<SystemClock, Cs4>();
+	Timer0::Start<Cs1>();
 return 0;
 }
