@@ -2,6 +2,8 @@
 
 //copied from Boost library
 
+#ifdef __cplusplus
+
 namespace boost
 {
 	template <bool x> struct STATIC_ASSERTION_FAILURE;
@@ -19,4 +21,8 @@ namespace boost
    typedef ::boost::static_assert_test<\
       sizeof(::boost::STATIC_ASSERTION_FAILURE< BOOST_STATIC_ASSERT_BOOL_CAST( B ) >)>\
          (CONCAT(boost_static_assert_typedef_, __LINE__))
+
+#endif
+
+#define C_STATIC_ASSERT(expr) typedef char CONCAT(static_assert_failed_at_line_, __LINE__) [(expr) ? 1 : -1]
 

@@ -2,8 +2,9 @@
 #include "static_switch.h"
 #include <stdint.h>
 #include <avr/io.h>
+#include <avr/interrupt.h>
 
-		enum class ClockSource
+		enum ClockSource
 		{
 			SystemClock,
 			AuxiliaryClock,
@@ -37,20 +38,39 @@
 				NativeCkStop=0, Native1=1, Native8=2, Native64=3, Native256=4, Native1024=5, NativeExtFalling=6, NativeExtRising=7
 			};
 
-			void Stop()
+			enum
 			{
-			
+				ExternalClockPrescaled = 0,
+				CompareChannel = 2,
+				HasOverflowInterrupt = 1,
+				HasCompareMatchInterrupt = 0
+			};
+
+			static void Set(DataT val)
+			{
+				TCNT0 = val;
 			}
 
-			void Clear()
+			static DataT Get()
 			{
-			
+				return TCNT0;
+			}
+
+			static void Stop()
+			{
+				TCCR0 = 0;
+			}
+
+			static void Clear()
+			{
+				TCNT0 = 0;
 			}
 
 			template<ClockDivider divider>
 			static void Start()
 			{
-				StaticSwitchValue
+				//Compile time convertion of global ClockDivider to NativeClockDivider
+				const int nativeDivider = StaticSwitchValue
 				<
 					divider,
 					Loki::TL::MakeTypelist
@@ -65,22 +85,36 @@
 					>::Result,
 					-1
 				>::Value;
+				// Compile time test if divider is applicable
+				BOOST_STATIC_ASSERT(nativeDivider > 0);
+				Start(NativeClockDivider(nativeDivider));
 			}
 
 			static void Start(NativeClockDivider divider)
 			{
-				TCCR0 = (divider&0x07 << CS00);
+				TCCR0 |= (divider&0x07 << CS00);
 			}
 
-			enum{CompareChannel = 2};
-			template<int CompreUnit> class CcUnit
+			static void EnableOverflowInterrupt()
 			{
-				
-			};
+				TIMSK |= (1 << TOIE0);
+			}
+
+			static bool Overflow()
+			{
+				return TIFR |= (1<<TOV0);
+			}
 		};
+
+
+ISR(TIMER0_OVF0_vect)
+{
+
+}
 
 int main()
 {
-	Timer0::Start<Cs1>();
-return 0;
+	Timer0::Start<Cs8>();
+	Timer0::Stop();
+	return 0;
 }
