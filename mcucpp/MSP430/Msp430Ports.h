@@ -76,7 +76,7 @@ namespace IO
 
 	//Port definitions for MSP430 families.
 
-	#define MAKE_PORT(portName, dirName, pinName, className, ID) \
+	#define MAKE_PORT(portName, dirName, pinName, selectName, interruptName, interruptEdge, resistorEnable, className, ID) \
 		class className{\
 		public:\
 			typedef uint8_t DataT;\
@@ -145,47 +145,47 @@ namespace IO
 
 
 	#ifdef USE_PORT1
-	MAKE_PORT(P1OUT, P1DIR, P1IN, Port1, '1')
+	MAKE_PORT(P1OUT, P1DIR, P1IN, P1SEL, P1IE, P1IES, P1REN, Port1, '1')
 	#endif
 
 
 	#ifdef USE_PORT2
-	MAKE_PORT(P2OUT, P2DIR, P2IN, Port2, '2')
+	MAKE_PORT(P2OUT, P2DIR, P2IN, P2SEL, P2IE, P2IES, P2REN, Port2, '2')
 	#endif
 
 
 	#ifdef USE_PORT3
-	MAKE_PORT(P3OUT, P3DIR, P3IN, Port3, '3')
+	MAKE_PORT(P3OUT, P3DIR, P3IN, P3SEL, P3IE, P3IES, P3REN, Port3, '3')
 	#endif
 
 
 	#ifdef USE_PORT4
-	MAKE_PORT(P4OUT, P4DIR, P4IN, Port4, '4')
+	MAKE_PORT(P4OUT, P4DIR, P4IN, P4SEL, P4IE, P4IES, P4REN, Port4, '4')
 	#endif
 
 
 	#ifdef USE_PORT5
-	MAKE_PORT(P5OUT, P5DIR, P5IN, Port5, '5')
+	MAKE_PORT(P5OUT, P5DIR, P5IN, P5SEL, P5IE, P5IES, P5REN, Port5, '5')
 	#endif
 
 	#ifdef USE_PORT6
-	MAKE_PORT(P6OUT, P6DIR, P6IN, Port6, '6')
+	MAKE_PORT(P6OUT, P6DIR, P6IN, P6SEL, P6IE, P6IES, P6REN, Port6, '6')
 	#endif
 
 	#ifdef USE_PORT7
-	MAKE_PORT(P7OUT, P7DIR, P7IN, Port7, '7')
+	MAKE_PORT(P7OUT, P7DIR, P7IN, P7SEL, P7IE, P7IES, P7REN, Port7, '7')
 	#endif
 
 	#ifdef USE_PORT8
-	MAKE_PORT(P8OUT, P8DIR, P8IN, Port8, '8')
+	MAKE_PORT(P8OUT, P8DIR, P8IN, P8SEL, P8IE, P8IES, P8REN, Port8, '8')
 	#endif
 
 	#ifdef USE_PORT9
-	MAKE_PORT(P9OUT, P9DIR, P9IN, Port9, '9')
+	MAKE_PORT(P9OUT, P9DIR, P9IN, P9SEL, P9IE, P9IES, P9REN, Port9, '9')
 	#endif
 
 	#ifdef USE_PORT10
-	MAKE_PORT(P10OUT, P10DIR, P10IN, Port10, '10')
+	MAKE_PORT(P10OUT, P10DIR, P10IN, P10SEL, P10IE, P10IES, P10REN, Port10, '10')
 	#endif
 
 }
