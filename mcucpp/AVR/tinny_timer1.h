@@ -55,7 +55,7 @@ namespace Timers
 		
 		static void Start(ClockDivider divider)
 		{
-			TCCR1B = (TCCR2 & ClockDividerMask) | divider;
+			TCCR1B = (TCCR1B & ClockDividerMask) | divider;
 		}
 
 		static void EnableInterrupt()

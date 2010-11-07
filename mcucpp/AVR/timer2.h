@@ -2,6 +2,30 @@
 	
 namespace Timers
 {
+
+#ifdef TIMSK2
+#define InterruptMaskReg TIMSK2
+#else
+#define InterruptMaskReg TIMSK
+#endif
+
+#ifdef TIFR2
+#define InterruptFlagsReg TIFR2
+#else
+#define InterruptFlagsReg TIFR
+#endif
+
+#ifdef TCCR2A
+#define ControlRegA TCCR2A
+#else
+#define ControlRegA TCCR2
+#define ControlRegB TCCR2
+#endif
+
+#ifdef TCCR2B
+#define ControlRegB TCCR2B
+#endif
+
 	class BaseTimer2
 	{
 		public:
@@ -32,7 +56,7 @@ namespace Timers
 
 		static void Stop()
 		{
-			TCCR2 = 0;
+			ControlRegB = 0;
 		}
 
 		static void Clear()
@@ -42,27 +66,27 @@ namespace Timers
 		
 		static void ClearPrescaller()
 		{
-			SFIOR |= (1 << PSR2);
+			//SFIOR |= (1 << PSR2);
 		}
 
 		static void Start(ClockDivider divider)
 		{
-			TCCR2 = (TCCR2 & ClockDividerMask) | divider;
+			ControlRegB = (ControlRegB & ClockDividerMask) | divider;
 		}
 
 		static void EnableInterrupt()
 		{
-			TIMSK |= (1 << TOIE2);
+			InterruptMaskReg |= (1 << TOIE2);
 		}
 
 		static bool IsInterrupt()
 		{
-			return TIFR & (1<<TOV2);
+			return InterruptFlagsReg & (1<<TOV2);
 		}
 		
 		static void ClearInterruptFlag()
 		{
-			TIFR |= (1<<TOV2);
+			InterruptFlagsReg |= (1<<TOV2);
 		}
 	};
 
@@ -105,17 +129,17 @@ namespace Timers
 
 		static void EnableInterrupt()
 		{
-			TIMSK |= (1 << OCIE2);
+			InterruptMaskReg |= (1 << OCIE2);
 		}
 
 		static bool IsInterrupt()
 		{
-			return TIFR & (1<<OCF2);
+			return InterruptFlagsReg & (1<<OCF2);
 		}
 	
 		static void ClearInterruptFlag()
 		{
-			TIFR |= (1<<OCF2);
+			InterruptFlagsReg |= (1<<OCF2);
 		}
 	};
 #else
@@ -123,5 +147,10 @@ namespace Timers
 	{
 	};
 #endif
+
+#undef InterruptMaskReg 
+#undef InterruptFlagsReg 
+#undef ControlRegA
+#undef ControlRegB
 
 }

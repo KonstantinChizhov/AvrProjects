@@ -19,7 +19,13 @@ namespace Timers
 #define ControlRegA TCCR0A
 #else
 #define ControlRegA TCCR0
+#define ControlRegB TCCR0
 #endif
+
+#ifdef TCCR0B
+#define ControlRegB TCCR0B
+#endif
+
 
 	class BaseTimer0
 	{
@@ -51,7 +57,7 @@ namespace Timers
 
 		static void Stop()
 		{
-			ControlRegA = 0;
+			ControlRegB = 0;
 		}
 
 		static void Clear()
@@ -66,7 +72,7 @@ namespace Timers
 
 		static void Start(ClockDivider divider)
 		{
-			ControlRegA = (ControlRegA & ClockDividerMask) | divider;
+			ControlRegB = (ControlRegB & ClockDividerMask) | divider;
 		}
 
 		static void EnableInterrupt()
@@ -85,7 +91,8 @@ namespace Timers
 		}
 	};
 
-#if defined WGM00	//Has waveform generation modes
+//mega16, mega32
+#if defined (WGM00) && !defined(WGM02) 
 
 	class Timer0 : public BaseTimer0
 	{		
@@ -137,6 +144,97 @@ namespace Timers
 			InterruptFlagsReg |= (1<<OCF0);
 		}
 	};
+#elif defined(WGM02) 
+
+	class Timer0 : public BaseTimer0
+	{		
+		public:
+	
+		enum TimerMode
+		{
+			Normal 			= (0 << WGM02) | (0 << WGM01) | (0 << WGM00),
+			PwmPhaseCorrect = (0 << WGM02) | (0 << WGM01) | (1 << WGM00),
+			ClearOnMatch 	= (0 << WGM02) | (1 << WGM01) | (0 << WGM00),
+			PwmFast 		= (0 << WGM02) | (1 << WGM01) | (1 << WGM00),
+			//Reserved1		= (1 << WGM02) | (0 << WGM01) | (0 << WGM00),
+			PwmPhaseCorrectToOCRA = (1 << WGM02) | (0 << WGM01) | (1 << WGM00),
+			//Reserved2 	= (1 << WGM02) | (1 << WGM01) | (0 << WGM00),
+			PwmFastToOCRA	= (1 << WGM02) | (1 << WGM01) | (1 << WGM00),
+		};
+
+		enum {TimerModeAClearMask = ~((1 << WGM01) | (1 << WGM00))};
+		enum {TimerModeAMask = ((1 << WGM01) | (1 << WGM00))};
+		enum {TimerModeBClearMask = ~((1 << WGM02))};
+		enum {TimerModeBMask = ~((1 << WGM02))};
+
+
+		static void SetMode(TimerMode mode)
+		{
+			ControlRegA = (ControlRegA & TimerModeAClearMask) | (mode & TimerModeAMask);
+			ControlRegB = (ControlRegB & TimerModeBClearMask) | (mode & TimerModeBMask);
+		}
+
+		template<int number> class OutputCompare;
+	};
+
+	template<> class Timer0::OutputCompare<0>
+	{
+	public:
+		static void Set(DataT val)
+		{
+			OCR0A = val;
+		}
+
+		static DataT Get()
+		{
+			return OCR0A;
+		}
+
+		static void EnableInterrupt()
+		{
+			InterruptMaskReg |= (1 << OCIE0A);
+		}
+
+		static bool IsInterrupt()
+		{
+			return InterruptFlagsReg & (1<<OCF0A);
+		}
+	
+		static void ClearInterruptFlag()
+		{
+			InterruptFlagsReg |= (1<<OCF0A);
+		}
+	};
+
+	template<> class Timer0::OutputCompare<1>
+	{
+	public:
+		static void Set(DataT val)
+		{
+			OCR0B = val;
+		}
+
+		static DataT Get()
+		{
+			return OCR0B;
+		}
+
+		static void EnableInterrupt()
+		{
+			InterruptMaskReg |= (1 << OCIE0B);
+		}
+
+		static bool IsInterrupt()
+		{
+			return InterruptFlagsReg & (1<<OCF0B);
+		}
+	
+		static void ClearInterruptFlag()
+		{
+			InterruptFlagsReg |= (1<<OCF0B);
+		}
+	};
+
 #else
 	class Timer0 : public BaseTimer0
 	{
@@ -147,6 +245,6 @@ namespace Timers
 #undef InterruptMaskReg 
 #undef InterruptFlagsReg 
 #undef ControlRegA
-
+#undef ControlRegB
 
 }

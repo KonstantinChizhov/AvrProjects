@@ -15,6 +15,13 @@ namespace Timers
 #define InterruptFlagsReg TIFR
 #endif
 
+//handle headers with outdated definitions
+#if defined(PWM10)
+#define WGM10 PWM10
+#define WGM11 PWM11
+#define WGM12 CTC1
+#define WGM13 4
+#endif
 
 	class BaseTimer1
 	{
@@ -75,7 +82,7 @@ namespace Timers
 		}
 	};
 
-#if defined WGM10
+#if defined(WGM10)
 
 	class Timer1 : public BaseTimer1
 	{		
@@ -172,7 +179,7 @@ namespace Timers
 			InterruptFlagsReg |= (1<<OCF1B);
 		}
 	};
-	
+
 #else
 	class Timer1 : public BaseTimer1
 	{

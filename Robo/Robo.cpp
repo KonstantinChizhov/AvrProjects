@@ -22,6 +22,7 @@ int main()
 	Timer1::Start(Timer1::Div64);
 	Timer1::SetMode(Timer1::Normal);
 	Timer0::Start(Timer0::Div8);
+	Timer0::SetMode(Timer0::PwmPhaseCorrect);
 
 	Sheduller::Init();
 
