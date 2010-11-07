@@ -20,7 +20,9 @@ ISR(SIG_OUTPUT_COMPARE1A)
 int main()
 {
 	Timer1::Start(Timer1::Div64);
-	Timer1::SetMode(Timer1::CtcToOcr1a);
+	Timer1::SetMode(Timer1::Normal);
+	Timer0::Start(Timer0::Div8);
+
 	Sheduller::Init();
 
 	while(1)

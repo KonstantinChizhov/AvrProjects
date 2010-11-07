@@ -2,6 +2,25 @@
 	
 namespace Timers
 {
+
+#ifdef TIMSK0
+#define InterruptMaskReg TIMSK0
+#else
+#define InterruptMaskReg TIMSK
+#endif
+
+#ifdef TIFR0
+#define InterruptFlagsReg TIFR0
+#else
+#define InterruptFlagsReg TIFR
+#endif
+
+#ifdef TCCR0A
+#define ControlRegA TCCR0A
+#else
+#define ControlRegA TCCR0
+#endif
+
 	class BaseTimer0
 	{
 		public:
@@ -17,6 +36,9 @@ namespace Timers
 			ExtFalling	= (1<<CS02) | (1<<CS01), 
 			ExtRising	= (1<<CS02) | (1<<CS01) | (1<<CS00)
 		};
+
+		enum {ClockDividerMask = ~((1<<CS02) | (1<<CS01) | (1<<CS00))};
+
 		static void Set(DataT val)
 		{
 			TCNT0 = val;
@@ -29,36 +51,41 @@ namespace Timers
 
 		static void Stop()
 		{
-			TCCR0 = 0;
+			ControlRegA = 0;
 		}
 
 		static void Clear()
 		{
 			TCNT0 = 0;
 		}
+		/*
+		static void ClearPrescaller()
+		{
+			SFIOR |= (1 << PSR10);
+		}*/
 
 		static void Start(ClockDivider divider)
 		{
-			TCCR0 |= (divider & 0x07 << CS00);
+			ControlRegA = (ControlRegA & ClockDividerMask) | divider;
 		}
 
 		static void EnableInterrupt()
 		{
-			TIMSK |= (1 << TOIE0);
+			InterruptMaskReg |= (1 << TOIE0);
 		}
 
 		static bool IsInterrupt()
 		{
-			return TIFR & (1<<TOV0);
+			return InterruptFlagsReg & (1<<TOV0);
 		}
 		
 		static void ClearInterruptFlag()
 		{
-			TIFR |= (1<<TOV0);
+			InterruptFlagsReg |= (1<<TOV0);
 		}
 	};
 
-#if defined WGM00
+#if defined WGM00	//Has waveform generation modes
 
 	class Timer0 : public BaseTimer0
 	{		
@@ -66,17 +93,17 @@ namespace Timers
 	
 		enum TimerMode
 		{
-			Normal = 0,
-			Pwm = (1 << WGM00),
-			Ctc = (1  << WGM01),
-			FastPwm = (1 << WGM01) | (1 << WGM00)
+			Normal 			= (0 << WGM01) | (0 << WGM00),
+			PwmPhaseCorrect = (0 << WGM01) | (1 << WGM00),
+			ClearOnMatch 	= (1 << WGM01) | (0 << WGM00),
+			PwmFast 		= (1 << WGM01) | (1 << WGM00)
 		};
 
 		enum {TimerModeClearMask = ~(1 << WGM01) | (1 << WGM00)};
 
 		static void SetMode(TimerMode mode)
 		{
-			TCCR0 = (TCCR0 & TimerModeClearMask) | mode;
+			ControlRegA = (ControlRegA & TimerModeClearMask) | mode;
 		}
 
 		template<int number> class OutputCompare;
@@ -97,17 +124,17 @@ namespace Timers
 
 		static void EnableInterrupt()
 		{
-			TIMSK |= (1 << OCIE0);
+			InterruptMaskReg |= (1 << OCIE0);
 		}
 
 		static bool IsInterrupt()
 		{
-			return TIFR & (1<<OCF0);
+			return InterruptFlagsReg & (1<<OCF0);
 		}
 	
 		static void ClearInterruptFlag()
 		{
-			TIFR |= (1<<OCF0);
+			InterruptFlagsReg |= (1<<OCF0);
 		}
 	};
 #else
@@ -115,5 +142,11 @@ namespace Timers
 	{
 	};
 #endif
+
+
+#undef InterruptMaskReg 
+#undef InterruptFlagsReg 
+#undef ControlRegA
+
 
 }

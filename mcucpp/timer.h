@@ -6,12 +6,20 @@
 
 #elif defined(__ICCAVR__) || defined(__AVR__)
 
+#ifdef PLLCSR
+#define USE_TINNY_TIMER_1
+#endif
+
 #ifdef TCNT0
 #define USE_TIMER_0
 #endif
 
-#ifdef TCNT1
+#if defined(TCNT1) && !defined(USE_TINNY_TIMER_1)
 #define USE_TIMER_1
+#endif
+
+#ifdef TCNT2
+#define USE_TIMER_2
 #endif
 
 #ifdef USE_TIMER_0
@@ -20,6 +28,14 @@
 
 #ifdef USE_TIMER_1
 #include "AVR/timer1.h"
+#endif
+
+#ifdef USE_TIMER_2
+#include "AVR/timer2.h"
+#endif
+
+#ifdef USE_TINNY_TIMER_1
+#include "AVR/tinny_timer1.h"
 #endif
 
 #else

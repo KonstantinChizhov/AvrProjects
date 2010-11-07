@@ -2,6 +2,20 @@
 	
 namespace Timers
 {
+
+#ifdef TIMSK1
+#define InterruptMaskReg TIMSK1
+#else
+#define InterruptMaskReg TIMSK
+#endif
+
+#ifdef TIFR1
+#define InterruptFlagsReg TIFR1
+#else
+#define InterruptFlagsReg TIFR
+#endif
+
+
 	class BaseTimer1
 	{
 		public:
@@ -17,6 +31,9 @@ namespace Timers
 			ExtFalling	= (1<<CS12) | (1<<CS11), 
 			ExtRising	= (1<<CS12) | (1<<CS11) | (1<<CS10)
 		};
+
+		enum {ClockDividerMask = ~((1<<CS12) | (1<<CS11) | (1<<CS10))};
+
 		static void Set(DataT val)
 		{
 			TCNT1 = val;
@@ -39,22 +56,22 @@ namespace Timers
 
 		static void Start(ClockDivider divider)
 		{
-			TCCR1B |= (divider & 0x07 << CS10);
+			TCCR1B = (TCCR1B & ClockDividerMask) | divider;
 		}
 
 		static void EnableInterrupt()
 		{
-			TIMSK |= (1 << TOIE1);
+			InterruptMaskReg |= (1 << TOIE1);
 		}
 
 		static bool IsInterrupt()
 		{
-			return TIFR & (1<<TOV1);
+			return InterruptFlagsReg & (1<<TOV1);
 		}
 		
 		static void ClearInterruptFlag()
 		{
-			TIFR |= (1<<TOV1);
+			InterruptFlagsReg |= (1<<TOV1);
 		}
 	};
 
@@ -66,22 +83,22 @@ namespace Timers
 	
 		enum TimerMode
 		{
-			Normal = 0,
-			PwmPhaseCorrect8Bit = (1 << WGM10),
-			PwmPhaseCorrect9Bit = (1 << WGM11),
-			PwmPhaseCorrect10Bit = (1 << WGM10) | (1 << WGM11),
-			CtcToOcr1a = (1 << WGM12),
-			PwmFast8Bit = (1 << WGM12) | (1 << WGM10),
-			PwmFast9Bit = (1 << WGM12) | (1 << WGM11),
-			PwmFast10Bit = (1 << WGM12) | (1 << WGM11) | (1 << WGM10),
-			PwmPhaseAndFreqCorrectToIcr1 = (1 << WGM13),
-			PwmPhaseAndFreqCorrectToOcr1a = (1 << WGM13) | (1 << WGM10),
-			PwmPhaseCorrectToIcr1 = (1 << WGM13) | (1 << WGM11),
-			PwmPhaseCorrectToOcr1a = (1 << WGM13) | (1 << WGM11) | (1 << WGM10),
-			CtcToIcr1 = (1 << WGM13) | (1 << WGM12),
-			// Reserved = (1 << WGM13) | (1 << WGM12) | (1 << WGM10),
-			PwmFastToIcr1 = (1 << WGM13) | (1 << WGM12) | (1 << WGM11),
-			PwmFastToOcr1a = (1 << WGM13) | (1 << WGM12) | (1 << WGM11) | (1 << WGM10)
+			Normal 						= (0 << WGM13) | (0 << WGM12) | (0 << WGM11) | (0 << WGM10),
+			PwmPhaseCorrect8Bit 		= (0 << WGM13) | (0 << WGM12) | (0 << WGM11) | (1 << WGM10),
+			PwmPhaseCorrect9Bit 		= (0 << WGM13) | (0 << WGM12) | (1 << WGM11) | (0 << WGM10),
+			PwmPhaseCorrect10Bit 		= (0 << WGM13) | (0 << WGM12) | (1 << WGM11) | (1 << WGM10),
+			ClearOnMatchOcr1a 			= (0 << WGM13) | (1 << WGM12) | (0 << WGM11) | (0 << WGM10),
+			PwmFast8Bit 				= (0 << WGM13) | (1 << WGM12) | (0 << WGM11) | (1 << WGM10),
+			PwmFast9Bit 				= (0 << WGM13) | (1 << WGM12) | (1 << WGM11) | (0 << WGM10),
+			PwmFast10Bit 				= (0 << WGM13) | (1 << WGM12) | (1 << WGM11) | (1 << WGM10),
+			PwmPhaseAndFreqCorrectToIcr1 	= (1 << WGM13) | (0 << WGM12) | (0 << WGM11) | (0 << WGM10),
+			PwmPhaseAndFreqCorrectToOcr1a 	= (1 << WGM13) | (0 << WGM12) | (0 << WGM11) | (1 << WGM10),
+			PwmPhaseCorrectToIcr1 		= (1 << WGM13) | (0 << WGM12) | (1 << WGM11) | (0 << WGM10),
+			PwmPhaseCorrectToOcr1a 		= (1 << WGM13) | (0 << WGM12) | (1 << WGM11) | (1 << WGM10),
+			ClearOnMatchIcr1 			= (1 << WGM13) | (1 << WGM12) | (0 << WGM11) | (0 << WGM10),
+			// Reserved 				= (1 << WGM13) | (1 << WGM12) | (0 << WGM11) | (1 << WGM10),
+			PwmFastToIcr1 				= (1 << WGM13) | (1 << WGM12) | (1 << WGM11) | (0 << WGM10),
+			PwmFastToOcr1a 				= (1 << WGM13) | (1 << WGM12) | (1 << WGM11) | (1 << WGM10)
 		};
 
 		enum {TCCR1AClearMask = ~((1 << WGM11) | (1 << WGM10))};
@@ -91,8 +108,8 @@ namespace Timers
 
 		static void SetMode(TimerMode mode)
 		{
-			TCCR1A = (TCCR0 & TCCR1AClearMask) | (mode & TCCR1AMask);
-			TCCR1B = (TCCR0 & TCCR1BClearMask) | (mode & TCCR1BMask);
+			TCCR1A = (TCCR1A & TCCR1AClearMask) | (mode & TCCR1AMask);
+			TCCR1B = (TCCR1B & TCCR1BClearMask) | (mode & TCCR1BMask);
 		}
 
 		template<int number> class OutputCompare;
@@ -113,17 +130,17 @@ namespace Timers
 
 		static void EnableInterrupt()
 		{
-			TIMSK |= (1 << OCIE1A);
+			InterruptMaskReg |= (1 << OCIE1A);
 		}
 
 		static bool IsInterrupt()
 		{
-			return TIFR & (1<<OCF1A);
+			return InterruptFlagsReg & (1<<OCF1A);
 		}
 	
 		static void ClearInterruptFlag()
 		{
-			TIFR |= (1<<OCF1A);
+			InterruptFlagsReg |= (1<<OCF1A);
 		}
 	};
 	
@@ -142,17 +159,17 @@ namespace Timers
 
 		static void EnableInterrupt()
 		{
-			TIMSK |= (1 << OCIE1B);
+			InterruptMaskReg |= (1 << OCIE1B);
 		}
 
 		static bool IsInterrupt()
 		{
-			return TIFR & (1<<OCF1B);
+			return InterruptFlagsReg & (1<<OCF1B);
 		}
 	
 		static void ClearInterruptFlag()
 		{
-			TIFR |= (1<<OCF1B);
+			InterruptFlagsReg |= (1<<OCF1B);
 		}
 	};
 	
@@ -161,5 +178,9 @@ namespace Timers
 	{
 	};
 #endif
+
+#undef InterruptMaskReg 
+#undef InterruptFlagsReg 
+
 
 }
