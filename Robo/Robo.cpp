@@ -15,7 +15,9 @@ ISR(SIG_OVERFLOW0)
 ISR(SIG_OUTPUT_COMPARE1A)
 {
 	Sheduller::TimerHandler();
+	Encoder1::CaptureHandler();
 }
+
 
 int main()
 {
@@ -25,6 +27,7 @@ int main()
 	Timer0::SetMode(Timer0::PwmPhaseCorrect);
 
 	Sheduller::Init();
+	
 
 	while(1)
 	{
