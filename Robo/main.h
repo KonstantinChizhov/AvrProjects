@@ -13,4 +13,4 @@ using namespace IO;
 
 typedef IrReciver<Timers::Timer0, uint16_t, 12> Ir;
 typedef Dispatcher<16, 10> Sheduller;
-typedef Encoder<uint16_t, PinList<Pa0, Pa1, Pa2, Pa3> > Encoder1;
+typedef Encoder<uint16_t, PinList<Pa0, Pa1> > Encoder1;
