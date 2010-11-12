@@ -41,6 +41,19 @@ union Int16
 	uint8_t Bytes[2];
 };
 
+	template<bool condition, class TypeIfTrue, class TypeIfFale>
+	struct StaticIf
+	{
+		typedef TypeIfTrue Result;
+	};
+
+	template<class TypeIfTrue, class TypeIfFale>
+	struct StaticIf<false, TypeIfTrue, TypeIfFale>
+	{
+		 typedef TypeIfFale Result;
+	};
+
+
 //integer part of decimal logarithm
 template <unsigned long Arg>
 struct Log10
