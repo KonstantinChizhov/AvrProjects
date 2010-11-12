@@ -27,6 +27,7 @@ namespace Timers
 	{
 		public:
 		typedef uint16_t DataT;
+		enum {MaxValue = 0xffff};
 		enum ClockDivider
 		{
 			DivStop=0, 
@@ -40,6 +41,8 @@ namespace Timers
 		};
 
 		enum {ClockDividerMask = ~((1<<CS12) | (1<<CS11) | (1<<CS10))};
+
+		template<unsigned Number> struct Divider;
 
 		static void Set(DataT val)
 		{
@@ -81,6 +84,12 @@ namespace Timers
 			InterruptFlagsReg |= (1<<TOV1);
 		}
 	};
+
+	template<> struct BaseTimer1::Divider <0> { static const ClockDivider value = Div1;		enum {Div = 1}; };
+	template<> struct BaseTimer1::Divider <1> { static const ClockDivider value = Div8;		enum {Div = 8}; };
+	template<> struct BaseTimer1::Divider <2> { static const ClockDivider value = Div64;	enum {Div = 64}; };
+	template<> struct BaseTimer1::Divider <3> { static const ClockDivider value = Div256;	enum {Div = 256}; };
+	template<> struct BaseTimer1::Divider <4> { static const ClockDivider value = Div1024;	enum {Div = 1024}; };
 
 #if defined(WGM10)
 

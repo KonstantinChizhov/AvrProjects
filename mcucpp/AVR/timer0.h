@@ -94,11 +94,11 @@ namespace Timers
 		}
 	};
 
-	template<> struct BaseTimer0::Divider <0> { static const ClockDivider value = Div1; };
-	template<> struct BaseTimer0::Divider <1> { static const ClockDivider value = Div8; };
-	template<> struct BaseTimer0::Divider <2> { static const ClockDivider value = Div64; };
-	template<> struct BaseTimer0::Divider <3> { static const ClockDivider value = Div256; };
-	template<> struct BaseTimer0::Divider <4> { static const ClockDivider value = Div1024; };
+	template<> struct BaseTimer0::Divider <0> { static const ClockDivider value = Div1;		enum {Div = 1}; };
+	template<> struct BaseTimer0::Divider <1> { static const ClockDivider value = Div8;		enum {Div = 8}; };
+	template<> struct BaseTimer0::Divider <2> { static const ClockDivider value = Div64;	enum {Div = 64}; };
+	template<> struct BaseTimer0::Divider <3> { static const ClockDivider value = Div256;	enum {Div = 256}; };
+	template<> struct BaseTimer0::Divider <4> { static const ClockDivider value = Div1024;	enum {Div = 1024}; };
 	
 
 //mega16, mega32

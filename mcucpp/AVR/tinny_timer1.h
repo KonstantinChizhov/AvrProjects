@@ -7,6 +7,9 @@ namespace Timers
 	{
 		public:
 		typedef uint8_t DataT;
+		
+		enum {MaxValue = 255};
+		
 		enum ClockDivider
 		{
 			DivStop		= (0<<CS13) | (0<<CS12) | (0<<CS11) | (0<<CS10), 
@@ -26,6 +29,9 @@ namespace Timers
 			Div8192	 	= (1<<CS13) | (1<<CS12) | (1<<CS11) | (0<<CS10),
 			Div16384	= (1<<CS13) | (1<<CS12) | (1<<CS11) | (1<<CS10)
 		};
+		
+		template<unsigned Number> struct Divider;
+		
 		static void Set(DataT val)
 		{
 			TCNT1 = val;
@@ -99,6 +105,22 @@ namespace Timers
 
 		template<int number> class OutputCompare;
 	};
+	
+	template<> struct Timer1::Divider <0> { static const ClockDivider value = Div1;		enum {Div = 1}; };
+	template<> struct Timer1::Divider <1> { static const ClockDivider value = Div1;		enum {Div = 2}; };
+	template<> struct Timer1::Divider <2> { static const ClockDivider value = Div4;		enum {Div = 4}; };
+	template<> struct Timer1::Divider <3> { static const ClockDivider value = Div8;		enum {Div = 8}; };
+	template<> struct Timer1::Divider <4> { static const ClockDivider value = Div16;	enum {Div = 16}; };
+	template<> struct Timer1::Divider <5> { static const ClockDivider value = Div32;	enum {Div = 32}; };
+	template<> struct Timer1::Divider <6> { static const ClockDivider value = Div64;	enum {Div = 64}; };
+	template<> struct Timer1::Divider <7> { static const ClockDivider value = Div128;	enum {Div = 128}; };
+	template<> struct Timer1::Divider <8> { static const ClockDivider value = Div256;	enum {Div = 256}; };
+	template<> struct Timer1::Divider <9> { static const ClockDivider value = Div512;	enum {Div = 512}; };
+	template<> struct Timer1::Divider <10>{ static const ClockDivider value = Div1024;	enum {Div = 1024}; };
+	template<> struct Timer1::Divider <11>{ static const ClockDivider value = Div2048;	enum {Div = 2048}; };
+	template<> struct Timer1::Divider <12>{ static const ClockDivider value = Div4096;	enum {Div = 4096}; };
+	template<> struct Timer1::Divider <13>{ static const ClockDivider value = Div8192;	enum {Div = 8192}; };
+	template<> struct Timer1::Divider <14>{ static const ClockDivider value = Div16384;	enum {Div = 16384}; };
 	
 	template<> class Timer1::OutputCompare<0>
 	{
