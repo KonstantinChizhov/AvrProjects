@@ -2,7 +2,6 @@
 
 using namespace Timers;
 
-
 ISR(SIG_INTERRUPT0)
 {
 	Ir::CaptureHandler();
@@ -28,7 +27,6 @@ int main()
 
 	Sheduller::Init();
 	
-	typedef TimerFreqSetup<Timer0, 1000> T0Setup;
 	Timer0::Start(T0Setup::Divider);
 	Timer0::Set(T0Setup::ReloadValue);
 

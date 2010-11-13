@@ -4,6 +4,12 @@
 #include "loki/TypeManip.h"
 #include "static_assert.h"
 
+#ifdef F_CPU
+#define DEFAULT_TIMER_CLOCK_FREQ =F_CPU
+#else
+#define DEFAULT_TIMER_CLOCK_FREQ
+#endif
+
 namespace Timers
 {
 	namespace Private
@@ -14,7 +20,7 @@ namespace Timers
 			typedef T Result;
 		};
 
-		template<class Timer, unsigned long Freq, unsigned long Fcpu = F_CPU, unsigned DividerNum = 0>
+		template<class Timer, unsigned long Freq, unsigned long Fcpu, unsigned DividerNum = 0>
 		struct ReloadValueIter
 		{
 			typedef typename Timer::template Divider<DividerNum> DividerType;
@@ -31,7 +37,7 @@ namespace Timers
 		};
 
 
-		template<class Timer, unsigned long Freq, unsigned long Fcpu = F_CPU, unsigned DividerNum = 0>
+		template<class Timer, unsigned long Freq, unsigned long Fcpu, unsigned DividerNum = 0>
 		class DividerIter
 		{
 			typedef typename Timer::template Divider<DividerNum> DividerType;
@@ -50,12 +56,15 @@ namespace Timers
 
 	enum {MinTimerClockCycles = 50};
 
-	template<class Timer, unsigned long Freq, unsigned long Fcpu = F_CPU>
+	template<class Timer, unsigned long Freq, unsigned long Fcpu DEFAULT_TIMER_CLOCK_FREQ>
 	struct TimerFreqSetup
 	{
-		enum{ReloadValue = Private::ReloadValueIter<Timer, Freq, Fcpu, 0>::value};
+		static const typename Timer::DataT ReloadValue = Private::ReloadValueIter<Timer, Freq, Fcpu, 0>::value;
 		static const typename Timer::ClockDivider Divider = Private::DividerIter<Timer, Freq, Fcpu, 0>::Result::value;
-		enum{DividerValue = Private::DividerIter<Timer, Freq, Fcpu, 0>::Result::Div};
+		static const unsigned DividerValue = Private::DividerIter<Timer, Freq, Fcpu, 0>::Result::Div;
+		static const unsigned long TickFreq = Fcpu / DividerValue;
+
+	private:
 		BOOST_STATIC_ASSERT( uint32_t(Timer::MaxValue - ReloadValue ) * DividerValue > MinTimerClockCycles);
 	};
 

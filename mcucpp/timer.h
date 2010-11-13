@@ -2,7 +2,9 @@
 
 #if defined(__ICC430__) || defined(__MSP430__)
 
-#include "MSP430/timer.h"
+#if defined(__MSP430_HAS_TA2__)
+#include "MSP430/timera2.h"
+#endif
 
 #elif defined(__ICCAVR__) || defined(__AVR__)
 
