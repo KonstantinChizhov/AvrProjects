@@ -11,27 +11,18 @@ public:
 	static void CaptureHandler()
 	{
 		PortType current = Pins::PinRead();
-		if(	_prevState != current)
-			return;
-		int decrement = -1;
+		
+		uint8_t tmp = _prevState | current << 2;
 
-		switch(_prevState)
+		switch(tmp)
 		{
-		case 0:
-			if(current == 2) decrement = 1;
+			case 0x04: case 0x02: case 0x09: case 0x0D: case 0x0B:
+				_value ++;
 			break;
-		case 1:
-			if(current == 0) decrement = 1;
-			break;
-		case 2:
-			if(current == 3) decrement = 1;
-			break; 
-		case 3:
-			if(current == 1) decrement = 1;
+			case 0x08: case 0x06: case 0x0E: case 0x01: case 0x07:
+				_value --;
 			break;
 		}
-
-		_value -= decrement;
 		_prevState = current;
 	}
 
@@ -40,11 +31,11 @@ public:
 		return _value;
 	}
 
-	static DataT _value;
-	static PortType _prevState;
+	static volatile DataT _value;
+	static volatile PortType _prevState;
 };
 
 	template<class DataT, class Pins>
-	DataT Encoder<DataT, Pins>::_value;
+	volatile DataT Encoder<DataT, Pins>::_value;
 	template<class DataT, class Pins>
-	typename Encoder<DataT, Pins>::PortType Encoder<DataT, Pins>::_prevState;
+	volatile typename Encoder<DataT, Pins>::PortType Encoder<DataT, Pins>::_prevState;
