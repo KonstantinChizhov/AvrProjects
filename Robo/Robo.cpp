@@ -11,16 +11,18 @@ ISR(SIG_OVERFLOW0)
 {
 	Ir::TimeoutHandler();
 }
-*/
+
 ISR(SIG_OUTPUT_COMPARE1A)
 {
 //	Sheduller::TimerHandler();
 	Encoder1::CaptureHandler();
 }
+*/
 
 static volatile uint8_t EncState=0;
 static volatile uint16_t EncData=0;
 static volatile uint16_t EncData2=0;
+uint8_t x1, x2;
 
 void EncoderScan(void)
 {
@@ -60,7 +62,7 @@ switch(EncState)
 
 }
 
-uint8_t x1, x2;
+
 
 void Enc2()
 {
@@ -72,8 +74,8 @@ void Enc2()
 	uint8_t back = ~(x2 | y1) & (x1 ^ y2) | x2 & y1 & ~(x1 & y2);
 	if(fwd&1)EncData++;
 	if(back&1)EncData--;
-	if(fwd&1)EncData2++;
-	if(back&1)EncData2--;
+	if(fwd&2)EncData2++;
+	if(back&2)EncData2--;
 	x1 = y1;
 	x2 = y2;
 }
@@ -89,11 +91,12 @@ int main()
 //	Timer0::Start(T0Setup::Divider);
 //	Timer0::Set(T0Setup::ReloadValue);
 
-	EncoderScan();
+//	EncoderScan();
 
 	while(1)
 	{
-
+		Enc2();
+		PORTA = EncData;
 //		Sheduller::Poll();
 	}	
 }

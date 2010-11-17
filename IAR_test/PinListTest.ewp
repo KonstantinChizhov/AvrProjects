@@ -263,7 +263,7 @@
         </option>
         <option>
           <name>CCListCFile</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>CCListCMnemonics</name>
@@ -271,7 +271,7 @@
         </option>
         <option>
           <name>CCListCMessages</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>CCListAssFile</name>
@@ -333,12 +333,12 @@
         <option>
           <name>CCOptimization</name>
           <version>1</version>
-          <state>2</state>
+          <state>4</state>
         </option>
         <option>
           <name>CCAllowList</name>
           <version>3</version>
-          <state>000000</state>
+          <state>111111</state>
         </option>
         <option>
           <name>CCCrossCallPassesList</name>
@@ -437,7 +437,7 @@
         <option>
           <name>CCOptimizationSlave</name>
           <version>1</version>
-          <state>2</state>
+          <state>4</state>
         </option>
         <option>
           <name>CCOutputFile</name>
