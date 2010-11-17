@@ -12,17 +12,19 @@ ISR(SIG_OVERFLOW0)
 	Ir::TimeoutHandler();
 }
 
+
 ISR(SIG_OUTPUT_COMPARE1A)
 {
-//	Sheduller::TimerHandler();
+	Sheduller::TimerHandler();
 	Encoder1::CaptureHandler();
 }
 */
 
+/*
 static volatile uint8_t EncState=0;
 static volatile uint16_t EncData=0;
-static volatile uint16_t EncData2=0;
-uint8_t x1, x2;
+
+uint8_t _x1, _x2;
 
 void EncoderScan(void)
 {
@@ -62,41 +64,57 @@ switch(EncState)
 
 }
 
+const unsigned EncCount = 8;
+static volatile uint16_t Value[EncCount];
 
+inline uint8_t Detect(uint8_t x1, uint8_t x2, uint8_t y1, uint8_t y2) 
+{
+	return ~(x1 | y2) & (x2 ^ y1) | x1 & y2 & ~(x2 & y1);
+}
 
 void Enc2()
 {
 	uint8_t y1 , y2;
-	y1 = PORTB;
-	y2 = PORTA;
+	y1 = PINC;
+	y2 = PIND;
 
-	uint8_t fwd  = ~(x1 | y2) & (x2 ^ y1) | x1 & y2 & ~(x2 & y1);
-	uint8_t back = ~(x2 | y1) & (x1 ^ y2) | x2 & y1 & ~(x1 & y2);
-	if(fwd&1)EncData++;
-	if(back&1)EncData--;
-	if(fwd&2)EncData2++;
-	if(back&2)EncData2--;
-	x1 = y1;
-	x2 = y2;
+	uint8_t fwd  = Detect(_x1, _x2, y1, y2);
+	uint8_t back = Detect(_x2, _x1, y2, y1);
+	
+	for(unsigned i = 0; i<EncCount; ++i)
+	{
+		if(fwd&1)
+			Value[i]++;
+		else if(back&1)
+			Value[i]--;
+		fwd >>= 1;
+		back >>= 1;
+	}
+
+	_x1 = y1;
+	_x2 = y2;
 }
+*/
 
 int main()
 {
+	DDRA = 0xff;
+	//Timer1::Start(Timer1::Div64);
+	//Timer1::SetMode(Timer1::Normal);
 
-//	Timer1::Start(Timer1::Div64);
-//	Timer1::SetMode(Timer1::Normal);
-
-//	Sheduller::Init();
+	//Sheduller::Init();
 	
-//	Timer0::Start(T0Setup::Divider);
-//	Timer0::Set(T0Setup::ReloadValue);
+	//Timer0::Start(T0Setup::Divider);
+	//Timer0::Set(T0Setup::ReloadValue);
 
 //	EncoderScan();
 
 	while(1)
 	{
-		Enc2();
-		PORTA = EncData;
-//		Sheduller::Poll();
+//		Enc2();
+		Encoder1::CaptureHandler();
+
+		PORTA = Encoder1::Value(0);
+		//Sheduller::Poll();
 	}	
 }

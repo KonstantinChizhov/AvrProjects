@@ -529,8 +529,8 @@ namespace IO
 		public:
 			typedef PINS PinTypeList;
 			typedef typename Loki::TL::NoDuplicates<PinsToPorts>::Result Ports;
-			enum{Length = Length<PINS>::value};
-			enum{LastBitPosition = IoPrivate::GetLastBitPosition<PINS>::value};
+			static const unsigned Length = Length<PINS>::value;
+			static const unsigned LastBitPosition = IoPrivate::GetLastBitPosition<PINS>::value;
 
 			typedef typename IoPrivate::SelectSize<LastBitPosition+1>::Result DataType;
 
