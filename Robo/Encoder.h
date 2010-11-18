@@ -17,14 +17,15 @@ public:
 		PortType fwd  = Detect(_x1, _x2, y1, y2);
 		PortType back = Detect(_x2, _x1, y2, y1);
 	
-		for(unsigned i = 0; i<Channels; ++i)
+		for(DataT i = 1; i != 1 << Channels; i <<= 1)
 		{
-			if(fwd&1)
-				_value[i]++;
-			else if(back&1)
-				_value[i]--;
-			fwd >>= 1;
-			back >>= 1;
+			DataT tmp = _value[i];
+			if(fwd&i)
+				tmp ++;
+			else 
+			if(back&i)
+				tmp --;
+			_value[i] = tmp;
 		}
 
 		_x1 = y1;
@@ -38,18 +39,19 @@ public:
 private:
 	static inline PortType Detect(PortType x1, PortType x2, PortType y1, PortType y2) 
 	{
-		return ~(x1 | y2) & (x2 ^ y1) | x1 & y2 & ~(x2 & y1);
+		//return ~(x1 | y2) & (x2 ^ y1) | x1 & y2 & ~(x2 & y1);
+		return (x2 ^ y1) & ~(x1 ^ y2);
 	}
 
 	static volatile DataT _value[Pins1::Length];
-	static volatile PortType _x1, _x2;
+	static PortType _x1, _x2;
 };
 
 	template<class DataT, class Pins1, class Pins2>
 	volatile DataT Encoder<DataT, Pins1, Pins2>::_value[Pins1::Length];
 
 	template<class DataT, class Pins1, class Pins2>
-	volatile typename Encoder<DataT, Pins1, Pins2>::PortType Encoder<DataT, Pins1, Pins2>::_x1;
+	typename Encoder<DataT, Pins1, Pins2>::PortType Encoder<DataT, Pins1, Pins2>::_x1;
 
 	template<class DataT, class Pins1, class Pins2>
-	volatile typename Encoder<DataT, Pins1, Pins2>::PortType Encoder<DataT, Pins1, Pins2>::_x2;
+	typename Encoder<DataT, Pins1, Pins2>::PortType Encoder<DataT, Pins1, Pins2>::_x2;
