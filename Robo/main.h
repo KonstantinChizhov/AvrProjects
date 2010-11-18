@@ -13,6 +13,6 @@ using namespace IO;
 
 typedef IrReciver<Timers::Timer0, uint16_t, 12> Ir;
 typedef Dispatcher<16, 10> Sheduller;
-typedef Encoder<uint16_t, PinList<Pa0, Pa1>, PinList<Pa2, Pa3> > Encoder1;
+typedef Encoder<uint16_t, PinList<Pc0>, PinList<Pc1> > Encoder1;
 
 typedef Timers::TimerFreqSetup<Timers::Timer0, 1000> T0Setup;

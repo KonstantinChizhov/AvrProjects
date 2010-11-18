@@ -20,7 +20,7 @@ ISR(SIG_OUTPUT_COMPARE1A)
 }
 */
 
-/*
+
 static volatile uint8_t EncState=0;
 static volatile uint16_t EncData=0;
 
@@ -29,7 +29,7 @@ uint8_t _x1, _x2;
 void EncoderScan(void)
 {
 
-uint8_t New = PINB & 0x03;	
+uint8_t New = PINC & 0x03;	
  
 switch(EncState)
 	{
@@ -63,7 +63,7 @@ switch(EncState)
 	EncState = New;
 
 }
-
+/*
 const unsigned EncCount = 8;
 static volatile uint16_t Value[EncCount];
 
@@ -98,7 +98,7 @@ void Enc2()
 
 int main()
 {
-	DDRA = 0xff;
+	DDRB = 0xff;
 	//Timer1::Start(Timer1::Div64);
 	//Timer1::SetMode(Timer1::Normal);
 
@@ -107,14 +107,16 @@ int main()
 	//Timer0::Start(T0Setup::Divider);
 	//Timer0::Set(T0Setup::ReloadValue);
 
-//	EncoderScan();
+//	
 
 	while(1)
 	{
+		//EncoderScan();
 //		Enc2();
 		Encoder1::CaptureHandler();
 
-		PORTA = Encoder1::Value(0);
+		PORTB = Encoder1::Value(0)>>8;
+		//RTB = EncData;
 		//Sheduller::Poll();
 	}	
 }
