@@ -16,18 +16,19 @@ public:
 
 		PortType fwd  = Detect(_x1, _x2, y1, y2);
 		PortType back = Detect(_x2, _x1, y2, y1);
-	
+
 		volatile DataT *ptr = _value;
-		for(DataT i = 1; i != 1 << Channels; i <<= 1)
+		for(PortType mask = 1; mask != 1 << Channels; mask <<= 1, ptr++)
 		{
-			DataT tmp = *ptr;
-			if(fwd&i)
-				tmp ++;
+			//DataT tmp = _value[i];
+			//DataT tmp = *ptr;
+			if(fwd & mask)
+				(*ptr) ++;
 			else 
-			if(back&i)
-				tmp --;
-			*ptr = tmp;
-			ptr++;
+			if(back & mask)
+				(*ptr) --;
+			//_value[i] = tmp;
+			//*ptr = tmp;
 		}
 
 		_x1 = y1;
