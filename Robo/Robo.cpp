@@ -20,7 +20,7 @@ ISR(SIG_OUTPUT_COMPARE1A)
 }
 */
 
-
+/*
 static volatile uint8_t EncState=0;
 static volatile uint16_t EncData=0;
 
@@ -63,6 +63,7 @@ switch(EncState)
 	EncState = New;
 
 }
+/*
 /*
 const unsigned EncCount = 8;
 static volatile uint16_t Value[EncCount];

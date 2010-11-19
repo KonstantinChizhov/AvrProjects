@@ -526,12 +526,14 @@ namespace IO
 		{
 		private:
 			typedef typename IoPrivate::GetPorts<PINS>::Result PinsToPorts;
+                        enum{LengthEnum = Length<PINS>::value};
+                        enum{LastBitPositionEnum = IoPrivate::GetLastBitPosition<PINS>::value};
 		public:
 			typedef PINS PinTypeList;
 			typedef typename Loki::TL::NoDuplicates<PinsToPorts>::Result Ports;
-			static const unsigned Length = Length<PINS>::value;
-			static const unsigned LastBitPosition = IoPrivate::GetLastBitPosition<PINS>::value;
-
+			static const unsigned Length = LengthEnum;
+			static const unsigned LastBitPosition = LastBitPositionEnum;
+                        
 			typedef typename IoPrivate::SelectSize<LastBitPosition+1>::Result DataType;
 
 			template<uint8_t Num>

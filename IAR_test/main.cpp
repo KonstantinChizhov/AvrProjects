@@ -2,36 +2,82 @@
 #include <ioavr.h>
 
 #define USE_PORTA
+#define USE_PORTB
+#define USE_PORTC
+
 #include "../mcucpp/iopins.h"
 #include "../mcucpp/pinlist.h"
 
 using namespace IO;
 typedef PinList<Pa1, Pa2, Pa3, Pa5, Pa6> Pins;
 
-uint8_t x1, x2;
-static volatile uint16_t EncData=0;
-static volatile uint16_t EncData2=0;
-
-void Enc2()
+template<class DataT, class Pins1, class Pins2>
+class Encoder
 {
-	uint8_t y1 , y2;
-	y1 = PORTB;
-	y2 = PORTA;
+	BOOST_STATIC_ASSERT(Pins1::Length == Pins2::Length);
+public:
+	typedef typename Pins1::DataType PortType;
+	static const unsigned Channels = Pins1::Length;
 
-	uint8_t fwd  = ~(x1 | y2) & (x2 ^ y1) | x1 & y2 & ~(x2 & y1);
-	uint8_t back = ~(x2 | y1) & (x1 ^ y2) | x2 & y1 & ~(x1 & y2);
-	if(fwd&1)EncData++;
-	if(back&1)EncData--;
-	if(fwd&2)EncData2++;
-	if(back&2)EncData2--;
-	x1 = y1;
-	x2 = y2;
-}
+	static void CaptureHandler()
+	{
+		PortType y1 = Pins1::PinRead();
+		PortType y2 = Pins2::PinRead();
 
+		PortType fwd  = Detect(_x1, _x2, y1, y2);
+		PortType back = Detect(_x2, _x1, y2, y1);
+	
+		volatile DataT *ptr = _value;
+		for(DataT i = 1; i != 1 << Channels; i <<= 1)
+		{
+			DataT tmp = *ptr;
+			if(fwd&i)
+				tmp ++;
+			else 
+			if(back&i)
+				tmp --;
+			*ptr = tmp;
+			ptr++;
+		}
+
+		_x1 = y1;
+		_x2 = y2;
+	}
+
+	static DataT Value(unsigned  index)
+	{
+		return _value[index];
+	}
+private:
+	static inline PortType Detect(PortType x1, PortType x2, PortType y1, PortType y2) 
+	{
+		//return ~(x1 | y2) & (x2 ^ y1) | x1 & y2 & ~(x2 & y1);
+		return (x2 ^ y1) & ~(x1 ^ y2);
+	}
+
+	static volatile DataT _value[Pins1::Length];
+	static PortType _x1, _x2;
+};
+
+	template<class DataT, class Pins1, class Pins2>
+	volatile DataT Encoder<DataT, Pins1, Pins2>::_value[Pins1::Length];
+
+	template<class DataT, class Pins1, class Pins2>
+	typename Encoder<DataT, Pins1, Pins2>::PortType Encoder<DataT, Pins1, Pins2>::_x1;
+
+	template<class DataT, class Pins1, class Pins2>
+	typename Encoder<DataT, Pins1, Pins2>::PortType Encoder<DataT, Pins1, Pins2>::_x2;
+
+        using namespace IO;
+        
+typedef Encoder<uint16_t, PinList<Pc0>, PinList<Pc1> > Encoder1;
 
 int main()
 {
-  //Pins::Write(0xff);
-  Enc2();
-  return 0;
+  DDRB = 0xff;
+  while(1)
+  {
+      Encoder1::CaptureHandler();
+      PORTB = Encoder1::Value(0)>>8;
+  }	
 }
