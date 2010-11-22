@@ -22,8 +22,8 @@ inline static void EncoderScan(void)
 	EncState = newValue;
 }
 
-#pragma vector=TIMER0_OVF_vect
-__interrupt void TIMER0_OVF()
+#pragma vector=TIMER1_COMPA_vect
+__interrupt void TIMER1_COMPA()
 {
   EncoderScan();
 }
@@ -35,7 +35,6 @@ __interrupt void TIMER0_OVF()
 
 	static inline uint8_t Detect(uint8_t x1, uint8_t x2, uint8_t y1, uint8_t y2) 
 	{
-		//return ~(x1 | y2) & (x2 ^ y1) | x1 & y2 & ~(x2 & y1);
 		return (x2 ^ y1) & ~(x1 ^ y2);
 	}
 
@@ -55,8 +54,7 @@ __interrupt void TIMER0_OVF()
 		_x2 = y2;
 
 		volatile EncValueType * ptr = EncoderValues;
-		uint8_t i = EncoderChannels - 1;
-		do
+		for(uint8_t i = EncoderChannels; i; --i)
 		{	
 			if(fwd & 1)
 				 (*ptr) ++;
@@ -66,7 +64,7 @@ __interrupt void TIMER0_OVF()
 			ptr++;
 			fwd >>= 1;
 			back >>= 1;
-		}while(i--);
+		}
 	}
 #pragma inline=forced
 	inline uint8_t EncRead1()
@@ -86,13 +84,15 @@ __interrupt void TIMER1_COMPA()
 }
 
 #endif
-
+typedef void (* voidCall)();
 int main()
 {
+  //call ISR dirrectly for timing calculation
+  voidCall func = (voidCall)TIMER1_COMPA;
+  func();
   while(1)
   {
-    //PORTB = EncValue;
-    PORTA = EncoderValues[0];
+   
   }
   return 0;
 }

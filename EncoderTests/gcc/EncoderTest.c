@@ -2,43 +2,6 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-/*
-static uint8_t EncState=0;
-static volatile uint16_t EncValue=0;
-static uint8_t EncState2=0;
-static volatile uint16_t EncValue2=0;
-
-inline static void EncoderCapture(void)
-{
-	uint8_t newValue = PINC & 0x03;
-	uint8_t fullState = newValue | EncState << 2;
-
-	switch(fullState)
-	{
-		case 0x2: case 0x4: case 0xB: case 0xD:
-			EncValue ++;
-		break;
-		case 0x1: case 0x7: case 0x8: case 0xE:
-			EncValue --;
-		break;
-	}
-	EncState = newValue;
-
-	newValue = (PINC & 0x06) >> 2;
-	fullState = newValue | EncState << 2;
-
-	switch(fullState)
-	{
-		case 0x2: case 0x4: case 0xB: case 0xD:
-			EncValue2 ++;
-		break;
-		case 0x1: case 0x7: case 0x8: case 0xE:
-			EncValue2 --;
-		break;
-	}
-	EncState2 = newValue;
-}
-*/
 
 static uint8_t EncState=0;
 static volatile uint16_t EncValue=0;
@@ -61,49 +24,6 @@ inline static void EncoderScan(void)
 }
 
 
-/*
-
-static volatile uint8_t EncState=0;
-static volatile uint16_t EncData=0;
-
-inline static void EncoderScan(void)
-{
-
-uint8_t New = PINC & 0x03;	
- 	
-switch(EncState)
-	{
-	case 2:
-		{
-		if(New == 3) EncData++;
-		if(New == 0) EncData--; 
-		break;
-		}
- 
-	case 0:
-		{
-		if(New == 2) EncData++;
-		if(New == 1) EncData--; 
-		break;
-		}
-	case 1:
-		{
-		if(New == 0) EncData++;
-		if(New == 3) EncData--; 
-		break;
-		}
-	case 3:
-		{
-		if(New == 1) EncData++;
-		if(New == 2) EncData--; 
-		break;
-		}
-	}
- 
-	EncState = New;
-
-}
-*/
 
 	typedef unsigned EncValueType;
 	enum{EncoderChannels = 8};
@@ -169,11 +89,12 @@ ISR(SIG_OUTPUT_COMPARE1A)
 
 int main()
 {
-
+	//call ISR dirrectly for timing calculation
+	__vector_6();
+	//__vector_9();
 
 	while(1)
 	{
 		
-		PORTB = EncData;
 	}
 }
