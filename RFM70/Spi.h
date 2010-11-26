@@ -32,25 +32,25 @@ class Spi
 
 	enum{ClockDividerMask = 1 << SPR1 | 1 << SPR0};
 
-	void Init(ClockDivider divider)
+	static void Init(ClockDivider divider)
 	{
 		SlaveSelectPin::SetDirWrite();
 		MisoPin::SetDirRead();
 		MosiPin::SetDirWrite();
 		ClockPin::SetDirWrite();
 		
-		SPCR = SPCR & ~ClockDividerMask | 1<<SPE | 1<<MSTR |
-				divider & ClockDividerMask;
-		
 		if(divider & (1 << (SPI2X + SPI2X_shift)))
 			SPSR |= 1 << SPI2X;
 		else 
 			SPSR &= ~(1 << SPI2X);
+			
+		SPCR = (SPCR & ~ClockDividerMask) | 1<<SPE | 1<<MSTR |
+				(divider & ClockDividerMask);		
 
 		SlaveSelectPin::Set();
 	}
 
-	uint8_t ReadWrite(uint8_t outValue)
+	static uint8_t ReadWrite(uint8_t outValue)
 	{
 		SPDR = outValue;
 		while(!(SPSR & (1<<SPIF)));

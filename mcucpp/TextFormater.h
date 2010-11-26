@@ -18,7 +18,8 @@
 //*****************************************************************************
 
 #pragma once
-
+#include <stdlib.h>
+#include <util.h>
 
 template<class DATA_SOURCE, uint8_t fieldSize=8>
 class TextFormater :public DATA_SOURCE
