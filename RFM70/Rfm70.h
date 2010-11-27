@@ -2,6 +2,10 @@
 
 #include <iopins.h>
 #include <static_assert.h>
+#include <util/delay.h>
+
+static const bool IsLSBitFirst = true;
+static const bool IsLSByteFirst = true;
 
 enum Command
 {
@@ -76,30 +80,8 @@ enum ConfigReg
 	PRIM_RX		= 1 << 0 
 };
 
-enum{Bank1RegsSize = 14*4 };
-const uint8_t Bank1Regs[Bank1RegsSize]=
-{
-// MSB first
-	0x40, 0x4B, 0x01, 0xE2, //0
-	0xC0, 0x4B, 0x00, 0x00,	//1
-	0xD0, 0xFC, 0x8C, 0x02,	//2
-	0x99, 0x00, 0x39, 0x41,	//3
-	0xD9, 0x9E, 0x86, 0x0B,	//4
-	0x24, 0x06, 0x7F, 0xA6,	//5
-	0x00, 0x00, 0x00, 0x00,	//6
-	0x00, 0x00, 0x00, 0x00,	//7
-	0x00, 0x00, 0x00, 0x00,	//8
-//LSB first
-	0x00, 0x00, 0x00, 0x00,	//9
-	0x00, 0x00, 0x00, 0x00,	//10
-	0x00, 0x00, 0x00, 0x00,	//11
-	0x00, 0x12, 0x73, 0x00,	//12
-	0x36, 0xB4, 0x80, 0x00	//13
-};
-
-
-enum{Reg14Size = 11 };
-const uint8_t Bank1_Reg14[Reg14Size]=
+enum{Reg15Size = 11 };
+const uint8_t Bank1_Reg15[Reg15Size]=
 {
 	0x41,0x20,0x08,0x04,0x81,0x20,0xCF,0xF7,0xFE,0xFF,0xFF //LSB first
 };
@@ -164,21 +146,19 @@ public:
 	static const AddressWidthValues AddressWidth = AW5Bytes;
 	static const uint8_t RfChannel 			= 12; // 0..83
 	static const uint8_t RfSetup 			= DataRate2Mbps | OutputPower5dBm | LnaHighGain;
-	static const uint8_t Pipe0RxAddress[AddressWidth + 2];
 
 public:
 	static const uint8_t RetrySetrup = Wait2000us | (AutoRetransmissionCount << 4);
 
 };
 
-const uint8_t Rfm70Defaults::Pipe0RxAddress[AddressWidth + 2] = {0x12, 0x34, 0x56, 0x78, 0x9A};
 
-template<class Spi, class SlaveSelectPin, class EnablePin, class IrqPin>
+template<class Spi, class SlaveSelectPin, class EnablePin, class IrqPin, class Defaults = Rfm70Defaults>
 class Rfm70
 {
 	static uint8_t _status;
 private:
-
+public:
 	static void WriteReg(uint8_t reg, uint8_t value)
 	{
 		SlaveSelectPin::Clear();
@@ -187,11 +167,44 @@ private:
 		SlaveSelectPin::Set();
 	}
 
-	static uint8_t ReadReg(uint8_t reg)                               
+	static uint8_t ReadReg(uint8_t reg)                            
 	{                                                           
 		SlaveSelectPin::Clear();
 		_status = Spi::ReadWrite(reg);
 		uint8_t value = Spi::ReadWrite(0);
+		SlaveSelectPin::Set();
+		return value;
+	}
+
+	static void WriteReg32(uint8_t reg, uint32_t value)
+	{
+		union
+		{
+			uint32_t dword;
+			uint8_t byte[4];
+		};
+		dword = value;
+
+		SlaveSelectPin::Clear();
+		_status = Spi::ReadWrite(reg);
+
+		Spi::ReadWrite(byte[0]);
+		Spi::ReadWrite(byte[1]);
+		Spi::ReadWrite(byte[2]);
+		Spi::ReadWrite(byte[3]);
+		
+		SlaveSelectPin::Set();
+	}
+
+
+	static uint32_t ReadReg32(uint8_t reg)
+	{                                                           
+		SlaveSelectPin::Clear();
+		_status = Spi::ReadWrite(reg);
+		uint32_t value = Spi::ReadWrite(0);
+		value |= Spi::ReadWrite(0) << 8;
+		value |= Spi::ReadWrite(0) << 16;
+		value |= Spi::ReadWrite(0) << 24;
 		SlaveSelectPin::Set();
 		return value;
 	}
@@ -221,10 +234,18 @@ private:
 	static void InitBank1Regs()
 	{
 		SwitchBank(1);
-		WriteBuffer(WRITE_REG | 14, Bank1_Reg14, Reg14Size);
+		WriteBuffer(WRITE_REG | 15, Bank1_Reg15, Reg15Size);
 
-		for(unsigned i=0; i < Bank1RegsSize; i+=4)
-			WriteBuffer(WRITE_REG | i>>2, Bank1Regs + i, 4);
+		WriteReg32(WRITE_REG | 0x00, 0xE2014B40);
+		WriteReg32(WRITE_REG | 0x01, 0x00004BC0);
+		WriteReg32(WRITE_REG | 0x02, 0x028CFCD0);
+		WriteReg32(WRITE_REG | 0x03, 0x41390099);
+		WriteReg32(WRITE_REG | 0x04, 0x0B869ED9);
+		WriteReg32(WRITE_REG | 0x05, 0xA67F0624);
+		WriteReg32(WRITE_REG | 0x06, 0x0B869ED9);
+
+		WriteReg32(WRITE_REG | 0x0c, 0x00731200);
+		WriteReg32(WRITE_REG | 0x0d, 0x0080B436);
 	}
 
 	static void SwitchBank(bool bank)
@@ -238,37 +259,23 @@ private:
 
 public:
 
-	template<class Formater>
-	static void DumpRegs()
-	{
-		Formater formater;
-		SwitchBank(0);
-		formater << "Bank0:\r\n";
-
-		for(unsigned i = 0; i<32; i++)
-		{
-			if(i==0x0A || i==0x0B || i==0x10)
-			{
-				unsigned long val;
-				ReadBuffer(READ_REG | i, (uint8_t*)(&val), 4);
-				formater << i << ":\t" << val << "\r\n";
-			}
-			else
-			{
-				unsigned val = ReadReg(READ_REG | i);
-				formater << i << ":\t" << val << "\r\n";
-			}
-		}
-	}
-
 	static void Init(uint8_t config)
 	{
 		SlaveSelectPin::Set();
 		EnablePin::Set();
 		SlaveSelectPin::SetDirWrite();
 		EnablePin::SetDirWrite();
-		InitBank1Regs();
+		_delay_ms(50);
+
 		SwitchBank(0);
+		WriteReg(WRITE_REG | CONFIG, config);
+
+		WriteReg(WRITE_REG | SETUP_AW, Defaults::AddressWidth);
+		WriteReg(WRITE_REG | RF_CH, Defaults::RfChannel);
+		WriteReg(WRITE_REG | RF_SETUP, Defaults::RfSetup);
+		WriteReg(WRITE_REG | SETUP_RETR, Defaults::RetrySetrup);
+		
+		InitBank1Regs();
 	}
 
 	static void SwitchToRxMode()
@@ -285,13 +292,12 @@ public:
 
 	static void SwitchToTxMode()
 	{
-		WriteReg(FLUSH_TX, 0);//flush Tx
+		WriteReg(FLUSH_TX, 0);
 		EnablePin::Clear();
 		uint8_t value = ReadReg(CONFIG);
-	  	WriteReg(WRITE_REG | CONFIG, value & 0xfe);
+	  	WriteReg(WRITE_REG | CONFIG, value & ~PRIM_RX);
 		EnablePin::Set();
 	}
-
 
 	static void RfChannel(uint8_t channel)
 	{
@@ -303,14 +309,66 @@ public:
 		WriteReg(WRITE_REG | RF_SETUP, rfSetup);
 	}
 
-
 	template<int PipeNumber>
-	class RxPipe
+	class RxPipe;
+
+	template<class Formater>
+	static void DumpRegs()
 	{
-		
-	};
+		Formater formater;
+		SwitchBank(0);
+		formater << "Bank0:\r\n";
+
+		uint8_t buffer[12];
+	
+		for(unsigned i = 0; i<32; i++)
+		{
+			if(i==0x0A || i==0x0B || i==0x10)
+			{
+				ReadBuffer(READ_REG | i, buffer, 5);
+				formater << i << ":\t0x";
+				for(unsigned i = 5; i; i--)
+					formater  << buffer[i-1];
+				formater << "\r\n";
+			}
+			else
+			{
+				unsigned val = ReadReg(READ_REG | i);
+				formater << i << ":\t" << val << "\r\n";
+			}
+		}
+	}
+
+	template<class Formater>
+	static void DumpRegs1()
+	{
+		Formater formater;
+		SwitchBank(1);
+		formater << "Bank1:\r\n";
+
+		for(unsigned i = 0; i<14; i++)
+		{
+			unsigned long val;
+			ReadBuffer(READ_REG | i, (uint8_t*)(&val), 4);
+			formater << "0x" << i << ":\t0x" << val << "\r\n";
+		}
+		uint8_t buffer[12];
+		ReadBuffer(READ_REG | 14, buffer, 11);
+		formater << "0xe:\t0x";
+		for(unsigned i = 11; i; i--)
+			formater  << buffer[i-1];
+		formater << "\r\n";
+		SwitchBank(0);
+	}
 
 };
 
-template<class Spi, class SlaveSelectPin, class EnablePin, class IrqPin>
-uint8_t Rfm70<Spi, SlaveSelectPin, EnablePin, IrqPin>::_status;
+template<class Spi, class SlaveSelectPin, class EnablePin, class IrqPin, class Defaults>
+template<int PipeNumber>
+class Rfm70<Spi, SlaveSelectPin, EnablePin, IrqPin, Defaults>::RxPipe
+{
+
+};
+
+template<class Spi, class SlaveSelectPin, class EnablePin, class IrqPin, class Defaults>
+uint8_t Rfm70<Spi, SlaveSelectPin, EnablePin, IrqPin, Defaults>::_status;

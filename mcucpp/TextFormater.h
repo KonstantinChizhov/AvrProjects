@@ -21,44 +21,45 @@
 #include <stdlib.h>
 #include <util.h>
 
-template<class DATA_SOURCE, uint8_t fieldSize=8>
+template<class DATA_SOURCE, int Base = 10, uint8_t fieldSize=8>
 class TextFormater :public DATA_SOURCE
 {
+	typedef TextFormater<DATA_SOURCE, Base, fieldSize> SelfType;
 public:
 
-	TextFormater<DATA_SOURCE>& operator<< (int value)
+	SelfType& operator<< (int value)
 	{
 		char buffer[7];
-		itoa(value, buffer, 10);
+		itoa(value, buffer, Base);
 		Puts(buffer);
 		return *this;
 	}
 
-	TextFormater<DATA_SOURCE>& operator<< (long value)
+	SelfType& operator<< (long value)
 	{
 		char buffer[11];
-		ltoa(value, buffer, 10);
+		ltoa(value, buffer, Base);
 		Puts(buffer);
 		return *this;
 	}
 
-	TextFormater<DATA_SOURCE>& operator<< (unsigned long value)
+	SelfType& operator<< (unsigned long value)
 	{
 		char buffer[11];
-		ultoa(value, buffer, 10);
+		ultoa(value, buffer, Base);
 		Puts(buffer);
 		return *this;
 	}
 	
-	TextFormater<DATA_SOURCE>& operator<< (unsigned value)
+	SelfType& operator<< (unsigned value)
 	{
 		char buffer[7];
-		utoa(value, buffer, 10);
+		utoa(value, buffer, Base);
 		Puts(buffer);
 		return *this;
 	}
 
-	TextFormater<DATA_SOURCE>& operator<< (double value)
+	SelfType& operator<< (double value)
 	{
 		const uint8_t presision=2;
 		char buffer[fieldSize+1];
@@ -74,7 +75,7 @@ public:
 		return *this;
 	}
 
-	TextFormater<DATA_SOURCE>& operator<< (const char *value)
+	SelfType& operator<< (const char *value)
 	{
 		Puts(value);
 		return *this;
@@ -163,7 +164,7 @@ public:
 		buffer[pos]=0;
 	} 
 
-	TextFormater<DATA_SOURCE>& operator>> (unsigned &value)
+	SelfType& operator>> (unsigned &value)
 	{
 		char buffer[7];
 		Gets(buffer, sizeof(buffer));
@@ -171,7 +172,7 @@ public:
 		return *this;
 	}
 
-	TextFormater<DATA_SOURCE>& operator>> (unsigned long &value)
+	SelfType& operator>> (unsigned long &value)
 	{
 		char buffer[11];
 		Gets(buffer, sizeof(buffer));

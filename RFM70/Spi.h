@@ -6,7 +6,7 @@ template
 	class SlaveSelectT = IO::Pb4,
 	class MosiT	= IO::Pb5,
 	class MisoT	= IO::Pb6,
-	class ClockT	= IO::Pb7
+	class ClockT= IO::Pb7
 	
 	>
 class Spi
@@ -55,5 +55,26 @@ class Spi
 		SPDR = outValue;
 		while(!(SPSR & (1<<SPIF)));
 		return SPDR;
+	}
+};
+
+
+template<class Mosi, class Miso, class Clock>
+class SoftSpi
+{
+	public:
+	static uint8_t ReadWrite(uint8_t value)
+	{
+		Clock::SetDirWrite();
+		Mosi::SetDirWrite();
+		for(uint8_t i = 0; i < 8;i++)
+		{
+			Mosi::Set(i & 0x80);
+			Clock::Set();
+			value <<= 1;
+			value |= Miso::IsSet() == 0 ? 0 : 1;
+			Clock::Clear();
+		}
+		return value;
 	}
 };
