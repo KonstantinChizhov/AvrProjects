@@ -28,5 +28,5 @@ public:
 	}
 
 private:
-	uint8_t values[Channels];
+	static uint8_t values[Channels];
 };
