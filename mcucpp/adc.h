@@ -4,32 +4,55 @@
 #include <avr/interrupt.h>
 
 
-enum Vref{External=0, VCC=1, Int2_56=3};
-enum AdcDivider{Dev2=1, Dev4=2, Dev8=3, Dev16=4, Dev32=5, Dev64=6, Dev128=7};
-
-
 class Adc
 {
 public:
 	enum{ADC_FREE_RUN=5};
-	static void SetClockDivider(AdcDivider devider)
+	
+	enum Vref
 	{
-		ADCSRA |= devider & 0x07;
+		External	= 0 << REFS1 | 0 << REFS0,
+		VCC			= 0 << REFS1 | 1 << REFS0,
+		Int2_56		= 1 << REFS1 | 1 << REFS0
+	};
+
+	enum AdcDivider
+	{
+		Div2	= 0 << ADPS2 | 0 << ADPS1 | 1 << ADPS0, 
+		Div4	= 0 << ADPS2 | 1 << ADPS1 | 0 << ADPS0, 
+		Div8	= 0 << ADPS2 | 1 << ADPS1 | 1 << ADPS0, 
+		Div16	= 1 << ADPS2 | 0 << ADPS1 | 0 << ADPS0, 
+		Div32	= 1 << ADPS2 | 0 << ADPS1 | 1 << ADPS0, 
+		Div64	= 1 << ADPS2 | 1 << ADPS1 | 0 << ADPS0, 
+		Div128	= 1 << ADPS2 | 1 << ADPS1 | 1 << ADPS0
+	};
+
+	enum 
+	{
+		DividerMask = 1 << ADPS2 | 1 << ADPS1 | 1 << ADPS0, 
+		MuxMask = 1 << MUX4 | 1 << MUX3 | 1 << MUX2 | 1 << MUX1 | 1 << MUX0,
+		VrefMask = 1 << REFS1 | 1 << REFS0
+	};
+
+	static void SetClockDivider(AdcDivider divider)
+	{
+		ADCSRA = (ADCSRA & DividerMask) | divider;
 	}
 
 	static void SetVref(Vref ref)
 	{
-		ADMUX |= (ref << REFS0);
+		ADMUX = (ADMUX & ~VrefMask) | ref;
 	}
 
 	static void SetChannel(uint8_t channel)
 	{
-		ADMUX |= (channel & 0x1f) << MUX0;
+		ADMUX = (ADMUX & ~MuxMask) | (channel & MuxMask);
 	}
 	 
-	static void Init(uint8_t channel, Vref ref)
+	static void Init(uint8_t channel = 0, AdcDivider divider = Div32, Vref ref = VCC)
 	{
-		ADMUX |= ((channel & 0x1f) << MUX0) | (ref << REFS0);
+		ADMUX = (ADMUX & ~(MuxMask | VrefMask)) | (channel & MuxMask) | ref;
+		ADCSRA = (ADCSRA & DividerMask) | divider | 1 << ADEN;
 	}
 	
 	static void StartFreeRun()
@@ -44,8 +67,8 @@ public:
 
 	static int16_t ReadSingle()
 	{
-		ADCSRA |= _BV(ADSC) | _BV(ADEN);
-		while (ADCSRA & _BV(ADSC));
+		ADCSRA |= 1 << ADSC | 1 << ADEN;
+		while (ADCSRA & (1 << ADSC));
 		return ADC;
 	}
 

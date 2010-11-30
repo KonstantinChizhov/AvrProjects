@@ -115,8 +115,8 @@ public:
 protected:
     DATA_T _data[SIZE];
 	BOOST_STATIC_ASSERT((SIZE&(SIZE-1))==0);//SIZE_mast_be_a_power_of_two
-    INDEX_T _readCount;
-    INDEX_T _writeCount;   
+    volatile INDEX_T _readCount;
+    volatile INDEX_T _writeCount;
 };
 
 
