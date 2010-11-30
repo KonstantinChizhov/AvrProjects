@@ -65,14 +65,17 @@ class SoftSpi
 	public:
 	static uint8_t ReadWrite(uint8_t value)
 	{
+		Miso::SetDirRead();
 		Clock::SetDirWrite();
 		Mosi::SetDirWrite();
+		
 		for(uint8_t i = 0; i < 8;i++)
 		{
-			Mosi::Set(i & 0x80);
+			Mosi::Set(value & 0x80);
 			Clock::Set();
 			value <<= 1;
-			value |= Miso::IsSet() == 0 ? 0 : 1;
+			if(Miso::IsSet())
+				value |= 1;
 			Clock::Clear();
 		}
 		return value;

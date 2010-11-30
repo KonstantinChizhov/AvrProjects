@@ -9,75 +9,68 @@ static const bool IsLSByteFirst = true;
 
 enum Command
 {
-	READ_REG        	= 0x00,  // Define read command to register
-	WRITE_REG       	= 0x20,  // Define write command to register
-	RD_RX_PLOAD     	= 0x61,  // Define RX payload register address
-	WR_TX_PLOAD     	= 0xA0,  // Define TX payload register address
-	FLUSH_TX        	= 0xE1,  // Define flush TX register command
-	FLUSH_RX        	= 0xE2,  // Define flush RX register command
-	REUSE_TX_PL     	= 0xE3,  // Define reuse TX payload register command
-	W_TX_PAYLOAD_NOACK	= 0xb0,
-	W_ACK_PAYLOAD		= 0xa8,
-	ACTIVATE			= 0x50,
-	R_RX_PL_WID			= 0x60,
-	NOP_NOP            	= 0xFF 
+	ReadRegCmd        	= 0x00,
+	WriteRegCmd       	= 0x20,
+	ReadRxDataCmd	   	= 0x61,
+	WriteTxDataCmd     	= 0xA0,
+	FlushTxCmd	       	= 0xE1,
+	FlushRxCmd	       	= 0xE2,
+	ReuseTxDataCmd     	= 0xE3,
+	WriteTxDataNoAckCmd	= 0xb0,
+	WriteAckDataCmd		= 0xa8,
+	ActivateCmd			= 0x50,
+	ReadRxDataLenghtCmd	= 0x60,
+	NopCmd            	= 0xFF 
 };
 
 enum Registers
 {
-	CONFIG          = 0x00,  // 'Config' register address
-	EN_AA           = 0x01,  // 'Enable Auto Acknowledgment' register address
-	EN_RXADDR       = 0x02,  // 'Enabled RX addresses' register address
-	SETUP_AW        = 0x03,  // 'Setup address width' register address
-	SETUP_RETR      = 0x04,  // 'Setup Auto. Retrans' register address
-	RF_CH           = 0x05,  // 'RF channel' register address
-	RF_SETUP        = 0x06,  // 'RF setup' register address
-	STATUS          = 0x07,  // 'Status' register address
-	OBSERVE_TX      = 0x08,  // 'Observe TX' register address
-	CD              = 0x09,  // 'Carrier Detect' register address
-	RX_ADDR_P0      = 0x0A,  // 'RX address pipe0' register address
-	RX_ADDR_P1      = 0x0B,  // 'RX address pipe1' register address
-	RX_ADDR_P2      = 0x0C,  // 'RX address pipe2' register address
-	RX_ADDR_P3      = 0x0D,  // 'RX address pipe3' register address
-	RX_ADDR_P4      = 0x0E,  // 'RX address pipe4' register address
-	RX_ADDR_P5      = 0x0F,  // 'RX address pipe5' register address
-	TX_ADDR         = 0x10,  // 'TX address' register address
-	RX_PW_P0        = 0x11,  // 'RX payload width, pipe0' register address
-	RX_PW_P1        = 0x12,  // 'RX payload width, pipe1' register address
-	RX_PW_P2        = 0x13,  // 'RX payload width, pipe2' register address
-	RX_PW_P3        = 0x14,  // 'RX payload width, pipe3' register address
-	RX_PW_P4        = 0x15,  // 'RX payload width, pipe4' register address
-	RX_PW_P5        = 0x16,  // 'RX payload width, pipe5' register address
-	FIFO_STATUS     = 0x17,  // 'FIFO Status Register' register address
-	PAYLOAD_WIDTH   = 0x1f   // 'payload length of 256 bytes modes register address
+	ConfigReg			= 0x00,
+	EnableAutoAckReg	= 0x01,
+	EnableRxAdressReg	= 0x02,
+	SetupAdressWidthReg	= 0x03,
+	SetupRetryReg		= 0x04,
+	RfChannelReg		= 0x05,
+	RfSetupReg			= 0x06,
+	StatusReg			= 0x07,
+	ObserveTxReg		= 0x08,
+	CarrierDetectReg	= 0x09,
+	RxAddress0			= 0x0A,
+	RxAddress1			= 0x0B,
+	RxAddress2			= 0x0C,
+	RxAddress3			= 0x0D,
+	RxAddress4			= 0x0E,
+	RxAddress5			= 0x0F,
+	TxAddress			= 0x10,
+	RxDataLength0		= 0x11,
+	RxDataLength1		= 0x12,
+	RxDataLength2		= 0x13,
+	RxDataLength3		= 0x14,
+	RxDataLength4		= 0x15,
+	RxDataLength5		= 0x16,
+	FifoStatusReg  		= 0x17,
+	RxDataLength   		= 0x1f 
 };
 
-enum IntStatus
-{
-	RX_DR 	= 0x40,
-	TX_DS 	= 0x20,
-	MAX_RT 	= 0x10
-};
-
-enum{ TX_FULL 	= 0x01};
 
 enum FifoStatus
 {
-	FIFO_STATUS_TX_REUSE 	= 0x40,
-	FIFO_STATUS_TX_FULL 	= 0x20,
-	FIFO_STATUS_TX_EMPTY 	= 0x10,
-	FIFO_STATUS_RX_FULL 	= 0x02,
-	FIFO_STATUS_RX_EMPTY 	= 0x01
+	FifoTxReuse		= 0x40,
+	FifoTxFull		= 0x20,
+	FifoTxEmpty		= 0x10,
+	FifoRxFull		= 0x02,
+	FifoRxEmpty		= 0x01
 };
-enum ConfigReg
+
+enum ConfigRegValues
 {
-	MASK_RX_DR	= 1 << 6,
-	MASK_TX_DS	= 1 << 5,
-	MASK_MAX_RT	= 1 << 4,
-	EN_CRC		= 1 << 3,
-	CRCO		= 1 << 2,
-	PWR_UP		= 1 << 1,
-	PRIM_RX		= 1 << 0 
+	MaskRxDataReady	= 1 << 6,
+	MaskTxDataReady	= 1 << 5,
+	MaskMaxRetry	= 1 << 4,
+	EnableCrc		= 1 << 3,
+	Crc2bytes		= 1 << 2,
+	PowerUpBit		= 1 << 1,
+	TxModeBit		= 1 << 0 
 };
 
 enum{Reg15Size = 11 };
@@ -133,7 +126,8 @@ enum StatusValues
 	RxDataReady		= 1 << 6,
 	TxDataSent		= 1 << 5,
 	MaxRetransmits	= 1 << 4,
-	RxPipeNumber	= 7 << 1,
+	RxPipeNumberMask= 7 << 1,
+	RxPipeNumberShift= 1,
 	TxFull			= 1
 };
 
@@ -141,11 +135,12 @@ class Rfm70Defaults
 {
 	static const AutoRetransmissionDelayValues AutoRetransmissionDelay = Wait2000us;
 	static const uint8_t AutoRetransmissionCount = 15; //0..15
-
 public:
 	static const AddressWidthValues AddressWidth = AW5Bytes;
-	static const uint8_t RfChannel 			= 12; // 0..83
-	static const uint8_t RfSetup 			= DataRate2Mbps | OutputPower5dBm | LnaHighGain;
+
+	static const uint8_t RfChannel	= 12; // 0..83
+	static const uint8_t RfSetup 	= DataRate2Mbps | OutputPower5dBm | LnaHighGain;
+	static const uint8_t Config 	= EnableCrc | Crc2bytes;
 
 public:
 	static const uint8_t RetrySetrup = Wait2000us | (AutoRetransmissionCount << 4);
@@ -196,7 +191,6 @@ public:
 		SlaveSelectPin::Set();
 	}
 
-
 	static uint32_t ReadReg32(uint8_t reg)
 	{                                                           
 		SlaveSelectPin::Clear();
@@ -234,32 +228,32 @@ public:
 	static void InitBank1Regs()
 	{
 		SwitchBank(1);
-		WriteBuffer(WRITE_REG | 15, Bank1_Reg15, Reg15Size);
+		WriteBuffer(WriteRegCmd | 15, Bank1_Reg15, Reg15Size);
 
-		WriteReg32(WRITE_REG | 0x00, 0xE2014B40);
-		WriteReg32(WRITE_REG | 0x01, 0x00004BC0);
-		WriteReg32(WRITE_REG | 0x02, 0x028CFCD0);
-		WriteReg32(WRITE_REG | 0x03, 0x41390099);
-		WriteReg32(WRITE_REG | 0x04, 0x0B869ED9);
-		WriteReg32(WRITE_REG | 0x05, 0xA67F0624);
-		WriteReg32(WRITE_REG | 0x06, 0x0B869ED9);
+		WriteReg32(WriteRegCmd | 0x00, 0xE2014B40);
+		WriteReg32(WriteRegCmd | 0x01, 0x00004BC0);
+		WriteReg32(WriteRegCmd | 0x02, 0x028CFCD0);
+		WriteReg32(WriteRegCmd | 0x03, 0x41390099);
+		WriteReg32(WriteRegCmd | 0x04, 0x0B869ED9);
+		WriteReg32(WriteRegCmd | 0x05, 0xA67F0624);
+		WriteReg32(WriteRegCmd | 0x06, 0x0B869ED9);
 
-		WriteReg32(WRITE_REG | 0x0c, 0x00731200);
-		WriteReg32(WRITE_REG | 0x0d, 0x0080B436);
+		WriteReg32(WriteRegCmd | 0x0c, 0x00731200);
+		WriteReg32(WriteRegCmd | 0x0d, 0x0080B436);
 	}
 
 	static void SwitchBank(bool bank)
 	{
-		bool tmp = (ReadReg(READ_REG | 7) & 0x80) != 0;
+		bool tmp = (ReadReg(ReadRegCmd | 7) & 0x80) != 0;
 		if(tmp != bank)		
 		{
-			WriteReg(ACTIVATE, 0x53);
+			WriteReg(ActivateCmd, 0x53);
 		}
 	}
 
 public:
 
-	static void Init(uint8_t config)
+	static void Init()
 	{
 		SlaveSelectPin::Set();
 		EnablePin::Set();
@@ -267,51 +261,121 @@ public:
 		EnablePin::SetDirWrite();
 		_delay_ms(50);
 
-		SwitchBank(0);
-		WriteReg(WRITE_REG | CONFIG, config);
+		Activate();
 
-		WriteReg(WRITE_REG | SETUP_AW, Defaults::AddressWidth);
-		WriteReg(WRITE_REG | RF_CH, Defaults::RfChannel);
-		WriteReg(WRITE_REG | RF_SETUP, Defaults::RfSetup);
-		WriteReg(WRITE_REG | SETUP_RETR, Defaults::RetrySetrup);
-		
 		InitBank1Regs();
+		
+		SwitchBank(0);
+
+		WriteReg(WriteRegCmd | ConfigReg, Defaults::Config | PowerUpBit);
+
+		WriteReg(WriteRegCmd | SetupAdressWidthReg, Defaults::AddressWidth);
+		RfChannel(Defaults::RfChannel);
+		RfSetup(Defaults::RfSetup);
+		WriteReg(WriteRegCmd | SetupRetryReg, Defaults::RetrySetrup);
+		
+	}
+
+	static void PowerUp()
+	{
+		uint8_t config = ReadReg(ReadRegCmd | ConfigReg);
+	  	WriteReg(WriteRegCmd | ConfigReg, config | PowerUpBit); 
+	}
+
+	static void PowerDown()
+	{
+		uint8_t config = ReadReg(ReadRegCmd | ConfigReg);
+	  	WriteReg(WriteRegCmd | ConfigReg, config & ~PowerUpBit); 
 	}
 
 	static void SwitchToRxMode()
 	{
-		WriteReg(FLUSH_RX, 0);
-		uint8_t value = ReadReg(STATUS);
-		WriteReg(WRITE_REG | STATUS, value);
+		FlushRx();
+		uint8_t value = ReadReg(ReadRegCmd | StatusReg);
+		WriteReg(WriteRegCmd | StatusReg, value);
 
 		EnablePin::Clear();
-		value = ReadReg(CONFIG);
-	  	WriteReg(WRITE_REG | CONFIG, value | PRIM_RX); 
+		value = ReadReg(ReadRegCmd | ConfigReg);
+	  	WriteReg(WriteRegCmd | ConfigReg, value | TxModeBit); 
 		EnablePin::Set();
 	}
 
 	static void SwitchToTxMode()
 	{
-		WriteReg(FLUSH_TX, 0);
+		FlushTx();
 		EnablePin::Clear();
-		uint8_t value = ReadReg(CONFIG);
-	  	WriteReg(WRITE_REG | CONFIG, value & ~PRIM_RX);
+		uint8_t value = ReadReg(ConfigReg);
+	  	WriteReg(WriteRegCmd | ConfigReg, value & ~TxModeBit);
 		EnablePin::Set();
 	}
 
 	static void RfChannel(uint8_t channel)
 	{
-		WriteReg(WRITE_REG | RF_CH, channel);
+		WriteReg(WriteRegCmd | RfChannelReg, channel);
 	}
 
-	static void RfSetUp(RfSetupValues rfSetup)
+	static void RfSetup(uint8_t rfSetup)
 	{
-		WriteReg(WRITE_REG | RF_SETUP, rfSetup);
+		WriteReg(WriteRegCmd | RfSetupReg, rfSetup);
 	}
+	
+	static void FlushTx()
+	{
+		Spi::ReadWrite(FlushTxCmd);
+	}
+	
+	static void FlushRx()
+	{
+		Spi::ReadWrite(FlushRxCmd);
+	}
+	
+	static void Activate()
+	{
+		WriteReg(ActivateCmd, 0x73);
+	}
+	
+	static uint8_t RecivedDataLength()
+	{
+		return ReadReg(RxDataLength);
+	}
+	
+	static uint8_t DataLength(uint8_t pipe)
+	{
+		return ReadReg(ReadRegCmd | (RxDataLength0 + pipe & 0x1f));
+	}
+	
+	static uint8_t ActiveRxPipe()
+	{
+		return (ReadReg(ReadRegCmd | StatusReg) >> RxPipeNumberShift) & RxPipeNumberMask;
+	}
+	
+	static bool Write(const void * buffer, uint8_t size)
+	{
+		SwitchToTxMode(); 
 
-	template<int PipeNumber>
-	class RxPipe;
-
+		uint8_t fifoStatus =ReadReg(ReadRegCmd | FifoStatusReg);
+		if(fifoStatus & FifoTxFull)
+		{
+			WriteBuffer(WriteTxDataCmd, buffer, size);
+		}
+	}
+	
+	/// Reads recived data payload.
+	static uint8_t Recive(void * buffer)
+	{
+		uint8_t length = RecivedDataLength();
+		uint8_t pipe = ActiveRxPipe();
+		if(_status & RxDataReady)
+		{
+			ReadBuffer(ReadRxDataCmd, buffer, length);
+		}
+		else
+		{
+			return 0xff;
+		}
+		return pipe;
+	}
+		
 	template<class Formater>
 	static void DumpRegs()
 	{
@@ -325,7 +389,7 @@ public:
 		{
 			if(i==0x0A || i==0x0B || i==0x10)
 			{
-				ReadBuffer(READ_REG | i, buffer, 5);
+				ReadBuffer(ReadRegCmd | i, buffer, 5);
 				formater << i << ":\t0x";
 				for(unsigned i = 5; i; i--)
 					formater  << buffer[i-1];
@@ -333,7 +397,7 @@ public:
 			}
 			else
 			{
-				unsigned val = ReadReg(READ_REG | i);
+				unsigned val = ReadReg(ReadRegCmd | i);
 				formater << i << ":\t" << val << "\r\n";
 			}
 		}
@@ -349,24 +413,17 @@ public:
 		for(unsigned i = 0; i<14; i++)
 		{
 			unsigned long val;
-			ReadBuffer(READ_REG | i, (uint8_t*)(&val), 4);
+			ReadBuffer(ReadRegCmd | i, (uint8_t*)(&val), 4);
 			formater << "0x" << i << ":\t0x" << val << "\r\n";
 		}
 		uint8_t buffer[12];
-		ReadBuffer(READ_REG | 14, buffer, 11);
+		ReadBuffer(ReadRegCmd | 14, buffer, 11);
 		formater << "0xe:\t0x";
 		for(unsigned i = 11; i; i--)
 			formater  << buffer[i-1];
 		formater << "\r\n";
 		SwitchBank(0);
 	}
-
-};
-
-template<class Spi, class SlaveSelectPin, class EnablePin, class IrqPin, class Defaults>
-template<int PipeNumber>
-class Rfm70<Spi, SlaveSelectPin, EnablePin, IrqPin, Defaults>::RxPipe
-{
 
 };
 
