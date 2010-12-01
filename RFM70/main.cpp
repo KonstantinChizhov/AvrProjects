@@ -1,17 +1,24 @@
 #include <avr/io.h>
 #include "Spi.h"
-#include "Rfm70.h"
+
 #include <TextFormater.h>
 #include <usart.h>
 #include <util/delay.h>
 
 typedef WaitAdapter<Usart<16, 16> >  MyUsart;
+
+
+
 typedef TextFormater<MyUsart, 16> MyFormater;
+
+#include "Rfm70.h"
+
 typedef Spi<> MySpi;
 
-typedef SoftSpi<IO::Pb5, IO::Pb6, IO::Pb7> Spi2;
+typedef SoftSpi<IO::Pc2, IO::Pc1, IO::Pc3> Spi2;
 
-typedef Rfm70<Spi2, IO::Pb0, IO::Pb1, IO::Pb2> Transiver1;
+typedef Rfm70<MySpi, IO::Pb0, IO::Pb1, IO::Pb2> Transiver1;
+typedef Rfm70<Spi2, IO::Pc4, IO::Pc5, IO::Pc0> Transiver2;
 
 typedef IO::Pa0 Debug;
 
@@ -30,6 +37,9 @@ __attribute__((OS_main))
 
 int main()
 {
+	uint8_t buffer1[32] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+	uint8_t buffer2[32];
+
 	Debug::SetDirWrite();
 
 	MyUsart::Init(19200);
@@ -39,12 +49,43 @@ int main()
 	formater.PutsP(PSTR("Rfm70 test programm\r\n"));
 
 	Transiver1::Init();
-
-	Transiver1::DumpRegs<MyFormater>();
-	Transiver1::DumpRegs1<MyFormater>();
-	//Transiver1::WriteReg(WRITE_REG | CONFIG, 100);
-	//Transiver1::DumpRegs<MyFormater>();
+	Transiver2::Init();
 	
+	Transiver1::SwitchToRxMode();
+
+	Transiver2::SwitchToTxMode();
+	
+formater << "Rx\t";
+	Transiver1::DumpRegs<MyFormater>();
+	//Transiver1::DumpRegs1<MyFormater>();
+formater << "Tx\t";
+	Transiver2::DumpRegs<MyFormater>();
+	//Transiver2::DumpRegs1<MyFormater>();
+
+	Transiver2::Write(buffer1, 32);
+	formater << "Rx\t";
+	Transiver1::DumpRegs<MyFormater>();
+	formater << "Tx\t";
+	Transiver2::DumpRegs<MyFormater>();
+
+	_delay_ms(100);
+	Transiver1::Recive(buffer2);
+
+	formater << "Rx\t";
+	Transiver1::DumpRegs<MyFormater>();
+	formater << "Tx\t";
+	Transiver2::DumpRegs<MyFormater>();
+
+	_delay_ms(100);
+	Transiver1::Recive(buffer2);
+	_delay_ms(100);
+	Transiver1::Recive(buffer2);
+	
+	formater << "Rx\t";
+	Transiver1::DumpRegs<MyFormater>();
+	formater << "Tx\t";
+	Transiver2::DumpRegs<MyFormater>();
+
 	while(1)
 	{
 		//Transiver1::RfChannel(10);

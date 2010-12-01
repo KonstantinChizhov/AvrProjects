@@ -48,8 +48,7 @@ enum Registers
 	RxDataLength3		= 0x14,
 	RxDataLength4		= 0x15,
 	RxDataLength5		= 0x16,
-	FifoStatusReg  		= 0x17,
-	RxDataLength   		= 0x1f 
+	FifoStatusReg  		= 0x17
 };
 
 
@@ -151,13 +150,12 @@ public:
 template<class Spi, class SlaveSelectPin, class EnablePin, class IrqPin, class Defaults = Rfm70Defaults>
 class Rfm70
 {
-	static uint8_t _status;
 private:
-public:
+
 	static void WriteReg(uint8_t reg, uint8_t value)
 	{
 		SlaveSelectPin::Clear();
-		_status = Spi::ReadWrite(reg);
+		Spi::ReadWrite(reg);
 		Spi::ReadWrite(value);
 		SlaveSelectPin::Set();
 	}
@@ -165,7 +163,7 @@ public:
 	static uint8_t ReadReg(uint8_t reg)                            
 	{                                                           
 		SlaveSelectPin::Clear();
-		_status = Spi::ReadWrite(reg);
+		Spi::ReadWrite(reg);
 		uint8_t value = Spi::ReadWrite(0);
 		SlaveSelectPin::Set();
 		return value;
@@ -181,7 +179,7 @@ public:
 		dword = value;
 
 		SlaveSelectPin::Clear();
-		_status = Spi::ReadWrite(reg);
+		Spi::ReadWrite(reg);
 
 		Spi::ReadWrite(byte[0]);
 		Spi::ReadWrite(byte[1]);
@@ -194,7 +192,7 @@ public:
 	static uint32_t ReadReg32(uint8_t reg)
 	{                                                           
 		SlaveSelectPin::Clear();
-		_status = Spi::ReadWrite(reg);
+		Spi::ReadWrite(reg);
 		uint32_t value = Spi::ReadWrite(0);
 		value |= Spi::ReadWrite(0) << 8;
 		value |= Spi::ReadWrite(0) << 16;
@@ -206,7 +204,7 @@ public:
 	static void ReadBuffer(uint8_t command, uint8_t *buffer, uint8_t length)
 	{
 		SlaveSelectPin::Clear();
-		_status = Spi::ReadWrite(command);
+		Spi::ReadWrite(command);
 
 		for(uint8_t *end = buffer + length; buffer != end; ++buffer)
 			*buffer = Spi::ReadWrite(0);
@@ -217,7 +215,7 @@ public:
 	static void WriteBuffer(uint8_t command, const uint8_t *buffer, uint8_t length)
 	{
 		SlaveSelectPin::Clear();
-		_status = Spi::ReadWrite(command);
+		Spi::ReadWrite(command);
 
 		for(const uint8_t *end = buffer + length; buffer != end; ++buffer)
 			Spi::ReadWrite(*buffer);
@@ -263,7 +261,7 @@ public:
 
 		Activate();
 
-		InitBank1Regs();
+	//	InitBank1Regs();
 		
 		SwitchBank(0);
 
@@ -273,6 +271,7 @@ public:
 		RfChannel(Defaults::RfChannel);
 		RfSetup(Defaults::RfSetup);
 		WriteReg(WriteRegCmd | SetupRetryReg, Defaults::RetrySetrup);
+		WriteReg(WriteRegCmd | RxDataLength0, 32);
 		
 	}
 
@@ -336,7 +335,7 @@ public:
 	
 	static uint8_t RecivedDataLength()
 	{
-		return ReadReg(RxDataLength);
+		return ReadReg(ReadRxDataLenghtCmd);
 	}
 	
 	static uint8_t DataLength(uint8_t pipe)
@@ -348,15 +347,27 @@ public:
 	{
 		return (ReadReg(ReadRegCmd | StatusReg) >> RxPipeNumberShift) & RxPipeNumberMask;
 	}
+
+	static uint8_t Status()
+	{
+		return ReadReg(ReadRegCmd | StatusReg);
+	}
+
+	static void ClearInterruptStatus()
+	{
+		WriteReg(WriteRegCmd | StatusReg, Status());
+	}
 	
 	static bool Write(const void * buffer, uint8_t size)
 	{
 		SwitchToTxMode(); 
 
 		uint8_t fifoStatus =ReadReg(ReadRegCmd | FifoStatusReg);
-		if(fifoStatus & FifoTxFull)
-		{
-			WriteBuffer(WriteTxDataCmd, buffer, size);
+		if(!(fifoStatus & FifoTxFull))
+		{	
+			MyFormater debug;
+			debug << "Write " << size << " bytes\r\n";
+			WriteBuffer(WriteTxDataCmd, (uint8_t*)buffer, size);
 		}
 	}
 	
@@ -365,9 +376,13 @@ public:
 	{
 		uint8_t length = RecivedDataLength();
 		uint8_t pipe = ActiveRxPipe();
-		if(_status & RxDataReady)
+		MyFormater debug;
+		
+		if(Status() & RxDataReady)
 		{
-			ReadBuffer(ReadRxDataCmd, buffer, length);
+			debug << "Recived " << length << " bytes at pipe" << pipe << "\r\n";
+			ReadBuffer(ReadRxDataCmd, (uint8_t*)buffer, length);
+			WriteReg(WriteRegCmd | StatusReg, Status());
 		}
 		else
 		{
@@ -424,8 +439,5 @@ public:
 		formater << "\r\n";
 		SwitchBank(0);
 	}
-
 };
 
-template<class Spi, class SlaveSelectPin, class EnablePin, class IrqPin, class Defaults>
-uint8_t Rfm70<Spi, SlaveSelectPin, EnablePin, IrqPin, Defaults>::_status;
