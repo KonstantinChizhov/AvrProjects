@@ -6,6 +6,13 @@
 static const bool IsLSBitFirst = true;
 static const bool IsLSByteFirst = true;
 
+static inline void delay(unsigned count)
+{
+  volatile unsigned i = count;
+  do{
+  }while(--i);
+}
+
 enum Command
 {
 	ReadRegCmd        	= 0x00,
@@ -256,11 +263,13 @@ public:
 		EnablePin::Set();
 		SlaveSelectPin::SetDirWrite();
 		EnablePin::SetDirWrite();
+                IrqPin::SetDirRead();
+                IrqPin::Clear();
 		//_delay_ms(50);
-
+                delay(50*1000u);
 		Activate();
 
-	//	InitBank1Regs();
+		InitBank1Regs();
 		
 		SwitchBank(0);
 
@@ -386,7 +395,8 @@ public:
 		}
 		return pipe;
 	}
-		
+        
+        		
 	template<class Formater>
 	static void DumpRegs()
 	{
