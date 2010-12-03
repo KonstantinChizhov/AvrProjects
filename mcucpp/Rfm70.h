@@ -2,7 +2,6 @@
 
 #include <iopins.h>
 #include <static_assert.h>
-#include <util/delay.h>
 
 static const bool IsLSBitFirst = true;
 static const bool IsLSByteFirst = true;
@@ -257,7 +256,7 @@ public:
 		EnablePin::Set();
 		SlaveSelectPin::SetDirWrite();
 		EnablePin::SetDirWrite();
-		_delay_ms(50);
+		//_delay_ms(50);
 
 		Activate();
 
@@ -272,7 +271,6 @@ public:
 		RfSetup(Defaults::RfSetup);
 		WriteReg(WriteRegCmd | SetupRetryReg, Defaults::RetrySetrup);
 		WriteReg(WriteRegCmd | RxDataLength0, 32);
-		
 	}
 
 	static void PowerUp()
@@ -365,10 +363,10 @@ public:
 		uint8_t fifoStatus =ReadReg(ReadRegCmd | FifoStatusReg);
 		if(!(fifoStatus & FifoTxFull))
 		{	
-			MyFormater debug;
-			debug << "Write " << size << " bytes\r\n";
 			WriteBuffer(WriteTxDataCmd, (uint8_t*)buffer, size);
+			return true;
 		}
+		return false;
 	}
 	
 	/// Reads recived data payload.
@@ -376,11 +374,9 @@ public:
 	{
 		uint8_t length = RecivedDataLength();
 		uint8_t pipe = ActiveRxPipe();
-		MyFormater debug;
-		
+
 		if(Status() & RxDataReady)
 		{
-			debug << "Recived " << length << " bytes at pipe" << pipe << "\r\n";
 			ReadBuffer(ReadRxDataCmd, (uint8_t*)buffer, length);
 			WriteReg(WriteRegCmd | StatusReg, Status());
 		}

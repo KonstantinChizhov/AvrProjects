@@ -1,5 +1,5 @@
 #include <avr/io.h>
-#include "Spi.h"
+#include <spi.h>
 
 #include <TextFormater.h>
 #include <usart.h>
@@ -11,9 +11,9 @@ typedef WaitAdapter<Usart<16, 16> >  MyUsart;
 
 typedef TextFormater<MyUsart, 16> MyFormater;
 
-#include "Rfm70.h"
+#include <Rfm70.h>
 
-typedef Spi<> MySpi;
+typedef Spi MySpi;
 
 typedef SoftSpi<IO::Pc2, IO::Pc1, IO::Pc3> Spi2;
 
