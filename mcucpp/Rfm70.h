@@ -138,17 +138,17 @@ enum StatusValues
 
 class Rfm70Defaults
 {
-	static const AutoRetransmissionDelayValues AutoRetransmissionDelay = Wait2000us;
+	static const AutoRetransmissionDelayValues AutoRetransmissionDelay = Wait1000us;
 	static const uint8_t AutoRetransmissionCount = 15; //0..15
 public:
 	static const AddressWidthValues AddressWidth = AW5Bytes;
 
-	static const uint8_t RfChannel	= 12; // 0..83
-	static const uint8_t RfSetup 	= DataRate2Mbps | OutputPower5dBm | LnaHighGain;
+	static const uint8_t RfChannel	= 50; // 0..83
+	static const uint8_t RfSetup 	= DataRate1Mbps | OutputPower5dBm | LnaHighGain;
 	static const uint8_t Config 	= EnableCrc | Crc2bytes;
 
 public:
-	static const uint8_t RetrySetrup = Wait2000us | (AutoRetransmissionCount << 4);
+	static const uint8_t RetrySetrup = (AutoRetransmissionDelay << 4) | (AutoRetransmissionCount );
 
 };
 
