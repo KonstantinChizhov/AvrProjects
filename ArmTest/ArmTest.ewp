@@ -150,7 +150,7 @@
         </option>
         <option>
           <name>CCPreprocFile</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>CCPreprocComments</name>
@@ -158,7 +158,7 @@
         </option>
         <option>
           <name>CCPreprocLine</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>CCListCFile</name>
@@ -275,7 +275,7 @@
         </option>
         <option>
           <name>CCIncludePath2</name>
-          <state></state>
+          <state>../mcucpp</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -1131,7 +1131,7 @@
         </option>
         <option>
           <name>CCIncludePath2</name>
-          <state></state>
+          <state>../mcucpp</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -1143,7 +1143,7 @@
         </option>
         <option>
           <name>IInterwork2</name>
-          <state>1</state>
+          <state>0</state>
         </option>
         <option>
           <name>IProcessorMode2</name>
@@ -1520,7 +1520,7 @@
         </option>
         <option>
           <name>IlinkIcfFile</name>
-          <state>$TOOLKIT_DIR$\CONFIG\generic.icf</state>
+          <state>$TOOLKIT_DIR$\CONFIG\generic_cortex.icf</state>
         </option>
         <option>
           <name>IlinkIcfFileSlave</name>
@@ -1580,7 +1580,7 @@
         </option>
         <option>
           <name>IlinkProgramEntryLabel</name>
-          <state></state>
+          <state>__iar_program_start</state>
         </option>
         <option>
           <name>DoFill</name>

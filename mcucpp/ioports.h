@@ -34,7 +34,10 @@
 #include "AVR/AvrPorts.h"
 #endif
 
+#elif (((__TID__ >> 8) & 0x7F) == 0x4F) //IAR Systems for ARM
+#include "ARM/Stm32Ports.h"
 #else
+
 #warning "Not supported arch. Test mode only."
 #include "TestPort.h"
 #endif

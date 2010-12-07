@@ -9,6 +9,21 @@
 
 namespace IO
 {
+	inline unsigned Unpack32(unsigned value)
+	{
+		value = (value & 0xf0) << 12 | (value & 0x0f);
+		value = (value & 0x000C000C) << 6 | (value & 0x00030003);
+		value = (value & 0x02020202) << 3 | (value & 0x01010101);
+		return value;
+	}
+	
+	inline unsigned Pack32(unsigned value)
+	{
+		value = (value & 0x10101010) >> 3 | (value & 0x01010101);
+		value = (value & 0x03000300) >> 6 | (value & 0x00030003);
+		value = (value & 0x000f0000) >> 12 | (value & 0x0f);
+		return value;
+	}
 
 #define MAKE_PORT(CRL, CRH, IDR, ODR, BSRR, BRR, LCKR, className, ID) \
 	class className{\
@@ -25,8 +40,7 @@ namespace IO
 		}\
 		static void DirClearAndSet(DataT clearMask, DataT value)\
 		{\
-			DirClear(clearMask);\
-			DirSet(value);\
+			DirWrite(DirRead() & clearMask | value);\
 		}\
 		static DataT Read()\
 		{\
@@ -34,11 +48,13 @@ namespace IO
 		}\
 		static void DirWrite(DataT value)\
 		{\
-			\
+			CRL = Unpack32(value);\
+			CRH = Unpack32(value>>8);\
 		}\
 		static DataT DirRead()\
 		{\
-			return ;\
+			DataT tmp = Pack32(CRH) << 8;\
+			return Pack32(CRL) | tmp;\
 		}\
 		static void Set(DataT value)\
 		{\
@@ -52,13 +68,13 @@ namespace IO
 		{\
 			ODR ^= value;\
 		}\
-		static void DirSet(DataT value)\
+		inline static void DirSet(DataT value)\
 		{\
-			\
+			DirWrite(DirRead() | value);\
 		}\
 		static void DirClear(DataT value)\
 		{\
-			\
+			DirWrite(DirRead() & value);\
 		}\
 		static DataT PinRead()\
 		{\
@@ -66,7 +82,7 @@ namespace IO
 		}\
 		static void DirTogle(DataT value)\
 		{\
-			\
+			DirWrite(DirRead() ^ value);\
 		}\
 		enum{Id = ID};\
 		enum{Width=16};\
@@ -74,57 +90,50 @@ namespace IO
 
 
 #ifdef USE_PORTA
-MAKE_PORT(PORTA, Porta, 'A')
+MAKE_PORT(GPIOA_CRL, GPIOA_CRH, GPIOA_IDR, GPIOA_ODR, GPIOA_BSRR, GPIOA_BRR, GPIOA_LCKR, Porta, 'A')
 #endif
 
 
 #ifdef USE_PORTB
-MAKE_PORT(PORTB, Portb, 'B')
+MAKE_PORT(GPIOB_CRL, GPIOB_CRH, GPIOB_IDR, GPIOB_ODR, GPIOB_BSRR, GPIOB_BRR, GPIOB_LCKR, Portb, 'B')
 #endif
 
 
 #ifdef USE_PORTC
-MAKE_PORT(PORTC, Portc, 'C')
+MAKE_PORT(GPIOC_CRL, GPIOC_CRH, GPIOC_IDR, GPIOC_ODR, GPIOC_BSRR, GPIOC_BRR, GPIOC_LCKR, Portc, 'C')
 #endif
 
 
 #ifdef USE_PORTD
-MAKE_PORT(PORTD, Portd, 'D')
+MAKE_PORT(GPIOD_CRL, GPIOD_CRH, GPIOD_IDR, GPIOD_ODR, GPIOD_BSRR, GPIOD_BRR, GPIOD_LCKR, Portd, 'D')
 #endif
 
 
 #ifdef USE_PORTE
-MAKE_PORT(PORTE, Porte, 'E')
+MAKE_PORT(GPIOE_CRL, GPIOE_CRH, GPIOE_IDR, GPIOE_ODR, GPIOE_BSRR, GPIOE_BRR, GPIOE_LCKR, Porte, 'E')
 #endif
 
 
 #ifdef USE_PORTF
-MAKE_PORT(PORTF, Portf, 'F')
+MAKE_PORT(GPIOF_CRL, GPIOF_CRH, GPIOF_IDR, GPIOF_ODR, GPIOF_BSRR, GPIOF_BRR, GPIOF_LCKR, Portf, 'F')
 #endif
 
 #ifdef USE_PORTG
-MAKE_PORT(PORTG, Portg, 'G')
+MAKE_PORT(GPIOG_CRL, GPIOG_CRH, GPIOG_IDR, GPIOG_ODR, GPIOG_BSRR, GPIOG_BRR, GPIOG_LCKR, Portg, 'G')
 #endif
 
 #ifdef USE_PORTH
-MAKE_PORT(PORTH, Porth, 'H')
+MAKE_PORT(GPIOH_CRL, GPIOH_CRH, GPIOH_IDR, GPIOH_ODR, GPIOH_BSRR, GPIOH_BRR, GPIOH_LCKR, Porth, 'H')
 #endif
 
 #ifdef USE_PORTJ
-MAKE_PORT(PORTJ, Portj, 'J')
+MAKE_PORT(GPIOJ_CRL, GPIOJ_CRH, GPIOJ_IDR, GPIOJ_ODR, GPIOJ_BSRR, GPIOJ_BRR, GPIOJ_LCKR, Portj, 'J')
 #endif
 
 #ifdef USE_PORTK
-MAKE_PORT(PORTK, Portk, 'K')
+MAKE_PORT(GPIOK_CRL, GPIOK_CRH, GPIOK_IDR, GPIOK_ODR, GPIOK_BSRR, GPIOK_BRR, GPIOK_LCKR, Portk, 'K')
 #endif
 
-#ifdef USE_PORTQ
-MAKE_PORT(PORTQ, Portq, 'Q')
-#endif
-
-#ifdef USE_PORTR
-MAKE_PORT(PORTR, Portr, 'R')
-#endif
 
 }//namespace IO
 
