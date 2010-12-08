@@ -34,7 +34,7 @@
 #include "AVR/AvrPorts.h"
 #endif
 
-#elif (((__TID__ >> 8) & 0x7F) == 0x4F) //IAR Systems for ARM
+#elif defined(__ICCARM__) //IAR Systems for ARM
 #include "ARM/Stm32Ports.h"
 #else
 
@@ -46,7 +46,7 @@ namespace IO
 {
 	class NullPort
 	{
-          public:
+ 	public:
 		typedef uint8_t DataT;
 		static void Write(DataT value)
 		{	}

@@ -16,7 +16,7 @@ namespace IO
 		value = (value & 0x02020202) << 3 | (value & 0x01010101);
 		return value;
 	}
-	
+
 	inline unsigned Pack32(unsigned value)
 	{
 		value = (value & 0x10101010) >> 3 | (value & 0x01010101);
@@ -68,13 +68,19 @@ namespace IO
 		{\
 			ODR ^= value;\
 		}\
-		inline static void DirSet(DataT value)\
+		static void DirSet(DataT value)\
 		{\
-			DirWrite(DirRead() | value);\
+			unsigned tmpl = Unpack32(value);\
+			unsigned tmph = Unpack32(value >> 8);\
+			CRL |= tmpl;\
+			CRH |= tmph;\
 		}\
 		static void DirClear(DataT value)\
 		{\
-			DirWrite(DirRead() & value);\
+			unsigned tmpl = Unpack32(value);\
+			unsigned tmph = Unpack32(value >> 8);\
+			CRL &= ~tmpl;\
+			CRH &= ~tmph;\
 		}\
 		static DataT PinRead()\
 		{\
@@ -82,7 +88,10 @@ namespace IO
 		}\
 		static void DirTogle(DataT value)\
 		{\
-			DirWrite(DirRead() ^ value);\
+			unsigned tmpl = Unpack32(value);\
+			unsigned tmph = Unpack32(value >> 8);\
+			CRL ^= tmpl;\
+			CRH ^= tmph;\
 		}\
 		enum{Id = ID};\
 		enum{Width=16};\
