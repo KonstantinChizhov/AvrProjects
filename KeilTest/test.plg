@@ -1,0 +1,13 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Project:</h2>
+D:\Projects\McuProjects\KeilTest\test.uvproj
+Project File Date:  12/09/2010
+
+<h2>Output:</h2>
+Build target 'Target 1'
+linking...
+test.axf: Error: L6218E: Undefined symbol SystemInit (referred from startup_stm32f10x_md_vl.o).
+Target not created

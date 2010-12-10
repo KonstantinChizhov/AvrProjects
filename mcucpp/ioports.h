@@ -34,7 +34,7 @@
 #include "AVR/AvrPorts.h"
 #endif
 
-#elif defined(__ICCARM__) //IAR Systems for ARM
+#elif defined(__ICCARM__) || defined ( __CC_ARM   ) //IAR Systems for ARM
 #include "ARM/Stm32Ports.h"
 #else
 

@@ -4,16 +4,17 @@
 #endif
 
 #include <iopins.h>
+#include <pinlist.h>
 
 template<class Mosi, class Miso, class Clock>
 class SoftSpi
 {
+	typedef IO::PinList<Mosi, Miso, Clock> Pins;
+	
 	public:
 	static uint8_t ReadWrite(uint8_t value)
 	{
-		Miso::SetDirRead();
-		Clock::SetDirWrite();
-		Mosi::SetDirWrite();
+		Pins::DirWrite(0x05);
 		
 		for(uint8_t i = 0; i < 8;i++)
 		{
