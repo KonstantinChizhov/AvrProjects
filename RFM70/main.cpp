@@ -48,13 +48,16 @@ int main()
 	
 	Transiver2::SwitchToRxMode();
 	
-	//formater << "Rx\t";
-	//Transiver2::DumpRegs<MyFormater>();
+	formater << "Rx\t";
+	Transiver2::DumpRegs(formater);
 
+	Transiver2::SetRxAddress<0>(0x12345678, 0x90);
+	Transiver2::SetRxAddress<3>(0x90);
+	Transiver2::SetTxAddress(0x12345678, 0x90);
 
 	while(1)
 	{
-		if(Transiver2::Recive(buffer) != 0xff)
+		if(Transiver2::Recive(buffer))
 			formater << buffer;
 		_delay_ms(100);
 	}

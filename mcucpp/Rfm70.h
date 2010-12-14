@@ -3,8 +3,6 @@
 #include <iopins.h>
 #include <static_assert.h>
 
-static const bool IsLSBitFirst = true;
-static const bool IsLSByteFirst = true;
 
 static inline void delay(unsigned count)
 {
@@ -79,7 +77,7 @@ enum ConfigRegValues
 };
 
 enum{Reg15Size = 11 };
-const uint8_t Bank1_Reg15[Reg15Size]=
+static const uint8_t Bank1_Reg15[Reg15Size]=
 {
 	0x41,0x20,0x08,0x04,0x81,0x20,0xCF,0xF7,0xFE,0xFF,0xFF //LSB first
 };
@@ -93,22 +91,22 @@ enum AddressWidthValues
 
 enum AutoRetransmissionDelayValues
 {
-	 Wait250us = 0x0,
-	 Wait500us = 0x1,
-	 Wait750us = 0x2,
-	 Wait1000us = 0x3,
-	 Wait1250us = 0x4,
-	 Wait1500us = 0x5,
-	 Wait1750us = 0x6,
-	 Wait2000us = 0x7,
-	 Wait2250us = 0x8,
-	 Wait2500us = 0x9,
-	 Wait2750us = 0xA,
-	 Wait3000us = 0xB,
-	 Wait3250us = 0xC,
-	 Wait3500us = 0xD,
-	 Wait3750us = 0xE,
-	 Wait4000us = 0xF
+	 Wait250us = 0x00,
+	 Wait500us = 0x10,
+	 Wait750us = 0x20,
+	 Wait1000us = 0x30,
+	 Wait1250us = 0x40,
+	 Wait1500us = 0x50,
+	 Wait1750us = 0x60,
+	 Wait2000us = 0x70,
+	 Wait2250us = 0x80,
+	 Wait2500us = 0x90,
+	 Wait2750us = 0xA0,
+	 Wait3000us = 0xB0,
+	 Wait3250us = 0xC0,
+	 Wait3500us = 0xD0,
+	 Wait3750us = 0xE0,
+	 Wait4000us = 0xF0
 };
 
 enum RfSetupValues
@@ -148,7 +146,7 @@ public:
 	static const uint8_t Config 	= EnableCrc | Crc2bytes;
 
 public:
-	static const uint8_t RetrySetrup = (AutoRetransmissionDelay << 4) | (AutoRetransmissionCount );
+	static const uint8_t RetrySetrup = AutoRetransmissionDelay | AutoRetransmissionCount;
 
 };
 
@@ -161,21 +159,35 @@ private:
 	static void WriteReg(uint8_t reg, uint8_t value)
 	{
 		SlaveSelectPin::Clear();
-		Spi::ReadWrite(reg);
+		Spi::ReadWrite(reg | WriteRegCmd);
 		Spi::ReadWrite(value);
 		SlaveSelectPin::Set();
 	}
 
-	static uint8_t ReadReg(uint8_t reg)                            
-	{                                                           
+	static uint8_t ReadReg(uint8_t reg)
+	{ 
 		SlaveSelectPin::Clear();
-		Spi::ReadWrite(reg);
+		Spi::ReadWrite(reg | ReadRegCmd);
 		uint8_t value = Spi::ReadWrite(0);
 		SlaveSelectPin::Set();
 		return value;
 	}
 
+	static void ModifyReg(uint8_t reg, uint8_t clearMask, uint8_t setMask)
+	{
+		uint8_t value = ReadReg(reg);
+		WriteReg(reg, (value & clearMask) | setMask);
+	}
+
 	static void WriteReg32(uint8_t reg, uint32_t value)
+	{
+		SlaveSelectPin::Clear();
+		Spi::ReadWrite(reg | WriteRegCmd);
+		Write(value);
+		SlaveSelectPin::Set();
+	}
+
+	static void Write(uint32_t value)
 	{
 		union
 		{
@@ -183,22 +195,17 @@ private:
 			uint8_t byte[4];
 		};
 		dword = value;
-
-		SlaveSelectPin::Clear();
-		Spi::ReadWrite(reg);
-
+		
 		Spi::ReadWrite(byte[0]);
 		Spi::ReadWrite(byte[1]);
 		Spi::ReadWrite(byte[2]);
 		Spi::ReadWrite(byte[3]);
-		
-		SlaveSelectPin::Set();
 	}
 
 	static uint32_t ReadReg32(uint8_t reg)
-	{                                                           
+	{
 		SlaveSelectPin::Clear();
-		Spi::ReadWrite(reg);
+		Spi::ReadWrite(reg | ReadRegCmd);
 		uint32_t value = Spi::ReadWrite(0);
 		value |= Spi::ReadWrite(0) << 8;
 		value |= Spi::ReadWrite(0) << 16;
@@ -234,24 +241,51 @@ private:
 		SwitchBank(1);
 		WriteBuffer(WriteRegCmd | 15, Bank1_Reg15, Reg15Size);
 
-		WriteReg32(WriteRegCmd | 0x00, 0xE2014B40);
-		WriteReg32(WriteRegCmd | 0x01, 0x00004BC0);
-		WriteReg32(WriteRegCmd | 0x02, 0x028CFCD0);
-		WriteReg32(WriteRegCmd | 0x03, 0x41390099);
-		WriteReg32(WriteRegCmd | 0x04, 0x0B869ED9);
-		WriteReg32(WriteRegCmd | 0x05, 0xA67F0624);
-		WriteReg32(WriteRegCmd | 0x06, 0x0B869ED9);
+		WriteReg32(0x00, 0xE2014B40);
+		WriteReg32(0x01, 0x00004BC0);
+		WriteReg32(0x02, 0x028CFCD0);
+		WriteReg32(0x03, 0x41390099);
+		WriteReg32(0x04, 0x0B869ED9);
+		WriteReg32(0x05, 0xA67F0624);
+		WriteReg32(0x06, 0x0B869ED9);
 
-		WriteReg32(WriteRegCmd | 0x0c, 0x00731200);
-		WriteReg32(WriteRegCmd | 0x0d, 0x0080B436);
+		WriteReg32(0x0c, 0x00731200);
+		WriteReg32(0x0d, 0x0080B436);
 	}
 
 	static void SwitchBank(bool bank)
 	{
-		bool tmp = (ReadReg(ReadRegCmd | 7) & 0x80) != 0;
-		if(tmp != bank)		
+		bool isBank0 = (ReadReg(StatusReg) & RegBank) != 0;
+		if(bank != isBank0)		
 		{
 			WriteReg(ActivateCmd, 0x53);
+		}
+	}
+
+	static void SetAddresess(uint8_t reg, uint32_t higherBytes, uint8_t lowerByte)
+	{
+		switch(Defaults::AddressWidth)
+		{
+			case AW3Bytes:
+				SlaveSelectPin::Clear();
+				Spi::ReadWrite(reg | WriteRegCmd);
+				Spi::ReadWrite((higherBytes >> 0) & 0xff);
+				Spi::ReadWrite((higherBytes >> 8) & 0xff);
+				Spi::ReadWrite((higherBytes >> 16) & 0xff);	
+				SlaveSelectPin::Set();
+			break;
+
+			case AW4Bytes:
+				WriteReg32(reg, higherBytes);
+			break;
+
+			case AW5Bytes:
+				SlaveSelectPin::Clear();
+				Spi::ReadWrite(reg | WriteRegCmd);
+				Write(higherBytes);
+				Spi::ReadWrite(lowerByte);
+				SlaveSelectPin::Set();
+			break;
 		}
 	}
 
@@ -263,46 +297,42 @@ public:
 		EnablePin::Set();
 		SlaveSelectPin::SetDirWrite();
 		EnablePin::SetDirWrite();
-                IrqPin::SetDirRead();
-                IrqPin::Clear();
-		//_delay_ms(50);
-                delay(50*1000u);
+		IrqPin::SetDirRead();
+		IrqPin::Clear();
+		
+		delay(50*1000u);
 		Activate();
 
 		InitBank1Regs();
 		
 		SwitchBank(0);
 
-		WriteReg(WriteRegCmd | ConfigReg, Defaults::Config | PowerUpBit);
+		WriteReg(ConfigReg, Defaults::Config | PowerUpBit);
 
-		WriteReg(WriteRegCmd | SetupAdressWidthReg, Defaults::AddressWidth);
-		RfChannel(Defaults::RfChannel);
+		WriteReg(SetupAdressWidthReg, Defaults::AddressWidth);
+		SetRfChannel(Defaults::RfChannel);
 		RfSetup(Defaults::RfSetup);
-		WriteReg(WriteRegCmd | SetupRetryReg, Defaults::RetrySetrup);
-		WriteReg(WriteRegCmd | RxDataLength0, 32);
+		WriteReg(SetupRetryReg, Defaults::RetrySetrup);
+		WriteReg(RxDataLength0, 32);
 	}
 
 	static void PowerUp()
 	{
-		uint8_t config = ReadReg(ReadRegCmd | ConfigReg);
-	  	WriteReg(WriteRegCmd | ConfigReg, config | PowerUpBit); 
+		ModifyReg(ConfigReg, 0xff, PowerUpBit);
 	}
 
 	static void PowerDown()
 	{
-		uint8_t config = ReadReg(ReadRegCmd | ConfigReg);
-	  	WriteReg(WriteRegCmd | ConfigReg, config & ~PowerUpBit); 
+		ModifyReg(ConfigReg, ~PowerUpBit, 0);
 	}
 
 	static void SwitchToRxMode()
 	{
 		FlushRx();
-		uint8_t value = ReadReg(ReadRegCmd | StatusReg);
-		WriteReg(WriteRegCmd | StatusReg, value);
+		ClearInterruptStatus();
 
 		EnablePin::Clear();
-		value = ReadReg(ReadRegCmd | ConfigReg);
-	  	WriteReg(WriteRegCmd | ConfigReg, value | TxModeBit); 
+		ModifyReg(ConfigReg, 0xff, TxModeBit);
 		EnablePin::Set();
 	}
 
@@ -310,19 +340,18 @@ public:
 	{
 		FlushTx();
 		EnablePin::Clear();
-		uint8_t value = ReadReg(ConfigReg);
-	  	WriteReg(WriteRegCmd | ConfigReg, value & ~TxModeBit);
+		ModifyReg(ConfigReg, ~TxModeBit, 0);
 		EnablePin::Set();
 	}
 
-	static void RfChannel(uint8_t channel)
+	static void SetRfChannel(uint8_t channel)
 	{
-		WriteReg(WriteRegCmd | RfChannelReg, channel);
+		WriteReg(RfChannelReg, channel);
 	}
 
 	static void RfSetup(uint8_t rfSetup)
 	{
-		WriteReg(WriteRegCmd | RfSetupReg, rfSetup);
+		WriteReg(RfSetupReg, rfSetup);
 	}
 	
 	static void FlushTx()
@@ -347,29 +376,50 @@ public:
 	
 	static uint8_t DataLength(uint8_t pipe)
 	{
-		return ReadReg(ReadRegCmd | (RxDataLength0 + pipe & 0x1f));
+		return ReadReg(RxDataLength0 + pipe & 0x1f);
 	}
 	
 	static uint8_t ActiveRxPipe()
 	{
-		return (ReadReg(ReadRegCmd | StatusReg) >> RxPipeNumberShift) & RxPipeNumberMask;
+		return (ReadReg(StatusReg) >> RxPipeNumberShift) & RxPipeNumberMask;
 	}
 
 	static uint8_t Status()
 	{
-		return ReadReg(ReadRegCmd | StatusReg);
+		return ReadReg(StatusReg);
 	}
 
 	static void ClearInterruptStatus()
 	{
-		WriteReg(WriteRegCmd | StatusReg, Status());
+		ModifyReg(StatusReg, 0xff, 0);
 	}
 	
+	// Address for pipes 2-5
+	template<int pipeNumber>
+	static void SetRxAddress(uint8_t lowerByte)
+	{
+		BOOST_STATIC_ASSERT(pipeNumber > 1 && pipeNumber < 6);
+		WriteReg(RxAddress0 + pipeNumber, lowerByte);
+	}
+
+	// Address for pipes 0-1
+	template<int pipeNumber>
+	static void SetRxAddress(uint32_t higherBytes, uint8_t lowerByte)
+	{
+		BOOST_STATIC_ASSERT(pipeNumber >= 0 && pipeNumber < 2);
+		SetAddresess(RxAddress0 + pipeNumber, higherBytes, lowerByte);
+	}
+
+	static void SetTxAddress(uint32_t higherBytes, uint8_t lowerByte)
+	{
+		SetAddresess(TxAddress, higherBytes, lowerByte);
+	}
+
 	static bool Write(const void * buffer, uint8_t size)
 	{
 		SwitchToTxMode(); 
 
-		uint8_t fifoStatus =ReadReg(ReadRegCmd | FifoStatusReg);
+		uint8_t fifoStatus = ReadReg(FifoStatusReg);
 		if(!(fifoStatus & FifoTxFull))
 		{	
 			WriteBuffer(WriteTxDataCmd, (uint8_t*)buffer, size);
@@ -379,30 +429,25 @@ public:
 	}
 	
 	/// Reads recived data payload.
-	static uint8_t Recive(void * buffer)
+	static bool Recive(void * buffer)
 	{
 		uint8_t length = RecivedDataLength();
-		uint8_t pipe = ActiveRxPipe();
 
 		if(Status() & RxDataReady)
 		{
 			ReadBuffer(ReadRxDataCmd, (uint8_t*)buffer, length);
-			WriteReg(WriteRegCmd | StatusReg, Status());
+			ClearInterruptStatus();
+			return true;
 		}
-		else
-		{
-			return 0xff;
-		}
-		return pipe;
+		return false;
 	}
         
-        		
-	template<class Formater>
-	static void DumpRegs()
+//debug routins
+	template<class Debug>
+	static void DumpRegs(Debug &debug)
 	{
-		Formater formater;
 		SwitchBank(0);
-		formater << "Bank0:\r\n";
+		debug << "Bank0:\r\n";
 
 		uint8_t buffer[12];
 	
@@ -411,38 +456,37 @@ public:
 			if(i==0x0A || i==0x0B || i==0x10)
 			{
 				ReadBuffer(ReadRegCmd | i, buffer, 5);
-				formater << i << ":\t0x";
+				debug << i << ":\t0x";
 				for(unsigned i = 5; i; i--)
-					formater  << buffer[i-1];
-				formater << "\r\n";
+					debug  << buffer[i-1];
+				debug << "\r\n";
 			}
 			else
 			{
-				unsigned val = ReadReg(ReadRegCmd | i);
-				formater << i << ":\t" << val << "\r\n";
+				unsigned val = ReadReg(i);
+				debug << i << ":\t" << val << "\r\n";
 			}
 		}
 	}
 
-	template<class Formater>
-	static void DumpRegs1()
+	template<class Debug>
+	static void DumpRegs1(Debug &debug)
 	{
-		Formater formater;
 		SwitchBank(1);
-		formater << "Bank1:\r\n";
+		debug << "Bank1:\r\n";
 
 		for(unsigned i = 0; i<14; i++)
 		{
 			unsigned long val;
 			ReadBuffer(ReadRegCmd | i, (uint8_t*)(&val), 4);
-			formater << "0x" << i << ":\t0x" << val << "\r\n";
+			debug << "0x" << i << ":\t0x" << val << "\r\n";
 		}
 		uint8_t buffer[12];
 		ReadBuffer(ReadRegCmd | 14, buffer, 11);
-		formater << "0xe:\t0x";
+		debug << "0xe:\t0x";
 		for(unsigned i = 11; i; i--)
-			formater  << buffer[i-1];
-		formater << "\r\n";
+			debug  << buffer[i-1];
+		debug << "\r\n";
 		SwitchBank(0);
 	}
 };
