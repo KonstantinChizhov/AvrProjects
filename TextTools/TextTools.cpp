@@ -2,42 +2,65 @@
 #include <avr/pgmspace.h>
 
 
-template<class T>
-class ProgmemPointer
+template<class T, class PtrType = T*>
+class ProgmemPtr
 {
+	typedef ProgmemPtr Self;
 public:
-	ProgmemPointer(T *address)
-		:_address((size_t)address)
+	ProgmemPtr(T *address)
+		:_address(address)
 	{
 	}
 
-	ProgmemPointer& operator ++()
+	Self& operator ++()
 	{
 		_address++;
 		return *this;
 	}
 
-	ProgmemPointer& operator ++(int)
+	Self& operator ++(int)
 	{
-		ProgmemPointer tmp = *this;
+		Self tmp = *this;
 		_address++;
 		return tmp;
 	}
 
-	ProgmemPointer& operator --()
+	Self& operator --()
 	{
 		_address--;
 		return *this;
 	}
 
-	ProgmemPointer& operator --(int)
+	Self& operator --(int)
 	{
-		ProgmemPointer tmp = *this;
+		Self tmp = *this;
 		_address--;
 		return tmp;
 	}
 
-	inline T operator *()
+	Self& operator +=(int value)
+	{
+		_address += value;
+		return *this;
+	}
+
+	Self& operator -=(int value)
+	{
+		_address += value;
+		return *this;
+	}
+
+	bool operator !=(const Self &other) const
+	{
+		return _address != other._address;
+	}
+
+	bool operator ==(const Self &other) const
+	{
+		return _address == other._address;
+	}
+
+	inline const T operator *()const
 	{
 		union 
 		{
@@ -51,61 +74,29 @@ public:
 
 
 private:
-	size_t _address;
+	PtrType _address;
 };
 
-
-
-class Text
+template<class T>
+void Put(T s)
 {
-public:
-	Text(const char *text, unsigned lenght)
-	:_text(text),
-	_lenght(lenght)
-	{}
-	
-//	operator const char * ()const
-//	{return _text;}
-
-	char operator [](unsigned index) const
-	{
-		return pgm_read_byte(_text + index);
-	}
-
-	unsigned Size() const
-	{
-		return _lenght;
-	}
-
-private:
-	const char *const _text;
-	const unsigned _lenght;
-};
-
-
-void DoSomethisng(Text & text)
-{
+  	while(*s)
+		PORTA = *s++; 
 }
 
-void DoSomethisng(const char * s)
-{
-	while(*s)
-	{
-		PORTA = *s++;
-	}
-}
+#define PROG(TYPE, NAME, INITIALIZER)\
+		PROGMEM static TYPE NAME ## _storage[] = INITIALIZER; \
+		ProgmemPtr<TYPE> NAME(NAME ## _storage)
+
+
 
 int main()
 {
-	//Text text(PSTR("12345"), 5);
 
-	//DoSomethisng(PSTR("12345"));
 
-ProgmemPointer<char> ptr(PSTR("12345"));
+PROG(char, str2, "1234567789");
 
-PORTA = *++ptr;
-PORTA = *++ptr;
-PORTA = *++ptr;
-PORTA = *++ptr;
+	Put(str2);
+	
 	while(1);
 }
