@@ -1,22 +1,20 @@
 #include <ioavr.h>
 #include <pgmspace.h>
 
-__flash char str1[] = "Message 1"; 
-
+__flash char str1[] = "Hello, world"; 
 
 template<class T>
-void Put(T s)
+void Put2(const T begin, const T end)
 {
-  	while(*s)
-		PORTA = *s++; 
+  	for(T ptr = begin; ptr != end; ++ptr)
+		PORTA = *ptr;
 }
 
 int main()
 {
-  static __flash char str2[] = "Message 2"; 
-  //msg=str1; 
-  Put(str1);
-  Put(str2);
+
+  Put2(str1, str1 + 11);
+  
   //PORTA = str[0];
   return 0;
 }
