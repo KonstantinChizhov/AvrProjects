@@ -25,6 +25,25 @@ namespace IO
 		class TestPort
 		{
 			public:
+			enum PinConfiguration
+			{
+				AnalogIn = 0,
+				In = 0x00,
+				PullUpOrDownIn = 0x00,
+				Out = 0x01,
+				AltOut = 0x01,
+			};
+		
+			template<unsigned pin, PinConfiguration configuration>
+			static void SetPinConfiguration()
+			{
+				BOOST_STATIC_ASSERT(pin < Width);
+				if(configuration)
+					Dir |= 1 << pin;
+				else
+					Dir &= ~(1 << pin);
+			}
+			
 			typedef DataType DataT;
 			static void Write(DataT value)
 			{

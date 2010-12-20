@@ -47,6 +47,15 @@ namespace IO
 	class NullPort
 	{
  	public:
+		enum PinConfiguration\
+		{\
+			AnalogIn = 0,
+			In = 0x00,
+			PullUpOrDownIn = 0x00,
+			Out = 0x01,
+			AltOut = 0x01,
+		};
+			  
 		typedef uint8_t DataT;
 		static void Write(DataT value)
 		{	}
@@ -80,6 +89,13 @@ namespace IO
 		{
 			return 0;
 		}
+		
+		template<unsigned pin, PinConfiguration configuration>
+		static void SetPinConfiguration()
+		{
+			BOOST_STATIC_ASSERT(pin < Width);
+		}
+		
 		enum{Id = '-'};
 		enum{Width=sizeof(DataT)*8};
 	};

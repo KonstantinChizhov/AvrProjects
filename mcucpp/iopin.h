@@ -33,6 +33,7 @@ namespace IO
 		BOOST_STATIC_ASSERT(PIN < PORT::Width);
 	public:
 		typedef PORT Port;
+		typedef typename PORT::PinConfiguration Configuration;
 		enum{Number = PIN};
 
 		static void Set()
@@ -66,17 +67,18 @@ namespace IO
 
 		static void SetDirRead()
 		{
-			PORT::template SetPinConfiguration<PIN>(PORT::In);
+			PORT::template SetPinConfiguration<PIN, PORT::In>();
 		}
 
 		static void SetDirWrite()
 		{
-			PORT:: template SetPinConfiguration<PIN>(PORT::Out);
+			PORT:: template SetPinConfiguration<PIN, PORT::Out>();
 		}
 		
-		static void SetConfiguration(typename PORT::PinConfiguration configuration)
+		template<Configuration configuration>
+		static void SetConfiguration()
 		{
-			PORT:: template SetPinConfiguration<PIN>(configuration);
+			PORT:: template SetPinConfiguration<PIN, configuration>();
 		}
 
 		static uint8_t IsSet()

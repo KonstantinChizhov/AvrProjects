@@ -162,8 +162,8 @@ namespace IO
 			{\
 				return pinName;\
 			}\
-			template<unsigned pin>\
-			static void SetPinConfiguration(PinConfiguration configuration)\
+			template<unsigned pin, PinConfiguration configuration>\
+			static void SetPinConfiguration()\
 			{\
 				BOOST_STATIC_ASSERT(pin < Width);\
 				if(configuration)\

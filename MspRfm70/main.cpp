@@ -21,6 +21,7 @@ int main( void )
 
   Transiver1::SwitchToTxMode();
 
+  DebugPin::SetConfiguration<DebugPin::Port::PullUpOrDownIn>();
   
   while(1)
   {
