@@ -26,7 +26,7 @@ namespace IO
 		value = (value & 0xf0) << 12 | (value & 0x0f);
 		value = (value & 0x000C000C) << 6 | (value & 0x00030003);
 		value = (value & 0x02020202) << 3 | (value & 0x01010101);
-		return value | value << 1;// | ~value << 2;
+		return value | value << 1 | (~value & 0x11111111) << 2;
 	}
 	
 	inline unsigned Pack32(unsigned value)
