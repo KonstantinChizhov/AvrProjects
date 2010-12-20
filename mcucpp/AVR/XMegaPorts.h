@@ -101,6 +101,14 @@ namespace IO
 	public:\
 		typedef uint8_t DataT;\
 	public:\
+		enum PinConfiguration\
+		{/*TODO: Implement other configurations*/\
+			AnalogIn = 0,\
+			In = 0x00,\
+			PullUpOrDownIn = 0x00,\
+			Out = 0x01,\
+			AltOut = 0x01,\
+		};\
 		static void Write(DataT value)\
 		{\
 			portName.OUT = value;\
@@ -135,7 +143,7 @@ namespace IO
 		{\
 			portName.OUTCLR = value;\
 		}\
-		static void Togle(DataT value)\
+		static void Toggle(DataT value)\
 		{\
 			portName.OUTTGL = value;\
 		}\
@@ -151,9 +159,18 @@ namespace IO
 		{\
 			return portName.IN;\
 		}\
-		static void DirTogle(DataT value)\
+		static void DirToggle(DataT value)\
 		{\
 			portName.DIRTGL = value;\
+		}\
+		template<unsigned pin>\
+		static void SetPinConfiguration(PinConfiguration configuration)\
+		{/*TODO: Implement other configurations*/\
+			BOOST_STATIC_ASSERT(pin < Width);\
+			if(configuration)\
+				DirSet(1 << pin);\
+			else\
+				DirClear(1 << pin);\
 		}\
 		enum{Id = ID};\
 		enum{Width=8};\
@@ -219,6 +236,14 @@ MAKE_PORT(PORTR, Portr, 'R')
 	public:\
 		typedef uint8_t DataT;\
 	public:\
+		enum PinConfiguration\
+		{\
+			AnalogIn = 0,\
+			In = 0x00,\
+			PullUpOrDownIn = 0x00,\
+			Out = 0x01,\
+			AltOut = 0x01,\
+		};\
 		static void Write(DataT value)\
 		{\
 			portName.OUT = value;\
@@ -243,7 +268,7 @@ MAKE_PORT(PORTR, Portr, 'R')
 		{\
 			portName.OUT &= ~value;\
 		}\
-		static void Togle(DataT value)\
+		static void Toggle(DataT value)\
 		{\
 			portName.OUT ^= value;\
 		}\
@@ -259,7 +284,7 @@ MAKE_PORT(PORTR, Portr, 'R')
 		{\
 			return portName.IN;\
 		}\
-		static void DirTogle(DataT value)\
+		static void DirToggle(DataT value)\
 		{\
 			portName.DIR ^= value;\
 		}\

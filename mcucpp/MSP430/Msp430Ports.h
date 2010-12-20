@@ -80,7 +80,16 @@ namespace IO
 		class className{\
 		public:\
 			typedef uint8_t DataT;\
+			enum{DirBit = 1, AltSelBit = 2, ResEnBit = 4};\
 		public:\
+			enum PinConfiguration\
+			{\
+				AnalogIn = 0,\
+				In = 0,\
+				PullUpOrDownIn = ResEnBit,\
+				Out = DirBit,\
+				AltOut = DirBit | AltSelBit,\
+			};\
 			static void Write(DataT value)\
 			{\
 				portName = value;\
@@ -115,7 +124,7 @@ namespace IO
 			{\
 				portName &= ~value;\
 			}\
-			static void Togle(DataT value)\
+			static void Toggle(DataT value)\
 			{\
 				portName ^= value;\
 			}\
@@ -127,13 +136,30 @@ namespace IO
 			{\
 				dirName &= ~value;\
 			}\
-			static void DirTogle(DataT value)\
+			static void DirToggle(DataT value)\
 			{\
 				dirName ^= value;\
 			}\
 			static DataT PinRead()\
 			{\
 				return pinName;\
+			}\
+			template<unsigned pin>\
+			static void SetPinConfiguration(PinConfiguration configuration)\
+			{\
+				BOOST_STATIC_ASSERT(pin < Width);\
+				if(configuration & DirBit)\
+					DirSet(1 << pin);\
+				else\
+					DirClear(1 << pin);\
+				if(configuration & AltSelBit)\
+					selectName |= (1 << pin);\
+				else\
+					selectName &= ~(1 << pin);\
+				if(configuration & ResEnBit)\
+					resistorEnable |= (1 << pin);\
+				else\
+					resistorEnable &= ~(1 << pin);\
 			}\
 			enum{Id = ID};\
 			enum{Width=sizeof(DataT)*8};\

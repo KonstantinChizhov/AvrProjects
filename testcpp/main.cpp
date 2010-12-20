@@ -34,15 +34,29 @@ int8_t mylog2 (uint32_t val) {
 }
 */
 
+//__attribute((noinline))
+void Foo(uint8_t *v)
+{
+//	PORTA = *v;
+}
+
 int main()
 {
+
+Pa1::SetDirWrite();
+//Porta::SetPinConfiguration<1>(Porta::Out);
+
+	uint8_t c = 10;
+	Foo(&c);
+	return 0;
 	/*Pins::DirWrite(PORTC);
   Pins::Write(PORTC);
   Pins::Write(PORTC);
   Pins::Write(PORTC);
   Pins::Write(PORTC);*/
 	//PORTA = floorLog2(PORTB | PORTC << 8);
-	PORTA = ilog10(PORTB | PORTC << 8);
+//	PORTA = ilog10(PORTB | PORTC << 8);
+
 }
 
 

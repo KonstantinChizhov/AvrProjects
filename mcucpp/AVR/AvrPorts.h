@@ -102,6 +102,14 @@ namespace IO
 		public:\
 			typedef uint8_t DataT;\
 		public:\
+			enum PinConfiguration\
+			{\
+				AnalogIn = 0,\
+				In = 0x00,\
+				PullUpOrDownIn = 0x00,\
+				Out = 0x01,\
+				AltOut = 0x01,\
+			};\
 			static void Write(DataT value)\
 			{\
 				portName = value;\
@@ -134,7 +142,7 @@ namespace IO
 			{\
 				portName &= ~value;\
 			}\
-			static void Togle(DataT value)\
+			static void Toggle(DataT value)\
 			{\
 				portName ^= value;\
 			}\
@@ -146,13 +154,22 @@ namespace IO
 			{\
 				ddrName &= ~value;\
 			}\
-			static void DirTogle(DataT value)\
+			static void DirToggle(DataT value)\
 			{\
 				ddrName ^= value;\
 			}\
 			static DataT PinRead()\
 			{\
 				return pinName;\
+			}\
+			template<unsigned pin>\
+			static void SetPinConfiguration(PinConfiguration configuration)\
+			{\
+				BOOST_STATIC_ASSERT(pin < Width);\
+				if(configuration)\
+					ddrName |= 1 << pin;\
+				else\
+					ddrName &= ~(1 << pin);\
 			}\
 			enum{Id = ID};\
 			enum{Width=sizeof(DataT)*8};\

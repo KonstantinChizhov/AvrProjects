@@ -7,8 +7,12 @@
 #ifndef STM32_PORTS_H
 #define STM32_PORTS_H
 
+#include <static_assert.h>
+
 namespace IO
 {
+  	//Unpacks bit value to be written in  CRL/CRH registers
+  	//Unpack32(0xff) => 0x11111111
 	inline unsigned Unpack32(unsigned value)
 	{
 		value = (value & 0xf0) << 12 | (value & 0x0f);
@@ -16,7 +20,15 @@ namespace IO
 		value = (value & 0x02020202) << 3 | (value & 0x01010101);
 		return value;
 	}
-
+	
+	inline unsigned UnpackPinMode(unsigned value)
+	{
+		value = (value & 0xf0) << 12 | (value & 0x0f);
+		value = (value & 0x000C000C) << 6 | (value & 0x00030003);
+		value = (value & 0x02020202) << 3 | (value & 0x01010101);
+		return value | value << 1;// | ~value << 2;
+	}
+	
 	inline unsigned Pack32(unsigned value)
 	{
 		value = (value & 0x10101010) >> 3 | (value & 0x01010101);
@@ -24,23 +36,30 @@ namespace IO
 		value = (value & 0x000f0000) >> 12 | (value & 0x0f);
 		return value;
 	}
-
+	
 #define MAKE_PORT(CRL, CRH, IDR, ODR, BSRR, BRR, LCKR, className, ID) \
 	class className{\
 	public:\
 		typedef uint16_t DataT;\
 	public:\
-		static void Write(DataT value)\
+	  	enum PinConfiguration\
 		{\
-			ODR = value;\
-		}\
-		static void ClearAndSet(DataT clearMask, DataT value)\
-		{\
-			BSRR = value | (uint32_t)clearMask << 16;\
-		}\
+			AnalogIn = 0,\
+			In = 0x04,\
+			PullUpOrDownIn = 0x08,\
+			Out = 0x03,\
+			OpenDrainOut = 0x07,\
+			AltOut = 0x0B,\
+			AltOpenDrain = 0x0f\
+		};\
 		static void DirClearAndSet(DataT clearMask, DataT value)\
 		{\
-			DirWrite(DirRead() & clearMask | value);\
+			unsigned tmpl = UnpackPinMode(value);\
+			unsigned tmph = UnpackPinMode(value >> 8);\
+			unsigned tmpMaskl = UnpackPinMode(clearMask);\
+			unsigned tmpMaskh = UnpackPinMode(clearMask >> 8);\
+			CRL = (CRL & ~tmpMaskl) | tmpl;\
+			CRH = (CRH & ~tmpMaskh) | tmph;\
 		}\
 		static DataT Read()\
 		{\
@@ -48,13 +67,44 @@ namespace IO
 		}\
 		static void DirWrite(DataT value)\
 		{\
-			CRL = Unpack32(value);\
-			CRH = Unpack32(value>>8);\
+		  	unsigned tmpl = UnpackPinMode(value);\
+			unsigned tmph = UnpackPinMode(value >> 8);\
+			CRL = tmpl;\
+			CRH = tmph;\
+		}\
+		static void DirSet(DataT value)\
+		{\
+			unsigned tmpl = UnpackPinMode(value);\
+			unsigned tmph = UnpackPinMode(value >> 8);\
+			CRL |= tmpl;\
+			CRH |= tmph;\
+		}\
+		static void DirClear(DataT value)\
+		{\
+			unsigned tmpl = UnpackPinMode(value);\
+			unsigned tmph = UnpackPinMode(value >> 8);\
+			CRL &= ~tmpl;\
+			CRH &= ~tmph;\
+		}\
+		 static void DirTogle(DataT value)\
+		{\
+			unsigned tmpl = UnpackPinMode(value);\
+			unsigned tmph = UnpackPinMode(value >> 8);\
+			CRL ^= tmpl;\
+			CRH ^= tmph;\
 		}\
 		static DataT DirRead()\
 		{\
 			DataT tmp = Pack32(CRH) << 8;\
 			return Pack32(CRL) | tmp;\
+		}\
+		static void Write(DataT value)\
+		{\
+			ODR = value;\
+		}\
+		static void ClearAndSet(DataT clearMask, DataT value)\
+		{\
+			BSRR = value | (uint32_t)clearMask << 16;\
 		}\
 		static void Set(DataT value)\
 		{\
@@ -68,30 +118,22 @@ namespace IO
 		{\
 			ODR ^= value;\
 		}\
-		static void DirSet(DataT value)\
-		{\
-			unsigned tmpl = Unpack32(value);\
-			unsigned tmph = Unpack32(value >> 8);\
-			CRL |= tmpl;\
-			CRH |= tmph;\
-		}\
-		static void DirClear(DataT value)\
-		{\
-			unsigned tmpl = Unpack32(value);\
-			unsigned tmph = Unpack32(value >> 8);\
-			CRL &= ~tmpl;\
-			CRH &= ~tmph;\
-		}\
 		static DataT PinRead()\
 		{\
 			return IDR;\
 		}\
-		static void DirTogle(DataT value)\
+		template<unsigned pin>\
+		static void SetPinConfiguration(PinConfiguration configuration)\
 		{\
-			unsigned tmpl = Unpack32(value);\
-			unsigned tmph = Unpack32(value >> 8);\
-			CRL ^= tmpl;\
-			CRH ^= tmph;\
+			BOOST_STATIC_ASSERT(pin < Width);\
+			if(pin < 8)\
+			{\
+				CRL = (CRL & ~(0x0fu << pin*4)) | (unsigned)configuration << pin*4;\
+			}\
+			else\
+			{\
+				CRH = (CRH & ~(0x0fu << (pin-8)*4)) | (unsigned)configuration << (pin-8)*4;\
+			}\
 		}\
 		enum{Id = ID};\
 		enum{Width=16};\

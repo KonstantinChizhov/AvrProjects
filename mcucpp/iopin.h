@@ -59,19 +59,24 @@ namespace IO
 			PORT::Clear(1 << PIN);
 		}
 
-		static void Togle()
+		static void Toggle()
 		{
-			PORT::Togle(1 << PIN);
+			PORT::Toggle(1 << PIN);
 		}
 
 		static void SetDirRead()
 		{
-			PORT::DirClear(1 << PIN);
+			PORT::template SetPinConfiguration<PIN>(PORT::In);
 		}
 
 		static void SetDirWrite()
 		{
-			PORT::DirSet(1 << PIN);
+			PORT:: template SetPinConfiguration<PIN>(PORT::Out);
+		}
+		
+		static void SetConfiguration(typename PORT::PinConfiguration configuration)
+		{
+			PORT:: template SetPinConfiguration<PIN>(configuration);
 		}
 
 		static uint8_t IsSet()
