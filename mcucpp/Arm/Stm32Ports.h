@@ -13,30 +13,58 @@ namespace IO
 {
   	//Unpacks bit value to be written in  CRL/CRH registers
   	//Unpack32(0xff) => 0x11111111
-	inline unsigned Unpack32(unsigned value)
+static inline unsigned Unpack32(unsigned value)
 	{
 		value = (value & 0xf0) << 12 | (value & 0x0f);
 		value = (value & 0x000C000C) << 6 | (value & 0x00030003);
 		value = (value & 0x02020202) << 3 | (value & 0x01010101);
 		return value;
 	}
-	
-	inline unsigned UnpackPinMode(unsigned value)
+
+static inline unsigned UnpackPinMode(unsigned value)
 	{
 		value = (value & 0xf0) << 12 | (value & 0x0f);
 		value = (value & 0x000C000C) << 6 | (value & 0x00030003);
 		value = (value & 0x02020202) << 3 | (value & 0x01010101);
 		return value | value << 1 | (~value & 0x11111111) << 2;
 	}
-	
-	inline unsigned Pack32(unsigned value)
+
+
+	static inline unsigned UnpackConfig(unsigned mask, unsigned value, unsigned configuration)
+	{
+		mask = (mask & 0xf0) << 12 | (mask & 0x0f);
+		mask = (mask & 0x000C000C) << 6 | (mask & 0x00030003);
+		mask = (mask & 0x02020202) << 3 | (mask & 0x01010101);
+		unsigned clearMask = mask | mask << 1 | mask << 2 | mask << 3;
+		value &= clearMask;
+		if(configuration & 1)
+		  value |= mask;
+		if(configuration & 2)
+		  value |= mask << 1;
+		if(configuration & 4)
+		  value |= mask << 2;
+		if(configuration & 8)
+		  value |= mask << 3;
+		return value;
+	}
+
+	template<unsigned value>
+	struct  UnpackPinModeT
+	{
+		static const unsigned value2 = (value & 0xf0) << 12 | (value & 0x0f);
+		static const unsigned value3 = (value2 & 0x000C000C) << 6 | (value2 & 0x00030003);
+		static const unsigned value4 = (value3 & 0x02020202) << 3 | (value3 & 0x01010101);
+		static const unsigned  result = value4 | value4 << 1 | (~value4 & 0x11111111) << 2;
+	};
+
+	static inline unsigned Pack32(unsigned value)
 	{
 		value = (value & 0x10101010) >> 3 | (value & 0x01010101);
 		value = (value & 0x03000300) >> 6 | (value & 0x00030003);
 		value = (value & 0x000f0000) >> 12 | (value & 0x0f);
 		return value;
 	}
-	
+
 #define MAKE_PORT(CRL, CRH, IDR, ODR, BSRR, BRR, LCKR, className, ID) \
 	class className{\
 	public:\
@@ -52,7 +80,7 @@ namespace IO
 			AltOut = 0x0B,\
 			AltOpenDrain = 0x0f\
 		};\
-		static void DirClearAndSet(DataT clearMask, DataT value)\
+ static void DirClearAndSet(DataT clearMask, DataT value)\
 		{\
 			unsigned tmpl = UnpackPinMode(value);\
 			unsigned tmph = UnpackPinMode(value >> 8);\
@@ -86,7 +114,7 @@ namespace IO
 			CRL &= ~tmpl;\
 			CRH &= ~tmph;\
 		}\
-		 static void DirTogle(DataT value)\
+		 static void DirToggle(DataT value)\
 		{\
 			unsigned tmpl = UnpackPinMode(value);\
 			unsigned tmph = UnpackPinMode(value >> 8);\
@@ -114,7 +142,7 @@ namespace IO
 		{\
 			BSRR = (uint32_t)value << 16;\
 		}\
-		static void Togle(DataT value)\
+		static void Toggle(DataT value)\
 		{\
 			ODR ^= value;\
 		}\
@@ -134,6 +162,24 @@ namespace IO
 			{\
 				CRH = (CRH & ~(0x0fu << (pin-8)*4)) | (unsigned)configuration << (pin-8)*4;\
 			}\
+		}\
+		static void SetConfiguration(DataT mask, PinConfiguration configuration)\
+		{\
+			for(unsigned i=0; i!=8; ++i)\
+			{\
+				if(mask & (1 << i))\
+				  CRL = (CRL & ~(0x0fu << i*4)) | (unsigned)configuration << i*4;\
+			}\
+			for(unsigned i=0; i!=8; ++i)\
+			{\
+				if(mask & (1 << i+8))\
+				  CRH = (CRH & ~(0x0fu << i*4)) | (unsigned)configuration << i*4;\
+			}\
+		}\
+		static void SetConfiguration2(DataT mask, PinConfiguration configuration)\
+		{\
+			CRL = UnpackConfig(mask, CRL, configuration);\
+			CRH = UnpackConfig(mask>>8, CRH, configuration);\
 		}\
 		enum{Id = ID};\
 		enum{Width=16};\
@@ -182,7 +228,7 @@ MAKE_PORT(GPIOJ_CRL, GPIOJ_CRH, GPIOJ_IDR, GPIOJ_ODR, GPIOJ_BSRR, GPIOJ_BRR, GPI
 MAKE_PORT(GPIOK_CRL, GPIOK_CRH, GPIOK_IDR, GPIOK_ODR, GPIOK_BSRR, GPIOK_BRR, GPIOK_LCKR, Portk, 'K')
 #endif
 //==================================================================================================
-#elif defined(__CC_ARM)
+#elif defined(__CC_ARM) || defined (__arm__)
 
 #ifdef USE_PORTA
 MAKE_PORT(GPIOA->CRL, GPIOA->CRH, GPIOA->IDR, GPIOA->ODR, GPIOA->BSRR, GPIOA->BRR, GPIOA->LCKR, Porta, 'A')

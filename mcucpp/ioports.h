@@ -34,7 +34,7 @@
 #include "AVR/AvrPorts.h"
 #endif
 
-#elif defined(__ICCARM__) || defined ( __CC_ARM   ) //IAR Systems for ARM
+#elif defined(__ICCARM__) || defined ( __CC_ARM   ) || defined(__arm__)
 #include "ARM/Stm32Ports.h"
 #else
 
@@ -55,7 +55,7 @@ namespace IO
 			Out = 0x01,
 			AltOut = 0x01,
 		};
-			  
+
 		typedef uint8_t DataT;
 		static void Write(DataT value)
 		{	}
@@ -89,17 +89,17 @@ namespace IO
 		{
 			return 0;
 		}
-		
+
 		template<unsigned pin, PinConfiguration configuration>
 		static void SetPinConfiguration()
 		{
 			BOOST_STATIC_ASSERT(pin < Width);
 		}
-		
+
 		enum{Id = '-'};
 		enum{Width=sizeof(DataT)*8};
 	};
-	
+
 	typedef TPin<NullPort, 0> NullPin;
 }
 

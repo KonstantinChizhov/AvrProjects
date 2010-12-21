@@ -21,10 +21,10 @@ int main()
   //Portc::DirSet(0x0);
     //Portc::DirWrite(0xf);
 	 //Portc::DirWrite(0x0);
-	 Portc::DirClearAndSet(0x0ff0, 0x0ff0);
-	 Portc::DirClearAndSet(0x0ff0, 0x0000);
-	 Portc::DirClearAndSet(0x0ff0, 0x0f00);
-	 
+  //Portc::DirClearAndSet(0x0ff0, 0x0f00);
+  //Portc::SetConfiguration(0x0ff0, Portc::Out);
+	Portc::SetConfiguration2(0x0ff0, Portc::Out);
+	 Porta::SetConfiguration2(0x0ff0, Porta::Out);
   //Porta::SetPinConfiguration<1>(Porta::Out);
   led::SetDirWrite();
  
