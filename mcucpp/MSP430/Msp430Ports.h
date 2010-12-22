@@ -118,22 +118,9 @@ namespace IO
                 portName &= ~clearMask;\
 				portName |= value;\
 			}\
-			static void DirClearAndSet(DataT clearMask, DataT value)\
-			{\
-				dirName &= ~clearMask;\
-				dirName |= value;\
-			}\
 			static DataT Read()\
 			{\
 				return portName;\
-			}\
-			static void DirWrite(DataT value)\
-			{\
-				dirName = value;\
-			}\
-			static DataT DirRead()\
-			{\
-				return dirName;\
 			}\
 			static void Set(DataT value)\
 			{\
@@ -146,18 +133,6 @@ namespace IO
 			static void Toggle(DataT value)\
 			{\
 				portName ^= value;\
-			}\
-			static void DirSet(DataT value)\
-			{\
-				dirName |= value;\
-			}\
-			static void DirClear(DataT value)\
-			{\
-				dirName &= ~value;\
-			}\
-			static void DirToggle(DataT value)\
-			{\
-				dirName ^= value;\
 			}\
 			static DataT PinRead()\
 			{\

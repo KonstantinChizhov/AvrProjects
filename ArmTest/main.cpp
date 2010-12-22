@@ -25,7 +25,8 @@ typedef PinList<Pa0, Pa1, Pa3, Pc1, L1, Pc15, Pb1> Pins;
 int main()
 {
   Pins::SetConfiguration(Pins::Out);
-
+  Pins::Write(0xff);
+  
 //  Spi::ReadWrite(0xff); 
   //Portc::DirSet(0xffff);
   //Portc::DirSet(0x0);
@@ -36,9 +37,10 @@ int main()
 	Portc::SetConfiguration(0x0ff0, Portc::Out);
 	Porta::SetConfiguration(0x0ff0, Porta::Out);
 
-  //led::SetDirWrite();
- 
-  //led::Set();  
+  led::SetDirWrite();
+  led::SetConfiguration(led::Port::AltOut);
+  
+  led::Set();  
   //Pins::DirSet(0xff);
   //Pins::Write(0x1f);
  // Pins::DirClear(0xff);

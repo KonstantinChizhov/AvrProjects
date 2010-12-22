@@ -8,6 +8,7 @@
 #define STM32_PORTS_H
 
 #include <static_assert.h>
+#define USE_SPLIT_PORT_CONFIGURATION 8
 
 namespace IO
 {	
@@ -102,6 +103,34 @@ namespace IO
 			CRH = UnpackConfig(mask>>8, CRH, configuration);\
 		}\
 		enum{Id = ID};\
+	};\
+	/*Lower part of port. Need for effective configuration writing*/\
+	class className ## L :public className{\
+		public:\
+		template<unsigned pin>\
+		static void SetPinConfiguration(Configuration configuration)\
+		{\
+			BOOST_STATIC_ASSERT(pin < 8);\
+			CRL = (CRL & ~(0x0fu << pin*4)) | (unsigned)configuration << pin*4;\
+		}\
+		static void SetConfiguration(DataT mask, Configuration configuration)\
+		{\
+			CRL = UnpackConfig(mask, CRL, configuration);\
+		}\
+	};\
+	 /*Hight part of port. Need for effective configuration writing*/\
+	class className ## H :public className{\
+		public:\
+		template<unsigned pin>\
+		static void SetPinConfiguration(Configuration configuration)\
+		{\
+			BOOST_STATIC_ASSERT(pin >= 8 && pin < 16);\
+			CRH = (CRH & ~(0x0fu << (pin-8)*4)) | (unsigned)configuration << (pin-8)*4;\
+		}\
+		static void SetConfiguration(DataT mask, Configuration configuration)\
+		{\
+			CRH = UnpackConfig(mask>>8, CRH, configuration);\
+		}\
 	};
 
 //==================================================================================================
