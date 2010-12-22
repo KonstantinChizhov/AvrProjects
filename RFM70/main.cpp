@@ -30,12 +30,13 @@ ISR(USART_UDRE_vect)
 	MyUsart::TxHandler();
 	//Debug::Clear();
 }
+
+char buffer[32];
+
 __attribute__((OS_main))
 
 int main()
 {
-	char buffer[32];
-
 	Debug::SetDirWrite();
 
 	MyUsart::Init(19200);

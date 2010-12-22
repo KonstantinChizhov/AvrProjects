@@ -152,7 +152,7 @@ namespace IO
 				return pinName;\
 			}\
 			template<unsigned pin>\
-			static void SetPinConfiguration(PinConfiguration configuration)\
+			static void SetPinConfiguration(Configuration configuration)\
 			{\
 				BOOST_STATIC_ASSERT(pin < Width);\
 				if(configuration)\
@@ -163,9 +163,9 @@ namespace IO
 			static void SetConfiguration(DataT mask, Configuration configuration)\
 			{\
 				if(configuration)\
-					dirName |= mask;\
+					ddrName |= mask;\
 				else\
-					dirName &= ~mask;\
+					ddrName &= ~mask;\
 			}\
 			enum{Id = ID};\
 		};
