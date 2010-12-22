@@ -197,6 +197,24 @@ namespace IO
         public:
             typedef Typelist<Port, L1> Result;
         };
+		
+////////////////////////////////////////////////////////////////////////////////	
+		template <class TList> struct GetConfigPorts;
+
+        template <> struct GetConfigPorts<NullType>
+        {
+            typedef NullType Result;
+        };
+
+        template <class Head, class Tail>
+        struct GetConfigPorts< Typelist<Head, Tail> >
+        {
+        private:
+			typedef typename Head::Pin::ConfigPort Port;
+            typedef typename GetConfigPorts<Tail>::Result L1;
+        public:
+            typedef Typelist<Port, L1> Result;
+        };
 
 ////////////////////////////////////////////////////////////////////////////////
 // class template GetPinsWithPort
@@ -542,11 +560,15 @@ namespace IO
 		class PinListProperties
 		{
 			typedef typename IoPrivate::GetPorts<PINS>::Result PinsToPorts;
+			typedef typename IoPrivate::GetConfigPorts<PINS>::Result PinsToConfigPorts;
+			
 			enum{LengthEnum = Length<PINS>::value};
 			enum{LastBitPositionEnum = IoPrivate::GetLastBitPosition<PINS>::value};
 			typedef PINS PinTypeList;
 		public:
 			typedef typename Loki::TL::NoDuplicates<PinsToPorts>::Result Ports;
+			typedef typename Loki::TL::NoDuplicates<PinsToConfigPorts>::Result ConfigPorts;
+			
 			static const unsigned Length = LengthEnum;
 			static const unsigned LastBitPosition = LastBitPositionEnum;
 			
@@ -580,6 +602,7 @@ namespace IO
 			using typename Config::Configuration;
 			using typename Config::BasePortType;
 			using typename Config::Ports;
+			using typename Config::ConfigPorts;
 			using Config::Length;
 		  
 			template<uint8_t Num>
@@ -633,7 +656,7 @@ namespace IO
 			
 			static void SetConfiguration(Configuration config, DataType mask = DataType(-1))
 			{
-				IoPrivate::PortWriteIterator<Ports, PINS>::SetConfiguration(config, mask);
+				IoPrivate::PortWriteIterator<ConfigPorts, PINS>::SetConfiguration(config, mask);
 			}
 		};
 

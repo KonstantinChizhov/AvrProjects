@@ -27,7 +27,7 @@ int main()
   Pins::SetConfiguration(Pins::Out);
   Pins::Write(0xff);
   
-//  Spi::ReadWrite(0xff); 
+  Spi::ReadWrite(0xff); 
   //Portc::DirSet(0xffff);
   //Portc::DirSet(0x0);
     //Portc::DirWrite(0xf);

@@ -9,12 +9,13 @@
 template<class Mosi, class Miso, class Clock>
 class SoftSpi
 {
-	typedef IO::PinList<Mosi, Miso, Clock> Pins;
+	typedef IO::PinList<Mosi, Miso, Clock> OutPins;
 	
 	public:
 	static uint8_t ReadWrite(uint8_t value)
 	{
-		Pins::DirWrite(0x05);
+		OutPins::SetConfiguration(OutPins::Out, 0xff);
+		Miso::SetConfiguration(Miso::Port::In);
 		
 		for(uint8_t i = 0; i < 8;i++)
 		{

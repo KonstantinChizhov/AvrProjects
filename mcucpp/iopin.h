@@ -27,12 +27,13 @@ namespace IO
 
 	// this class represents one pin in a IO port.
 	// It is fully static.
-	template<class PORT, uint8_t PIN, class ConfigPort = PORT>
+	template<class PORT, uint8_t PIN, class CONFIG_PORT = PORT>
 	class TPin
 	{
 		BOOST_STATIC_ASSERT(PIN < PORT::Width);
 	public:
 		typedef PORT Port;
+		typedef CONFIG_PORT ConfigPort;
 		typedef typename ConfigPort::Configuration Configuration;
 		enum{Number = PIN};
 
