@@ -6,7 +6,7 @@
 
 using namespace IO;
 
-typedef PinList<Pa1, Pa2, Pa3, Pa5, Pa6, Pb2, Pb4, Pb6>  Pins;
+typedef PinList<Pa1, Pa2, Pa3, Pa6, Pa5>  Pins;
 
 /*
 int8_t floorLog2(uint32_t n) 
@@ -35,19 +35,24 @@ int8_t mylog2 (uint32_t val) {
 */
 
 //__attribute((noinline))
-void Foo(uint8_t *v)
-{
+//void Foo(uint8_t *v)
+//{
 //	PORTA = *v;
-}
+//}
+
 
 int main()
 {
 
-Pa1::SetDirWrite();
+//Pa1::SetDirWrite();
 //Porta::SetPinConfiguration<1>(Porta::Out);
 
-	uint8_t c = 10;
-	Foo(&c);
+	//uint8_t c = 10;
+	//Foo(&c);
+	//Pins::Write(PORTB);
+PORTB = Pins::PinRead();
+	//PORTA = Bar(PORTB);
+
 	return 0;
 	/*Pins::DirWrite(PORTC);
   Pins::Write(PORTC);

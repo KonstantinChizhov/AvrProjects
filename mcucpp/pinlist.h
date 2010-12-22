@@ -369,15 +369,13 @@ namespace IO
 			typedef uint8_t PortDataType;
 
 			template<class DataType>
-			static PortDataType UppendValue(DataType value)
+			static void UppendValue(DataType value, PortDataType &result)
 			{
-				return 0;
 			}
 
 			template<class DataType>
-			static inline DataType UppendReadValue(PortDataType portValue, DataType)
+			static inline void UppendReadValue(PortDataType portValue, DataType &result)
 			{
-				return 0;
 			}
 
         };
@@ -388,18 +386,17 @@ namespace IO
 			typedef typename Head::Pin::Port::DataT PortDataType;
 
 			template<class DataType>
-			static inline PortDataType UppendValue(DataType value)
+			static inline void UppendValue(DataType value, PortDataType &result)
 			{
 				if(IsSerial<Typelist<Head, Tail> >::value && Length<Typelist<Head, Tail> >::value > 1)
 				{
-					return Shifter<
+					result |= Shifter<
 							Head::Pin::Number, 	//bit position in port
 							Head::Position, 	//bit position in value
 							ValueToPort>::Shift(value) &
 						GetPortMask<Typelist<Head, Tail> >::value;
+					return;
 				}
-
-				PortDataType result=0;
 
 				if((int)Head::Position == (int)Head::Pin::Number)
 					result |= value & (1 << Head::Position);
@@ -407,11 +404,11 @@ namespace IO
 					if(value & (1 << Head::Position))
 						result |= (1 << Head::Pin::Number);
 
-				return result | PinWriteIterator<Tail>::UppendValue(value);
+				PinWriteIterator<Tail>::UppendValue(value, result);
 			}
 
 			template<class DataType>
-			static inline DataType UppendReadValue(PortDataType portValue, DataType dummy)
+			static inline void UppendReadValue(PortDataType portValue, DataType &result)
 			{
 				using namespace IoPrivate;
 				if(IsSerial<Typelist<Head, Tail> >::value && Length<Typelist<Head, Tail> >::value > 1)
@@ -421,18 +418,18 @@ namespace IO
 							Head::Position, 	//bit position in value
 							PortToValue> AtctualShifter;
 
-					return AtctualShifter::Shift(DataType(portValue)) &
+					result |= AtctualShifter::Shift(DataType(portValue)) &
 						GetValueMask<Typelist<Head, Tail> >::value;
+					return;
 				}
 
-				DataType value=0;
 				if((int)Head::Position == (int)Head::Pin::Number)
-					value |= portValue & (1 << Head::Position);
+					result |= portValue & (1 << Head::Position);
 				else
 					if(portValue & (1 << Head::Pin::Number))
-						value |= (1 << Head::Position);
+						result |= (1 << Head::Position);
 
-				return value | PinWriteIterator<Tail>::UppendReadValue(portValue, dummy);
+				PinWriteIterator<Tail>::UppendReadValue(portValue, result);
 			}
         };
 
@@ -487,7 +484,8 @@ namespace IO
 			template<class DataType>
 			static void Write(DataType value)
 			{
-				DataType result = PinWriteIterator<Pins>::UppendValue(value);
+				DataType result = 0;
+				PinWriteIterator<Pins>::UppendValue(value, result);
 				if((int)Length<Pins>::value == (int)Port::Width)// whole port
 					Port::Write(result);
 				else
@@ -501,7 +499,8 @@ namespace IO
 			template<class DataType>
 			static void Set(DataType value)
 			{
-				DataType result = PinWriteIterator<Pins>::UppendValue(value);
+				DataType result;
+				PinWriteIterator<Pins>::UppendValue(value, result);
 				Port::Set(result);
 
 				PortWriteIterator<Tail, PinList>::Set(value);
@@ -510,7 +509,8 @@ namespace IO
 			template<class DataType>
 			static void Clear(DataType value)
 			{
-				DataType result = PinWriteIterator<Pins>::UppendValue(value);
+				DataType result;
+				PinWriteIterator<Pins>::UppendValue(value, result);
 				Port::Clear(result);
 
 				PortWriteIterator<Tail, PinList>::Clear(value);
@@ -519,7 +519,8 @@ namespace IO
 			template<class Configuration, class DataType>
 			static void SetConfiguration(Configuration config, DataType mask)
 			{
-				DataType portMask = PinWriteIterator<Pins>::UppendValue(mask);
+				DataType portMask;
+				PinWriteIterator<Pins>::UppendValue(mask, portMask);
 				Port::SetConfiguration(portMask, config);
 				PortWriteIterator<Tail, PinList>::SetConfiguration(config, mask);
 			}
@@ -527,25 +528,26 @@ namespace IO
 			template<class DataType>
 			static void SetConfiguration(GpioBase::GenericConfiguration config, DataType mask)
 			{
-				DataType portMask = PinWriteIterator<Pins>::UppendValue(mask);
+				DataType portMask = 0;
+				PinWriteIterator<Pins>::UppendValue(mask, portMask);
 				Port::SetConfiguration(portMask, Port::MapConfiguration(config) );
 				PortWriteIterator<Tail, PinList>::SetConfiguration(config, mask);
 			}
 
 			template<class DataType>
-			static DataType PinRead(DataType dummy)
+			static void PinRead(DataType &value)
 			{
 				typename Port::DataT portValue = Port::PinRead();
-				DataType value = PinWriteIterator<Pins>::UppendReadValue(portValue, dummy);
-				return value | PortWriteIterator<Tail, PinList>::PinRead(dummy);
+				PinWriteIterator<Pins>::UppendReadValue(portValue, value);
+				PortWriteIterator<Tail, PinList>::PinRead(value);
 			}
 
 			template<class DataType>
-			static DataType OutRead(DataType dummy)
+			static void OutRead(DataType &value)
 			{
 				typename Port::DataT portValue = Port::Read();
-				DataType value = PinWriteIterator<Pins>::UppendReadValue(portValue, dummy);
-				return value | PortWriteIterator<Tail, PinList>::OutRead(dummy);
+				PinWriteIterator<Pins>::UppendReadValue(portValue, value);
+				PortWriteIterator<Tail, PinList>::OutRead(value);
 			}
 
         };		
@@ -636,7 +638,9 @@ namespace IO
 			static DataType Read()
 			{
 				typedef IoPrivate::PortWriteIterator<Ports, PINS> iter;
-				return iter::OutRead(DataType(0));
+				DataType result = 0;
+				iter::OutRead(result);
+				return result;
 			}
 			static void Set(DataType value)
 			{
@@ -651,7 +655,9 @@ namespace IO
 			static DataType PinRead()
 			{
 				typedef IoPrivate::PortWriteIterator<Ports, PINS> iter;
-				return iter::PinRead(DataType(0));
+				DataType result = 0;
+				iter::PinRead(result);
+				return result;
 			}
 			
 			static void SetConfiguration(Configuration config, DataType mask = DataType(-1))
