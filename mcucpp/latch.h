@@ -2,11 +2,25 @@
 #ifndef LATCH_H
 #define LATCH_H
 
+#include "gpiobase.h"
 
-//serial-in, parallel-out shift register with output latches, somthing like like 74HC595
-
+//serial-in, parallel-out shift register with output latches, somthing like 74HC595
+	class LatchBase : public IO::GpioBase
+	{
+		public:
+		enum{Out = 1};
+		//SetConfiguration is do nothing function 
+		// and accepts any configuration type
+		typedef DontCareConfiguration Configuration;
+		//enum Configuration{Out};
+		static Configuration MapConfiguration(GenericConfiguration config)
+		{
+			return Configuration();
+		}
+	};
+	
 	template<class ClockPin, class DataPin, class LatchPin, unsigned ID, class T = uint8_t>
-	class ThreePinLatch
+	class ThreePinLatch :public LatchBase
 	{
 		public:
 		
@@ -68,7 +82,19 @@
 
 		static void DirTogle(DataT value)
 		{	}
-
+		
+		template<unsigned pin, class Configuration>
+		static void SetPinConfiguration(Configuration configuration)
+		{
+			BOOST_STATIC_ASSERT(pin < Width);
+			//Nothing to do
+		}
+		
+		template<class Configuration>
+		static void SetConfiguration(DataT mask, Configuration configuration)
+		{
+			//Nothing to do
+		}
 		protected:
 		static DataT _currentValue;
 	};

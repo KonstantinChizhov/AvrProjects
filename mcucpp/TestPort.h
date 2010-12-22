@@ -25,7 +25,7 @@ namespace IO
 		class TestPort
 		{
 			public:
-			enum PinConfiguration
+			enum Configuration
 			{
 				AnalogIn = 0,
 				In = 0x00,
@@ -34,14 +34,22 @@ namespace IO
 				AltOut = 0x01,
 			};
 		
-			template<unsigned pin, PinConfiguration configuration>
-			static void SetPinConfiguration()
+			template<unsigned pin, >
+			static void SetPinConfiguration(Configuration configuration)
 			{
 				BOOST_STATIC_ASSERT(pin < Width);
 				if(configuration)
 					Dir |= 1 << pin;
 				else
 					Dir &= ~(1 << pin);
+			}
+			
+			static void SetConfiguration(DataT mask, Configuration configuration)
+			{
+				if(configuration)
+					Dir |= mask;
+				else
+					Dir &= ~mask;
 			}
 			
 			typedef DataType DataT;
@@ -54,22 +62,9 @@ namespace IO
 				Out &= ~clearMask;
 				Out |= value;
 			}
-			static void DirClearAndSet(DataT clearMask, DataT value)
-			{
-				Dir &= ~clearMask;
-				Dir |= value;
-			}
 			static DataT Read()
 			{
 				return Out;
-			}
-			static void DirWrite(DataT value)
-			{
-				Dir = value;
-			}
-			static DataT DirRead()
-			{
-				return Dir;
 			}
 			static void Set(DataT value)
 			{
@@ -82,18 +77,6 @@ namespace IO
 			static void Togle(DataT value)
 			{
 				Out ^= value;
-			}
-			static void DirSet(DataT value)
-			{
-				Dir |= value;
-			}
-			static void DirClear(DataT value)
-			{
-				Dir &= ~value;
-			}
-			static void DirTogle(DataT value)
-			{
-				Dir ^= value;
 			}
 			static DataT PinRead()
 			{

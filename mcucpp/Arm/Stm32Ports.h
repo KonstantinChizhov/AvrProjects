@@ -10,121 +10,54 @@
 #include <static_assert.h>
 
 namespace IO
-{
-  	//Unpacks bit value to be written in  CRL/CRH registers
-  	//Unpack32(0xff) => 0x11111111
-static inline unsigned Unpack32(unsigned value)
+{	
+	class NativePortBase :public GpioBase
 	{
-		value = (value & 0xf0) << 12 | (value & 0x0f);
-		value = (value & 0x000C000C) << 6 | (value & 0x00030003);
-		value = (value & 0x02020202) << 3 | (value & 0x01010101);
-		return value;
-	}
-
-static inline unsigned UnpackPinMode(unsigned value)
-	{
-		value = (value & 0xf0) << 12 | (value & 0x0f);
-		value = (value & 0x000C000C) << 6 | (value & 0x00030003);
-		value = (value & 0x02020202) << 3 | (value & 0x01010101);
-		return value | value << 1 | (~value & 0x11111111) << 2;
-	}
-
-
-	static inline unsigned UnpackConfig(unsigned mask, unsigned value, unsigned configuration)
-	{
-		mask = (mask & 0xf0) << 12 | (mask & 0x0f);
-		mask = (mask & 0x000C000C) << 6 | (mask & 0x00030003);
-		mask = (mask & 0x02020202) << 3 | (mask & 0x01010101);
-		unsigned clearMask = mask | mask << 1 | mask << 2 | mask << 3;
-		value &= clearMask;
-		if(configuration & 1)
-		  value |= mask;
-		if(configuration & 2)
-		  value |= mask << 1;
-		if(configuration & 4)
-		  value |= mask << 2;
-		if(configuration & 8)
-		  value |= mask << 3;
-		return value;
-	}
-
-	template<unsigned value>
-	struct  UnpackPinModeT
-	{
-		static const unsigned value2 = (value & 0xf0) << 12 | (value & 0x0f);
-		static const unsigned value3 = (value2 & 0x000C000C) << 6 | (value2 & 0x00030003);
-		static const unsigned value4 = (value3 & 0x02020202) << 3 | (value3 & 0x01010101);
-		static const unsigned  result = value4 | value4 << 1 | (~value4 & 0x11111111) << 2;
+	public:
+		enum{Width=16};
+		typedef uint16_t DataT;
+		enum Configuration
+		{
+			AnalogIn = 0,
+			In = 0x04,
+			PullUpOrDownIn = 0x08,
+			Out = 0x03,
+			OpenDrainOut = 0x07,
+			AltOut = 0x0B,
+			AltOpenDrain = 0x0f
+		};
+		
+		static inline unsigned UnpackConfig(unsigned mask, unsigned value, Configuration configuration)
+		{
+			mask = (mask & 0xf0) << 12 | (mask & 0x0f);
+			mask = (mask & 0x000C000C) << 6 | (mask & 0x00030003);
+			mask = (mask & 0x02020202) << 3 | (mask & 0x01010101);
+			return (value & ~(mask*0x0f)) | mask * configuration;
+		}
+		
+		static Configuration MapConfiguration(GenericConfiguration config)
+		{
+			switch(config)
+			{
+			case GpioBase::In: return In;
+			case GpioBase::AnalogIn: return AnalogIn;
+			case GpioBase::PullUpOrDownIn: return PullUpOrDownIn;
+			case GpioBase::OpenDrainOut: return OpenDrainOut;
+			case GpioBase::AltOut: return AltOut;
+			case GpioBase::AltOpenDrain: return AltOpenDrain;
+			//case GpioBase::Out: 
+			default:
+			  return Out;
+			}
+		}
 	};
 
-	static inline unsigned Pack32(unsigned value)
-	{
-		value = (value & 0x10101010) >> 3 | (value & 0x01010101);
-		value = (value & 0x03000300) >> 6 | (value & 0x00030003);
-		value = (value & 0x000f0000) >> 12 | (value & 0x0f);
-		return value;
-	}
-
 #define MAKE_PORT(CRL, CRH, IDR, ODR, BSRR, BRR, LCKR, className, ID) \
-	class className{\
+  class className :public NativePortBase{\
 	public:\
-		typedef uint16_t DataT;\
-	public:\
-	  	enum PinConfiguration\
-		{\
-			AnalogIn = 0,\
-			In = 0x04,\
-			PullUpOrDownIn = 0x08,\
-			Out = 0x03,\
-			OpenDrainOut = 0x07,\
-			AltOut = 0x0B,\
-			AltOpenDrain = 0x0f\
-		};\
- static void DirClearAndSet(DataT clearMask, DataT value)\
-		{\
-			unsigned tmpl = UnpackPinMode(value);\
-			unsigned tmph = UnpackPinMode(value >> 8);\
-			unsigned tmpMaskl = UnpackPinMode(clearMask);\
-			unsigned tmpMaskh = UnpackPinMode(clearMask >> 8);\
-			CRL = (CRL & ~tmpMaskl) | tmpl;\
-			CRH = (CRH & ~tmpMaskh) | tmph;\
-		}\
 		static DataT Read()\
 		{\
 			return ODR;\
-		}\
-		static void DirWrite(DataT value)\
-		{\
-		  	unsigned tmpl = UnpackPinMode(value);\
-			unsigned tmph = UnpackPinMode(value >> 8);\
-			CRL = tmpl;\
-			CRH = tmph;\
-		}\
-		static void DirSet(DataT value)\
-		{\
-			unsigned tmpl = UnpackPinMode(value);\
-			unsigned tmph = UnpackPinMode(value >> 8);\
-			CRL |= tmpl;\
-			CRH |= tmph;\
-		}\
-		static void DirClear(DataT value)\
-		{\
-			unsigned tmpl = UnpackPinMode(value);\
-			unsigned tmph = UnpackPinMode(value >> 8);\
-			CRL &= ~tmpl;\
-			CRH &= ~tmph;\
-		}\
-		 static void DirToggle(DataT value)\
-		{\
-			unsigned tmpl = UnpackPinMode(value);\
-			unsigned tmph = UnpackPinMode(value >> 8);\
-			CRL ^= tmpl;\
-			CRH ^= tmph;\
-		}\
-		static DataT DirRead()\
-		{\
-			DataT tmp = Pack32(CRH) << 8;\
-			return Pack32(CRL) | tmp;\
 		}\
 		static void Write(DataT value)\
 		{\
@@ -150,8 +83,8 @@ static inline unsigned UnpackPinMode(unsigned value)
 		{\
 			return IDR;\
 		}\
-		template<unsigned pin, PinConfiguration configuration>\
-		static void SetPinConfiguration()\
+		template<unsigned pin>\
+		static void SetPinConfiguration(Configuration configuration)\
 		{\
 			BOOST_STATIC_ASSERT(pin < Width);\
 			if(pin < 8)\
@@ -163,26 +96,12 @@ static inline unsigned UnpackPinMode(unsigned value)
 				CRH = (CRH & ~(0x0fu << (pin-8)*4)) | (unsigned)configuration << (pin-8)*4;\
 			}\
 		}\
-		static void SetConfiguration(DataT mask, PinConfiguration configuration)\
-		{\
-			for(unsigned i=0; i!=8; ++i)\
-			{\
-				if(mask & (1 << i))\
-				  CRL = (CRL & ~(0x0fu << i*4)) | (unsigned)configuration << i*4;\
-			}\
-			for(unsigned i=0; i!=8; ++i)\
-			{\
-				if(mask & (1 << i+8))\
-				  CRH = (CRH & ~(0x0fu << i*4)) | (unsigned)configuration << i*4;\
-			}\
-		}\
-		static void SetConfiguration2(DataT mask, PinConfiguration configuration)\
+		static void SetConfiguration(DataT mask, Configuration configuration)\
 		{\
 			CRL = UnpackConfig(mask, CRL, configuration);\
 			CRH = UnpackConfig(mask>>8, CRH, configuration);\
 		}\
 		enum{Id = ID};\
-		enum{Width=16};\
 	};
 
 //==================================================================================================

@@ -96,19 +96,35 @@
 namespace IO
 {
 
+	class NativePortBase :public GpioBase
+	{
+		public:
+			typedef uint8_t DataT;
+			enum{Width=sizeof(DataT)*8};
+		public:
+			/*TODO: Implement other configurations*/
+			enum Configuration
+			{
+				AnalogIn = 0,
+				In = 0x00,
+				PullUpOrDownIn = 0x00,
+				Out = 0x01,
+				AltOut = 0x01,
+			};
+			
+			static Configuration MapConfiguration(GenericConfiguration config)
+			{
+				if(config & GpioBase::Out)
+					return Out;
+				return In;
+			}
+	};
+
 #define MAKE_PORT(portName, className, ID) \
 	class className{\
 	public:\
 		typedef uint8_t DataT;\
 	public:\
-		enum PinConfiguration\
-		{/*TODO: Implement other configurations*/\
-			AnalogIn = 0,\
-			In = 0x00,\
-			PullUpOrDownIn = 0x00,\
-			Out = 0x01,\
-			AltOut = 0x01,\
-		};\
 		static void Write(DataT value)\
 		{\
 			portName.OUT = value;\
@@ -118,22 +134,9 @@ namespace IO
 			Clear(clearMask);\
 			Set(value);\
 		}\
-		static void DirClearAndSet(DataT clearMask, DataT value)\
-		{\
-			DirClear(clearMask);\
-			DirSet(value);\
-		}\
 		static DataT Read()\
 		{\
 			return portName.OUT;\
-		}\
-		static void DirWrite(DataT value)\
-		{\
-			portName.DIR = value;\
-		}\
-		static DataT DirRead()\
-		{\
-			return portName.DIR;\
 		}\
 		static void Set(DataT value)\
 		{\
@@ -159,18 +162,21 @@ namespace IO
 		{\
 			return portName.IN;\
 		}\
-		static void DirToggle(DataT value)\
+		template<unsigned pin>\
+		static void SetPinConfiguration(PinConfiguration configuration)\
 		{\
-			portName.DIRTGL = value;\
-		}\
-		template<unsigned pin, PinConfiguration configuration>\
-		static void SetPinConfiguration()\
-		{/*TODO: Implement other configurations*/\
 			BOOST_STATIC_ASSERT(pin < Width);\
 			if(configuration)\
-				DirSet(1 << pin);\
+				portName.DIRSET = 1 << pin;\
 			else\
-				DirClear(1 << pin);\
+				portName.DIRCLR = 1 << pin;\
+		}\
+		static void SetConfiguration(DataT mask, Configuration configuration)\
+		{\
+			if(configuration)\
+				portName.DIRSET = mask;\
+			else\
+				portName.DIRCLR = mask;\
 		}\
 		enum{Id = ID};\
 		enum{Width=8};\

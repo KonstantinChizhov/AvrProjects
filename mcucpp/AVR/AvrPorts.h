@@ -95,21 +95,34 @@
 namespace IO
 {
 
+	class NativePortBase :public GpioBase
+	{
+		public:
+			typedef uint8_t DataT;
+			enum{Width=sizeof(DataT)*8};
+		public:
+			enum Configuration
+			{
+				AnalogIn = 0,
+				In = 0x00,
+				PullUpOrDownIn = 0x00,
+				Out = 0x01,
+				AltOut = 0x01,
+			};
+			
+			static Configuration MapConfiguration(GenericConfiguration config)
+			{
+				if(config & GpioBase::Out)
+					return Out;
+				return In;
+			}
+	};
+	
 	//Port definitions for AtTiny, AtMega families.
 
 	#define MAKE_PORT(portName, ddrName, pinName, className, ID) \
-		class className{\
+		class className :public NativePortBase{\
 		public:\
-			typedef uint8_t DataT;\
-		public:\
-			enum PinConfiguration\
-			{\
-				AnalogIn = 0,\
-				In = 0x00,\
-				PullUpOrDownIn = 0x00,\
-				Out = 0x01,\
-				AltOut = 0x01,\
-			};\
 			static void Write(DataT value)\
 			{\
 				portName = value;\
@@ -118,21 +131,9 @@ namespace IO
 			{\
 				portName = (portName & ~clearMask) | value;\
 			}\
-			static void DirClearAndSet(DataT clearMask, DataT value)\
-			{\
-				ddrName = (ddrName & ~clearMask) | value;\
-			}\
 			static DataT Read()\
 			{\
 				return portName;\
-			}\
-			static void DirWrite(DataT value)\
-			{\
-				ddrName = value;\
-			}\
-			static DataT DirRead()\
-			{\
-				return ddrName;\
 			}\
 			static void Set(DataT value)\
 			{\
@@ -146,24 +147,12 @@ namespace IO
 			{\
 				portName ^= value;\
 			}\
-			static void DirSet(DataT value)\
-			{\
-				ddrName |= value;\
-			}\
-			static void DirClear(DataT value)\
-			{\
-				ddrName &= ~value;\
-			}\
-			static void DirToggle(DataT value)\
-			{\
-				ddrName ^= value;\
-			}\
 			static DataT PinRead()\
 			{\
 				return pinName;\
 			}\
-			template<unsigned pin, PinConfiguration configuration>\
-			static void SetPinConfiguration()\
+			template<unsigned pin>\
+			static void SetPinConfiguration(PinConfiguration configuration)\
 			{\
 				BOOST_STATIC_ASSERT(pin < Width);\
 				if(configuration)\
@@ -171,8 +160,14 @@ namespace IO
 				else\
 					ddrName &= ~(1 << pin);\
 			}\
+			static void SetConfiguration(DataT mask, Configuration configuration)\
+			{\
+				if(configuration)\
+					dirName |= mask;\
+				else\
+					dirName &= ~mask;\
+			}\
 			enum{Id = ID};\
-			enum{Width=sizeof(DataT)*8};\
 		};
 
 	#ifdef USE_PORTA

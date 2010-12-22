@@ -75,21 +75,40 @@ namespace IO
 {
 
 	//Port definitions for MSP430 families.
-
+	class NativePortBase :public GpioBase
+	{
+		public:
+		typedef uint8_t DataT;
+			enum{DirBit = 1, AltSelBit = 2, ResEnBit = 4};
+			enum{Width=sizeof(DataT)*8};
+		public:
+			enum Configuration
+			{
+				AnalogIn = AltSelBit,
+				In = 0,
+				PullUpOrDownIn = ResEnBit,
+				Out = DirBit,
+				AltOut = DirBit | AltSelBit
+			};
+			
+			static Configuration MapConfiguration(GenericConfiguration config)
+			{
+				switch(config)
+				{
+				case GpioBase::In: return In;
+				case GpioBase::AnalogIn: return AnalogIn;
+				case GpioBase::PullUpOrDownIn: return PullUpOrDownIn;
+				case GpioBase::AltOut: return AltOut;
+				//case GpioBase::Out: 
+				default:
+					return Out;
+				}
+			}
+	};
+	
 	#define MAKE_PORT(portName, dirName, pinName, selectName, interruptName, interruptEdge, resistorEnable, className, ID) \
-		class className{\
+		class className :public NativePortBase{\
 		public:\
-			typedef uint8_t DataT;\
-			enum{DirBit = 1, AltSelBit = 2, ResEnBit = 4};\
-		public:\
-			enum PinConfiguration\
-			{\
-				AnalogIn = 0,\
-				In = 0,\
-				PullUpOrDownIn = ResEnBit,\
-				Out = DirBit,\
-				AltOut = DirBit | AltSelBit,\
-			};\
 			static void Write(DataT value)\
 			{\
 				portName = value;\
@@ -144,14 +163,14 @@ namespace IO
 			{\
 				return pinName;\
 			}\
-			template<unsigned pin, PinConfiguration configuration>\
-			static void SetPinConfiguration()\
+			template<unsigned pin>\
+			static void SetPinConfiguration(Configuration configuration)\
 			{\
 				BOOST_STATIC_ASSERT(pin < Width);\
 				if(configuration & DirBit)\
-					DirSet(1 << pin);\
+					dirName |= (1 << pin);\
 				else\
-					DirClear(1 << pin);\
+					dirName &= ~(1 << pin);\
 				if(configuration & AltSelBit)\
 					selectName |= (1 << pin);\
 				else\
@@ -161,8 +180,22 @@ namespace IO
 				else\
 					resistorEnable &= ~(1 << pin);\
 			}\
+			static void SetConfiguration(DataT mask, Configuration configuration)\
+			{\
+				if(configuration & DirBit)\
+					dirName |= mask;\
+				else\
+					dirName &= ~mask;\
+				if(configuration & AltSelBit)\
+					selectName |= mask;\
+				else\
+					selectName &= ~mask;\
+				if(configuration & ResEnBit)\
+					resistorEnable |= mask;\
+				else\
+					resistorEnable &= ~mask;\
+			}\
 			enum{Id = ID};\
-			enum{Width=sizeof(DataT)*8};\
 		};
 
 	#ifdef USE_PORT0

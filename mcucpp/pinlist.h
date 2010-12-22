@@ -24,6 +24,8 @@
 
 #include "iopin.h"
 #include "loki\Typelist.h"
+#include "gpiobase.h"
+
 
 namespace IO
 {
@@ -56,6 +58,48 @@ namespace IO
 					::Result Result;
 		};
 
+////////////////////////////////////////////////////////////////////////////////
+// class template CheckSameConfig
+// Checks if all ports has the same configuration enum
+// PlaceHolderType matchs any type in TList
+////////////////////////////////////////////////////////////////////////////////		
+		template <class TList, class PlaceHolderType, bool skipNext> struct CheckSameConfig;
+
+        template <class PlaceHolderType, bool skipNext> struct CheckSameConfig<NullType, PlaceHolderType, skipNext>
+        {
+            enum{value = 1};
+			enum{EndOfList = 1};
+			typedef NullType PinConfigType;
+        };
+		
+        template <class Head, class Tail, class PlaceHolderType, bool skipNext>
+        struct CheckSameConfig< Typelist<Head, Tail>, PlaceHolderType, skipNext>
+        {
+		//private:
+			typedef typename Head::Configuration PinConfigType;
+			typedef CheckSameConfig<Tail, PlaceHolderType, false> Next;
+			typedef typename Next::PinConfigType NextConfig;
+			enum{SameAsNext = IsSameType<PinConfigType, NextConfig>::value};
+		
+			enum{IsPlaceHolder = IsSameType<PinConfigType, PlaceHolderType>::value};
+						
+			enum{NextIsPlaceHolder = IsSameType<NextConfig, PlaceHolderType>::value};	
+			typedef CheckSameConfig<Tail, PlaceHolderType, NextIsPlaceHolder> Iter;
+			
+			enum{EndOfList = 0};
+		//public:
+			enum{value = ((SameAsNext || IsPlaceHolder || NextIsPlaceHolder) && Iter::value) || Iter::EndOfList};
+        };
+		
+		template <class Head, class Tail, class PlaceHolderType> 
+		struct CheckSameConfig<Typelist<Head, Tail>, PlaceHolderType, true>
+		{
+		  	typedef CheckSameConfig<Tail, PlaceHolderType, false> Next;
+			enum{value = Next::value};
+			enum{EndOfList = 0};
+		};
+				
+////////////////////////////////////////////////////////////////////////////////
 
 		template<unsigned BitsToShift>
 		struct ShiftLeft
@@ -403,17 +447,9 @@ namespace IO
 				return 0;
 			}
 
-			template<class DataType>
-			static void DirWrite(DataType value)
+			template<class Configuration, class DataType>
+			static void SetConfiguration(Configuration config, DataType mask)
 			{	}
-
-			template<class DataType>
-			static void DirSet(DataType value)
-			{   }
-
-			template<class DataType>
-			static void DirClear(DataType value)
-			{   }
 
 			template<class DataType>
 			static DataType OutRead(DataType dummy)
@@ -439,8 +475,6 @@ namespace IO
 				else
 				{
 					Port::ClearAndSet(Mask, result);
-					//Port::Clear(Mask);
-					//Port::Set(result);
 				}
 
 				PortWriteIterator<Tail, PinList>::Write(value);
@@ -464,36 +498,20 @@ namespace IO
 				PortWriteIterator<Tail, PinList>::Clear(value);
 			}
 
-			template<class DataType>
-			static void DirWrite(DataType value)
+			template<class Configuration, class DataType>
+			static void SetConfiguration(Configuration config, DataType mask)
 			{
-				DataType result = PinWriteIterator<Pins>::UppendValue(value);
-				if((int)Length<Pins>::value == (int)Port::Width)
-					Port::DirWrite(result);
-				else
-				{
-					Port::DirClearAndSet(Mask, result);
-				}
-
-				PortWriteIterator<Tail, PinList>::DirWrite(value);
+				DataType portMask = PinWriteIterator<Pins>::UppendValue(mask);
+				Port::SetConfiguration(portMask, config);
+				PortWriteIterator<Tail, PinList>::SetConfiguration(config, mask);
 			}
-
+			
 			template<class DataType>
-			static void DirSet(DataType value)
+			static void SetConfiguration(GpioBase::GenericConfiguration config, DataType mask)
 			{
-				DataType result = PinWriteIterator<Pins>::UppendValue(value);
-				Port::DirSet(result);
-
-				PortWriteIterator<Tail, PinList>::DirSet(value);
-			}
-
-			template<class DataType>
-			static void DirClear(DataType value)
-			{
-				DataType result = PinWriteIterator<Pins>::UppendValue(value);
-				Port::DirClear(result);
-
-				PortWriteIterator<Tail, PinList>::DirClear(value);
+				DataType portMask = PinWriteIterator<Pins>::UppendValue(mask);
+				Port::SetConfiguration(portMask, Port::MapConfiguration(config) );
+				PortWriteIterator<Tail, PinList>::SetConfiguration(config, mask);
 			}
 
 			template<class DataType>
@@ -512,7 +530,7 @@ namespace IO
 				return value | PortWriteIterator<Tail, PinList>::OutRead(dummy);
 			}
 
-        };
+        };		
 	}
 ////////////////////////////////////////////////////////////////////////////////
 // class template PinSet
@@ -520,22 +538,50 @@ namespace IO
 // Pins from list are grouped by their port and group read/write operation is
 // performed on each port.
 ////////////////////////////////////////////////////////////////////////////////
-
 		template<class PINS>
-		struct PinSet
+		class PinListProperties
 		{
-		private:
 			typedef typename IoPrivate::GetPorts<PINS>::Result PinsToPorts;
-                        enum{LengthEnum = Length<PINS>::value};
-                        enum{LastBitPositionEnum = IoPrivate::GetLastBitPosition<PINS>::value};
-		public:
+			enum{LengthEnum = Length<PINS>::value};
+			enum{LastBitPositionEnum = IoPrivate::GetLastBitPosition<PINS>::value};
 			typedef PINS PinTypeList;
+		public:
 			typedef typename Loki::TL::NoDuplicates<PinsToPorts>::Result Ports;
 			static const unsigned Length = LengthEnum;
 			static const unsigned LastBitPosition = LastBitPositionEnum;
-                        
+			
+			enum {PortsHasSameConfig = 
+			  IoPrivate::CheckSameConfig
+				<Ports, GpioBase::DontCareConfiguration, false>::value};
+			
+			typedef typename IoPrivate::StaticIf
+			  		<
+					  PortsHasSameConfig, 
+					  typename Ports::Head::Configuration, //native port configuration
+					  GpioBase::GenericConfiguration		//generic port configuration
+					 >::Result Configuration;
+			
+			typedef typename IoPrivate::StaticIf
+			  		<
+					  PortsHasSameConfig, 
+					  NativePortBase, 
+					  GpioBase
+					 >::Result BasePortType;
+			
 			typedef typename IoPrivate::SelectSize<LastBitPosition+1>::Result DataType;
-
+		};
+	
+		template<class PINS>
+		class PinSet :public PinListProperties<PINS>, public PinListProperties<PINS>::BasePortType
+		{
+		  typedef PinListProperties<PINS> Config;
+		public:
+			using typename Config::DataType;
+			using typename Config::Configuration;
+			using typename Config::BasePortType;
+			using typename Config::Ports;
+			using Config::Length;
+		  
 			template<uint8_t Num>
 			class Take: public PinSet< typename IoPrivate::TakeFirst<PINS, Num>::Result >
 			{};
@@ -552,7 +598,7 @@ namespace IO
 							StartIndex>::Result
 					>
 			{
-				BOOST_STATIC_ASSERT(StartIndex + Size <= Length);
+			  BOOST_STATIC_ASSERT(StartIndex + Size <= Length);
 			};
 
 			template<uint8_t PIN>
@@ -584,20 +630,10 @@ namespace IO
 				typedef IoPrivate::PortWriteIterator<Ports, PINS> iter;
 				return iter::PinRead(DataType(0));
 			}
-
-			static void DirWrite(DataType value)
+			
+			static void SetConfiguration(Configuration config, DataType mask = DataType(-1))
 			{
-				IoPrivate::PortWriteIterator<Ports, PINS>::DirWrite(value);
-			}
-
-			static void DirSet(DataType value)
-			{
-				IoPrivate::PortWriteIterator<Ports, PINS>::DirSet(value);
-			}
-
-			static void DirClear(DataType value)
-			{
-				IoPrivate::PortWriteIterator<Ports, PINS>::DirClear(value);
+				IoPrivate::PortWriteIterator<Ports, PINS>::SetConfiguration(config, mask);
 			}
 		};
 

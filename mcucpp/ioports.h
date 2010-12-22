@@ -23,6 +23,7 @@
 #ifndef IOPORTS_HPP
 #define IOPORTS_HPP
 
+#include "gpiobase.h"
 
 #if defined(__ICC430__) || defined(__MSP430__)
 #include "MSP430/Msp430Ports.h"
@@ -43,33 +44,18 @@
 #endif
 
 namespace IO
-{
-	class NullPort
+{	
+	class NullPort :public GpioBase
 	{
  	public:
-		enum PinConfiguration\
-		{\
-			AnalogIn = 0,
-			In = 0x00,
-			PullUpOrDownIn = 0x00,
-			Out = 0x01,
-			AltOut = 0x01,
-		};
-
+		typedef DontCareConfiguration Configuration;
+		
 		typedef uint8_t DataT;
 		static void Write(DataT value)
 		{	}
 		static void ClearAndSet(DataT clearMask, DataT value)
 		{	}
-		static void DirClearAndSet(DataT clearMask, DataT value)
-		{	}
 		static DataT Read()
-		{
-			return 0;
-		}
-		static void DirWrite(DataT value)
-		{	}
-		static DataT DirRead()
 		{
 			return 0;
 		}
@@ -79,23 +65,22 @@ namespace IO
 		{	}
 		static void Togle(DataT value)
 		{	}
-		static void DirSet(DataT value)
-		{	}
-		static void DirClear(DataT value)
-		{	}
-		static void DirTogle(DataT value)
-		{	}
 		static DataT PinRead()
 		{
 			return 0;
 		}
 
-		template<unsigned pin, PinConfiguration configuration>
-		static void SetPinConfiguration()
+		template<unsigned pin, class Configuration>
+		static void SetPinConfiguration(Configuration configuration)
 		{
-			BOOST_STATIC_ASSERT(pin < Width);
+			//Nothing to do
 		}
-
+		
+		template<class Configuration>
+		static void SetConfiguration(DataT mask, Configuration configuration)
+		{
+			//Nothing to do
+		}
 		enum{Id = '-'};
 		enum{Width=sizeof(DataT)*8};
 	};

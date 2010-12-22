@@ -33,7 +33,7 @@ namespace IO
 		BOOST_STATIC_ASSERT(PIN < PORT::Width);
 	public:
 		typedef PORT Port;
-		typedef typename PORT::PinConfiguration Configuration;
+		typedef typename PORT::Configuration Configuration;
 		enum{Number = PIN};
 
 		static void Set()
