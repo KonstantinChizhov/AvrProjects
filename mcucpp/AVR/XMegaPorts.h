@@ -121,7 +121,7 @@ namespace IO
 	};
 
 #define MAKE_PORT(portName, className, ID) \
-	class className{\
+	class className: public NativePortBase{\
 	public:\
 		typedef uint8_t DataT;\
 	public:\
@@ -163,7 +163,7 @@ namespace IO
 			return portName.IN;\
 		}\
 		template<unsigned pin>\
-		static void SetPinConfiguration(PinConfiguration configuration)\
+		static void SetPinConfiguration(Configuration configuration)\
 		{\
 			BOOST_STATIC_ASSERT(pin < Width);\
 			if(configuration)\

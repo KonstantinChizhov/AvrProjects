@@ -20,7 +20,7 @@ typedef ThreePinLatch<Pa0, Pa1, Pa3, 'L'> Latch;
 
 typedef TPin<Latch , 0> L0;
 typedef TPin<Latch , 1> L1;
-typedef PinList<Pa0, Pa1, Pa3, Pc1, L1, Pc15, Pb1> Pins;
+typedef PinList<Pa0, Pa1, Pa3, Pc1, NullPin, Pc15, Pb1> Pins;
 
 int main()
 {

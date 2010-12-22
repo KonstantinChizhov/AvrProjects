@@ -598,11 +598,11 @@ namespace IO
 		{
 		  typedef PinListProperties<PINS> Config;
 		public:
-			using typename Config::DataType;
-			using typename Config::Configuration;
-			using typename Config::BasePortType;
-			using typename Config::Ports;
-			using typename Config::ConfigPorts;
+			typedef typename Config::DataType DataType;
+			typedef typename Config::Configuration Configuration;
+			typedef typename Config::BasePortType BasePortType;
+			typedef typename Config::Ports Ports;
+			typedef typename Config::ConfigPorts ConfigPorts;
 			using Config::Length;
 		  
 			template<uint8_t Num>
