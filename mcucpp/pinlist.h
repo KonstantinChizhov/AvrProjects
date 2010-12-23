@@ -199,21 +199,24 @@ namespace IO
         };
 		
 ////////////////////////////////////////////////////////////////////////////////	
-		template <class TList> struct GetConfigPorts;
+		template <class TList> struct GetConfigPins;
 
-        template <> struct GetConfigPorts<NullType>
+        template <> struct GetConfigPins<NullType>
         {
             typedef NullType Result;
         };
 
         template <class Head, class Tail>
-        struct GetConfigPorts< Typelist<Head, Tail> >
+        struct GetConfigPins< Typelist<Head, Tail> >
         {
         private:
-			typedef typename Head::Pin::ConfigPort Port;
-            typedef typename GetConfigPorts<Tail>::Result L1;
+		  typedef PinPositionHolder<
+						TPin<	typename Head::Pin::ConfigPort,
+								Head::Pin::Number>,
+							Head::Position> Pin;
+            typedef typename GetConfigPins<Tail>::Result L1;
         public:
-            typedef Typelist<Port, L1> Result;
+            typedef Typelist<Pin, L1> Result;
         };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -230,12 +233,12 @@ namespace IO
         {
             typedef NullType Result;
         };
-
-        template <class TPort, class Tail, uint8_t PortBitPosition, uint8_t ValueBitPosition>
-        struct GetPinsWithPort<Typelist<PinPositionHolder<TPin<TPort, PortBitPosition>, ValueBitPosition>, Tail>, TPort>
+		
+		template <class TPort, class Tail, uint8_t PortBitPosition, uint8_t ValueBitPosition, class TConfigPort>
+        struct GetPinsWithPort<Typelist<PinPositionHolder<TPin<TPort, PortBitPosition, TConfigPort>, ValueBitPosition>, Tail>, TPort>
         {
             // Go all the way down the list removing the type
-           typedef Typelist<PinPositionHolder<TPin<TPort, PortBitPosition>, ValueBitPosition>,
+           typedef Typelist<PinPositionHolder<TPin<TPort, PortBitPosition, TConfigPort>, ValueBitPosition>,
                     typename GetPinsWithPort<Tail, TPort>::Result>
                 Result;
         };
@@ -366,26 +369,23 @@ namespace IO
 
         template <> struct PinWriteIterator<NullType>
         {
-			typedef uint8_t PortDataType;
-
-			template<class DataType>
-			static void UppendValue(DataType value, PortDataType &result)
+			template<class DataType, class PortDataType>
+			static inline void UppendValue(DataType value, PortDataType result)
 			{
 			}
 
-			template<class DataType>
-			static inline void UppendReadValue(PortDataType portValue, DataType &result)
+			template<class DataType, class PortDataType>
+			static inline void UppendReadValue(PortDataType portValue, DataType result)
 			{
 			}
-
         };
 
         template <class Head, class Tail>
         struct PinWriteIterator< Typelist<Head, Tail> >
         {
-			typedef typename Head::Pin::Port::DataT PortDataType;
+			//typedef typename Head::Pin::Port::DataT PortDataType;
 
-			template<class DataType>
+			template<class DataType, class PortDataType>
 			static inline void UppendValue(DataType value, PortDataType &result)
 			{
 				if(IsSerial<Typelist<Head, Tail> >::value && Length<Typelist<Head, Tail> >::value > 1)
@@ -407,7 +407,7 @@ namespace IO
 				PinWriteIterator<Tail>::UppendValue(value, result);
 			}
 
-			template<class DataType>
+			template<class DataType, class PortDataType>
 			static inline void UppendReadValue(PortDataType portValue, DataType &result)
 			{
 				using namespace IoPrivate;
@@ -478,6 +478,7 @@ namespace IO
         {
 			//pins on current port
 			typedef typename GetPinsWithPort<PinList, Head>::Result Pins;
+			
 			enum{Mask = GetPortMask<Pins>::value};
 			typedef Head Port; //Head points to current port i the list.
 
@@ -519,9 +520,9 @@ namespace IO
 			template<class Configuration, class DataType>
 			static void SetConfiguration(Configuration config, DataType mask)
 			{
-				DataType portMask;
+				DataType portMask = 0;
 				PinWriteIterator<Pins>::UppendValue(mask, portMask);
-				Port::SetConfiguration(portMask, config);
+				Port::SetConfiguration(mask, config);
 				PortWriteIterator<Tail, PinList>::SetConfiguration(config, mask);
 			}
 			
@@ -562,12 +563,14 @@ namespace IO
 		class PinListProperties
 		{
 			typedef typename IoPrivate::GetPorts<PINS>::Result PinsToPorts;
-			typedef typename IoPrivate::GetConfigPorts<PINS>::Result PinsToConfigPorts;
-			
+						
 			enum{LengthEnum = Length<PINS>::value};
 			enum{LastBitPositionEnum = IoPrivate::GetLastBitPosition<PINS>::value};
 			typedef PINS PinTypeList;
 		public:
+		  	typedef typename IoPrivate::GetConfigPins<PINS>::Result ConfigPins;
+			typedef typename IoPrivate::GetPorts<ConfigPins>::Result PinsToConfigPorts;
+			
 			typedef typename Loki::TL::NoDuplicates<PinsToPorts>::Result Ports;
 			typedef typename Loki::TL::NoDuplicates<PinsToConfigPorts>::Result ConfigPorts;
 			
@@ -605,6 +608,7 @@ namespace IO
 			typedef typename Config::BasePortType BasePortType;
 			typedef typename Config::Ports Ports;
 			typedef typename Config::ConfigPorts ConfigPorts;
+			typedef typename Config::ConfigPins ConfigPins;
 			using Config::Length;
 		  
 			template<uint8_t Num>
@@ -662,7 +666,7 @@ namespace IO
 			
 			static void SetConfiguration(Configuration config, DataType mask = DataType(-1))
 			{
-				IoPrivate::PortWriteIterator<ConfigPorts, PINS>::SetConfiguration(config, mask);
+				IoPrivate::PortWriteIterator<ConfigPorts, ConfigPins>::SetConfiguration(config, mask);
 			}
 		};
 
