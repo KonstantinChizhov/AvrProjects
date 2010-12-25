@@ -19,84 +19,90 @@
 
 namespace IO
 {
+    class NativePortBase
+    {
+        public:
+        enum Configuration
+        {
+            AnalogIn = 0,
+            In = 0x00,
+            PullUpOrDownIn = 0x00,
+            Out = 0x01,
+            AltOut = 0x01,
+        };
+    };
+
 	namespace Test
 	{
 		template<class DataType, unsigned Identity>
-		class TestPort
+		class TestPort :public NativePortBase
 		{
 			public:
-			enum Configuration
-			{
-				AnalogIn = 0,
-				In = 0x00,
-				PullUpOrDownIn = 0x00,
-				Out = 0x01,
-				AltOut = 0x01,
-			};
-		
-			template<unsigned pin, >
+
+            typedef DataType DataT;
+
+			template<unsigned pin>
 			static void SetPinConfiguration(Configuration configuration)
 			{
 				BOOST_STATIC_ASSERT(pin < Width);
 				if(configuration)
-					Dir |= 1 << pin;
+					DirReg |= 1 << pin;
 				else
-					Dir &= ~(1 << pin);
+					DirReg &= ~(1 << pin);
 			}
-			
+
 			static void SetConfiguration(DataT mask, Configuration configuration)
 			{
 				if(configuration)
-					Dir |= mask;
+					DirReg |= mask;
 				else
-					Dir &= ~mask;
+					DirReg &= ~mask;
 			}
-			
-			typedef DataType DataT;
+
 			static void Write(DataT value)
 			{
-				Out = value;
+				OutReg = value;
 			}
 			static void ClearAndSet(DataT clearMask, DataT value)
 			{
-				Out &= ~clearMask;
-				Out |= value;
+				OutReg &= ~clearMask;
+				OutReg |= value;
 			}
 			static DataT Read()
 			{
-				return Out;
+				return OutReg;
 			}
 			static void Set(DataT value)
 			{
-				Out |= value;
+				OutReg |= value;
 			}
 			static void Clear(DataT value)
 			{
-				Out &= ~value;
+				OutReg &= ~value;
 			}
 			static void Togle(DataT value)
 			{
-				Out ^= value;
+				OutReg ^= value;
 			}
 			static DataT PinRead()
 			{
-				return In;
+				return InReg;
 			}
 			enum{Id = Identity};
 			enum{Width=sizeof(DataT)*8};
 
-			volatile static DataType Out;
-			volatile static DataType Dir;
-			volatile static DataType In;
+			volatile static DataType OutReg;
+			volatile static DataType DirReg;
+			volatile static DataType InReg;
 		};
 
 		template<class DataType, unsigned Identity>
-		volatile DataType TestPort<DataType, Identity>::Out;
+		volatile DataType TestPort<DataType, Identity>::OutReg;
 
 		template<class DataType, unsigned Identity>
-		volatile DataType TestPort<DataType, Identity>::Dir;
+		volatile DataType TestPort<DataType, Identity>::DirReg;
 
 		template<class DataType, unsigned Identity>
-		volatile DataType TestPort<DataType, Identity>::In;
+		volatile DataType TestPort<DataType, Identity>::InReg;
 	}
 }

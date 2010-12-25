@@ -66,41 +66,36 @@ void TestOnePortPinList(unsigned listValue, unsigned portValue)
     Port::Write(0);
 
     Pins::Write(listValue);
-    ASSERT_EQUAL(Port::Out,  portValue);
+    ASSERT_EQUAL(Port::OutReg,  portValue);
     val = Pins::Read();
     ASSERT_EQUAL(val, listValue);
 
-    Pins::DirWrite(listValue);
-    ASSERT_EQUAL(Port::Dir, portValue);
+    Port::DirReg = 0;
+    Pins::SetConfiguration(Pins::Out, listValue);
+    ASSERT_EQUAL(Port::DirReg, portValue);
 
     Port::Write(0);
-    Port::DirWrite(0);
+    Port::DirReg = 0;
 
-    Port::In = portValue;
+    Port::InReg = portValue;
     val = Pins::PinRead();
     ASSERT_EQUAL(val, listValue);
 
-    Port::In = 0;
+    Port::InReg = 0;
     val = Pins::PinRead();
     ASSERT_EQUAL(val, 0);
 
     Pins::Write(0);
-    ASSERT_EQUAL(Port::Out, 0);
+    ASSERT_EQUAL(Port::OutReg, 0);
 
     Pins::Set(listValue);
-    ASSERT_EQUAL(Port::Out, portValue);
+    ASSERT_EQUAL(Port::OutReg, portValue);
 
     Pins::Clear(listValue);
-    ASSERT_EQUAL(Port::Out, 0);
+    ASSERT_EQUAL(Port::OutReg, 0);
 
-    Pins::DirWrite(0);
-    ASSERT_EQUAL(Port::Dir, 0);
-
-    Pins::DirSet(listValue);
-    ASSERT_EQUAL(Port::Dir, portValue);
-
-    Pins::DirClear(listValue);
-    ASSERT_EQUAL(Port::Dir, 0);
+    Pins::SetConfiguration(Pins::In, 0xff);
+    ASSERT_EQUAL(Port::DirReg, 0);
 
     cout << "\tOK" << endl;
 }
@@ -125,6 +120,7 @@ int main()
     TestOnePortPinList<PinList<Pa2, Pa1, Pa3, Pa4, Pa6, Pa8, Pa7, Pa0, Pa5> >(0x1ff, 0x1ff);
 
     TestOnePortPinList<PinList<Pa0, Pa1, Pa2, Pa3, Pa4, Pa5, Pa6, Pa7, Pa8>::Slice<5, 4> >(0x1e0, 0x1e0);
+    cout << "Length = \t" <<PinList<Pa0, Pa1, Pa2, Pa3, Pa4, Pa5, Pa6, Pa7, Pa8>::Slice<5, 4>::Length;
     TestOnePortPinList<PinList<Pa0, Pa1, Pa2, Pa3, Pa4, Pa5, Pa6, Pa7, Pa8>::Slice<0, 4> >(0x0f, 0x0f);
 
     return 0;
