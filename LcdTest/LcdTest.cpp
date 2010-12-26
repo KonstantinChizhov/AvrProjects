@@ -1,4 +1,5 @@
 #include <avr/io.h>
+#include <util/delay.h>
 #include "HD44780.h"
 #include "iopins.h"
 #include "pinlist.h"
@@ -24,7 +25,6 @@ typedef Lcd<PinList<L0, L1, L2, L3, L4, L5, L6> > Lcd2;
 
 int main()
 {
-	
 	Lcd1::Init();
  	Lcd1::Puts("Hello world!", 12);
 

@@ -83,15 +83,15 @@
 		static void DirTogle(DataT value)
 		{	}
 		
-		template<unsigned pin, class Configuration>
-		static void SetPinConfiguration(Configuration configuration)
+		template<unsigned pin, class ConfigurationT>
+		static void SetPinConfiguration(ConfigurationT configuration)
 		{
 			BOOST_STATIC_ASSERT(pin < Width);
 			//Nothing to do
 		}
 		
-		template<class Configuration>
-		static void SetConfiguration(DataT mask, Configuration configuration)
+		template<class ConfigurationT>
+		static void SetConfiguration(DataT mask, ConfigurationT configuration)
 		{
 			//Nothing to do
 		}

@@ -584,13 +584,6 @@ namespace IO
 			typedef typename IoPrivate::StaticIf
 			  		<
 					  PortsHasSameConfig,
-					  typename Ports::Head::Configuration, //native port configuration
-					  GpioBase::GenericConfiguration		//generic port configuration
-					 >::Result Configuration;
-
-			typedef typename IoPrivate::StaticIf
-			  		<
-					  PortsHasSameConfig,
 					  NativePortBase,
 					  GpioBase
 					 >::Result BasePortType;
@@ -604,8 +597,6 @@ namespace IO
 		  typedef PinListProperties<PINS> Config;
 		public:
 			typedef typename Config::DataType DataType;
-			typedef typename Config::Configuration Configuration;
-			typedef typename Config::BasePortType BasePortType;
 			typedef typename Config::Ports Ports;
 			typedef typename Config::ConfigPorts ConfigPorts;
 			typedef typename Config::ConfigPins ConfigPins;
@@ -663,8 +654,9 @@ namespace IO
 				iter::PinRead(result);
 				return result;
 			}
-
-			static void SetConfiguration(Configuration config, DataType mask = DataType(-1))
+			
+			template<class ConfigurationT>
+			static void SetConfiguration(ConfigurationT config, DataType mask = DataType(-1))
 			{
 				IoPrivate::PortWriteIterator<ConfigPorts, ConfigPins>::SetConfiguration(config, mask);
 			}

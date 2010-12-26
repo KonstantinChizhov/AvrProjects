@@ -58,7 +58,7 @@ public:
 
 	static void Init()
 	{
-		BUS::DirSet(0x7f);
+		BUS::SetConfiguration(BUS::Out);
 		RW::Clear();
 		RS::Clear();
 		DATA_BUS::Write(0x03<<3); 
@@ -139,7 +139,7 @@ protected:
 	static void Write(uint8_t c)//__attribute__ ((noinline))
 	{
 		RW::Clear();
-		DATA_BUS::DirSet(0x0f<<3);
+		DATA_BUS::SetConfiguration(DATA_BUS::Out);
 		DATA_BUS::Write(c>>1);
 		Strobe();
 		DATA_BUS::Write(c<<3); 
@@ -148,7 +148,7 @@ protected:
 
 	static uint8_t Read() //__attribute__ ((noinline))
 	{
-		DATA_BUS::DirSet(0);
+		DATA_BUS::SetConfiguration(DATA_BUS::In);
 		RW::Set();
 		E::Set();
 		//Delay();
