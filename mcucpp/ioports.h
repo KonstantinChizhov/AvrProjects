@@ -49,7 +49,7 @@ namespace IO
 	{
  	public:
 		typedef DontCareConfiguration Configuration;
-		
+		typedef GpioBase Base;
 		typedef uint8_t DataT;
 		static void Write(DataT value)
 		{	}

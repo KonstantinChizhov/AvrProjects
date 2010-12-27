@@ -8,7 +8,8 @@
 	class LatchBase : public IO::GpioBase
 	{
 		public:
-		enum{Out = 1};
+		//typedef IO::GpioBase Base;
+		typedef LatchBase Base;
 		//SetConfiguration is do nothing function 
 		// and accepts any configuration type
 		typedef DontCareConfiguration Configuration;

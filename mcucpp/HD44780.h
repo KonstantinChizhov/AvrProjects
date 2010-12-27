@@ -5,7 +5,7 @@
 // Title		: C++ LCD HD44780 compatible display
 // Author		: Konstantin Chizhov
 // Date			: 2010
-// Target MCU	: Atmel mega AVR, TINY avr AND Xmega Series
+// Target MCU	: platform independent
 //
 //       This code is distributed under the GNU Public License
 //       which can be found at http://www.gnu.org/licenses/gpl.txt

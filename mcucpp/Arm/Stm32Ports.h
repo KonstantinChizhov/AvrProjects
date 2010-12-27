@@ -16,6 +16,7 @@ namespace IO
 	{
 	public:
 		enum{Width=16};
+		typedef NativePortBase Base;
 		typedef uint16_t DataT;
 		enum Configuration
 		{

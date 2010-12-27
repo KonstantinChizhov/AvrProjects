@@ -31,11 +31,12 @@ int main( void )
 {
   // Stop watchdog timer to prevent time out reset
   WDTCTL = WDTPW | WDTHOLD;
-    
+
   MyLcd::Init();
   MyLcd::Puts("Hello msp430", 8);
   MyLcd::Goto(0x40);
   MyLcd::Puts("Hello msp430"+8, 4);
+  
   while(1)
   {    
    

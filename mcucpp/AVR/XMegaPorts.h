@@ -100,6 +100,7 @@ namespace IO
 	{
 		public:
 			typedef uint8_t DataT;
+			typedef NativePortBase Base;
 			enum{Width=sizeof(DataT)*8};
 		public:
 			/*TODO: Implement other configurations*/

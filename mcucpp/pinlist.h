@@ -63,41 +63,71 @@ namespace IO
 // Checks if all ports has the same configuration enum
 // PlaceHolderType matchs any type in TList
 ////////////////////////////////////////////////////////////////////////////////
-		template <class TList, class PlaceHolderType, bool skipNext> struct CheckSameConfig;
 
-        template <class PlaceHolderType, bool skipNext> struct CheckSameConfig<NullType, PlaceHolderType, skipNext>
+		template <class TList, class CurrentConfig = typename TList::Head::Configuration> 
+		struct CheckSameConfig;
+
+		template<class TList, class CurrentConfig, class NextConfig>
+		struct CheckSameConfigHelper
+		{
+			enum{value = 0};
+		};
+
+		template<class Head, class Tail, class CurrentConfig>
+		struct CheckSameConfigHelper<Typelist<Head, Tail>, CurrentConfig, CurrentConfig>
+		{
+			enum{value = CheckSameConfig<Tail, CurrentConfig>::value};
+		};
+
+        template <class CurrentConfig> struct CheckSameConfig<NullType, CurrentConfig>
         {
             enum{value = 1};
-			enum{EndOfList = 1};
-			typedef NullType PinConfigType;
         };
 
-        template <class Head, class Tail, class PlaceHolderType, bool skipNext>
-        struct CheckSameConfig< Typelist<Head, Tail>, PlaceHolderType, skipNext>
+        template <class Head, class Tail, class CurrentConfig>
+        struct CheckSameConfig<Typelist<Head, Tail>, CurrentConfig>
         {
-		//private:
-			typedef typename Head::Configuration PinConfigType;
-			typedef CheckSameConfig<Tail, PlaceHolderType, false> Next;
-			typedef typename Next::PinConfigType NextConfig;
-			enum{SameAsNext = IsSameType<PinConfigType, NextConfig>::value};
-
-			enum{IsPlaceHolder = IsSameType<PinConfigType, PlaceHolderType>::value};
-
-			enum{NextIsPlaceHolder = IsSameType<NextConfig, PlaceHolderType>::value};
-			typedef CheckSameConfig<Tail, PlaceHolderType, NextIsPlaceHolder> Iter;
-
-			enum{EndOfList = 0};
-		//public:
-			enum{value = ((SameAsNext || IsPlaceHolder || NextIsPlaceHolder) && Iter::value) || Iter::EndOfList};
+			enum{value = CheckSameConfigHelper<Typelist<Head, Tail>, CurrentConfig, typename Head::Configuration>::value};
         };
 
-		template <class Head, class Tail, class PlaceHolderType>
-		struct CheckSameConfig<Typelist<Head, Tail>, PlaceHolderType, true>
+
+////////////////////////////////////////////////////////////////////////////////
+		template <class TList, class T, class ConfigT>
+		struct ErisePortsHelper;
+
+		template <class TList, class T>
+		struct ErasePortsWithConfig
 		{
-		  	typedef CheckSameConfig<Tail, PlaceHolderType, false> Next;
-			enum{value = Next::value};
-			enum{EndOfList = 0};
+			typedef typename ErisePortsHelper<TList, T, typename TList::Head::Configuration>::Result Result;
 		};
+
+		template < class T>
+		struct ErasePortsWithConfig<NullType, T>
+		{
+			typedef NullType Result;
+		};
+
+        template <class T, class ConfigT>
+        struct ErisePortsHelper<NullType, T, ConfigT>
+        {
+            typedef NullType Result;
+        };
+
+        template <class Head, class Tail, class T>
+        struct ErisePortsHelper<Typelist<Head, Tail>, T, T>
+        {
+            // Go all the way down the list removing the type
+            typedef typename ErasePortsWithConfig<Tail, T>::Result Result;
+        };
+
+        template <class Head, class Tail, class T, class ConfigT>
+        struct ErisePortsHelper<Typelist<Head, Tail>, T, ConfigT>
+        {
+            // Go all the way down the list removing the type
+            typedef Typelist<Head, 
+                    typename ErasePortsWithConfig<Tail, T>::Result>
+                Result;
+        };
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -572,19 +602,23 @@ namespace IO
 			typedef typename IoPrivate::GetPorts<ConfigPins>::Result PinsToConfigPorts;
 
 			typedef typename Loki::TL::NoDuplicates<PinsToPorts>::Result Ports;
-			typedef typename Loki::TL::NoDuplicates<PinsToConfigPorts>::Result ConfigPorts;
+			typedef typename Loki::TL::NoDuplicates<PinsToConfigPorts>::Result AllConfigPorts;
+
+			typedef typename IoPrivate::ErasePortsWithConfig<
+								AllConfigPorts,
+								GpioBase::DontCareConfiguration
+							>::Result ConfigPorts;
 
 			static const unsigned Length = LengthEnum;
 			static const unsigned LastBitPosition = LastBitPositionEnum;
 
 			enum {PortsHasSameConfig =
-			  IoPrivate::CheckSameConfig
-				<Ports, GpioBase::DontCareConfiguration, false>::value};
+			  IoPrivate::CheckSameConfig<Ports>::value};
 
 			typedef typename IoPrivate::StaticIf
 			  		<
 					  PortsHasSameConfig,
-					  NativePortBase,
+					  typename Ports::Head::Base,
 					  GpioBase
 					 >::Result BasePortType;
 
@@ -610,15 +644,15 @@ namespace IO
 			class Skip: public PinSet< typename IoPrivate::SkipFirst<PINS, Num>::Result >
 			{};
 
-			template<uint8_t StartIndex, uint8_t Size>
+			template<uint8_t StartIndex, uint8_t SliceSize>
 			class Slice: public PinSet
 					<
 						typename IoPrivate::SkipFirst<
-							typename IoPrivate::TakeFirst<PINS, StartIndex + Size>::Result,
+							typename IoPrivate::TakeFirst<PINS, StartIndex + SliceSize>::Result,
 							StartIndex>::Result
 					>
 			{
-                BOOST_STATIC_ASSERT(Size == Length);
+                BOOST_STATIC_ASSERT(SliceSize == Slice::Length);
 			};
 
 			template<uint8_t PIN>

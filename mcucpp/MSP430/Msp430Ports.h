@@ -80,6 +80,7 @@ namespace IO
 		public:
 		typedef uint8_t DataT;
 			enum{DirBit = 1, AltSelBit = 2, ResEnBit = 4};
+			typedef NativePortBase Base;
 			enum{Width=sizeof(DataT)*8};
 		public:
 			enum Configuration
