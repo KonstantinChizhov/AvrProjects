@@ -92,7 +92,7 @@ namespace IO
 				AltOut = DirBit | AltSelBit
 			};
 			
-			static Configuration MapConfiguration(GenericConfiguration config)
+			static Configuration MapConfiguration(GpioBase::GenericConfiguration config)
 			{
 				switch(config)
 				{

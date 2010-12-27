@@ -613,7 +613,7 @@ namespace IO
 			static const unsigned LastBitPosition = LastBitPositionEnum;
 
 			enum {PortsHasSameConfig =
-			  IoPrivate::CheckSameConfig<Ports>::value};
+			  IoPrivate::CheckSameConfig<ConfigPorts>::value};
 
 			typedef typename IoPrivate::StaticIf
 			  		<

@@ -38,7 +38,7 @@ int main( void )
   MyLcd::Puts("Hello msp430"+8, 4);
   
   while(1)
-  {    
+  { 
    
   }
   return 0;

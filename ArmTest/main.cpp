@@ -13,19 +13,39 @@ using namespace IoPrivate;
 
 typedef IO::Pc8 led;
 
-volatile short v = 0;
-typedef SoftSpi<Pa0, Pa1, Pa3> Spi;
+static void delay_loop(unsigned long count)
+{
+  do{}while(count--);
+}
 
-typedef ThreePinLatch<Pa0, Pa1, Pa3, 'L'> Latch;
+inline void
+_delay_ms(unsigned __ms)
+{
+  delay_loop(__ms*1000);
+}
 
-//typedef TPin<Latch , 0> L0;
-//typedef TPin<Latch , 1> L1;
-typedef PinList<Pa7, Pa2, Pa1, Pa4, Pa3, Pa6, Pa5, Pa0> Pins;
+inline void
+_delay_us(unsigned __us)
+{
+  delay_loop(__us);
+}
+
+
+#include "HD44780.h"
+
+using namespace IO;
+typedef PinList<Pa0, Pa1, Pa2, Pa3, Pa4, Pa5, Pa6> LcdBus;
+typedef Lcd<LcdBus> MyLcd;
 
 int main()
 {
-  Pins::SetConfiguration(Pins::Out, 0xff);
-  Pins::Write(0x0f);
+   MyLcd::Init();
+  MyLcd::Puts("Hello msp430", 8);
+  MyLcd::Goto(0x40);
+  MyLcd::Puts("Hello msp430"+8, 4);
+  
+ // Pins::SetConfiguration(Pins::Out, 0xff);
+  //Pins::Write(0x0f);
  
  // Spi::ReadWrite(0xff); 
   //Portc::DirSet(0xffff);
