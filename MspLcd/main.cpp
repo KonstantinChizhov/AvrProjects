@@ -28,7 +28,7 @@ typedef PinList<P1_0, NullPin, P1_1, P1_2, P1_3, P1_4, P1_5> LcdBus;
 typedef Lcd<LcdBus> MyLcd;
 
 int main( void )
-{
+{ 
   // Stop watchdog timer to prevent time out reset
   WDTCTL = WDTPW | WDTHOLD;
 

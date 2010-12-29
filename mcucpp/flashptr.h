@@ -1,11 +1,6 @@
 #pragma once
 
-#if defined(__ICC430__) || defined(__MSP430__)
-
-#define FLASH_PTR(PTR) (PTR)
-#define FLASH const
-
-#elif defined(__ICCAVR__) 
+#if defined(__ICCAVR__) 
 
 #define FLASH_PTR(PTR) (PTR)
 #define FLASH __flash
@@ -102,10 +97,9 @@ private:
 #define FLASH_PTR(PTR) ProgmemPtr<typeof(*(PTR))>(PTR)
 
 
-#elif defined(__ICCARM__) || defined ( __CC_ARM   )
-#error Not supported yet.
 #else
 
-#warning "Not supported arch."
+#define FLASH_PTR(PTR) (PTR)
+#define FLASH const
 
 #endif
