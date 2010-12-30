@@ -1,9 +1,13 @@
 #pragma once
 
-//copied from Boost library
+
+
+#define CONCAT2(First, Second) (First ## Second)
+#define CONCAT(First, Second) CONCAT2(First, Second)
 
 #ifdef __cplusplus
 
+//copied from Boost library
 namespace boost
 {
 	template <bool x> struct STATIC_ASSERTION_FAILURE;
@@ -12,9 +16,6 @@ namespace boost
 }
 
 #define BOOST_STATIC_ASSERT_BOOL_CAST(x) (bool)(x)
-
-#define CONCAT2(First, Second) (First ## Second)
-#define CONCAT(First, Second) CONCAT2(First, Second)
 
 
 #define BOOST_STATIC_ASSERT( B ) \
