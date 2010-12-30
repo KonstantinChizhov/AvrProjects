@@ -1394,7 +1394,7 @@
         <option>
           <name>OOCOutputFormat</name>
           <version>2</version>
-          <state>0</state>
+          <state>2</state>
         </option>
         <option>
           <name>OCOutputOverride</name>
@@ -1402,7 +1402,7 @@
         </option>
         <option>
           <name>OOCOutputFile</name>
-          <state>5.srec</state>
+          <state>ArmTest.bin</state>
         </option>
         <option>
           <name>OOCCommandLineProducer</name>
@@ -1410,7 +1410,7 @@
         </option>
         <option>
           <name>OOCObjCopyEnable</name>
-          <state>0</state>
+          <state>1</state>
         </option>
       </data>
     </settings>
@@ -1516,11 +1516,11 @@
         </option>
         <option>
           <name>IlinkIcfOverride</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>IlinkIcfFile</name>
-          <state>$TOOLKIT_DIR$\CONFIG\generic_cortex.icf</state>
+          <state>$PROJ_DIR$\ArmTest.icf</state>
         </option>
         <option>
           <name>IlinkIcfFileSlave</name>

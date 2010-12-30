@@ -14,6 +14,8 @@ const uint8_t buffer[32] = {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l
 
 int main( void )
 {
+  delay(1000);
+  /*
   // Stop watchdog timer to prevent time out reset
   DebugPin::SetDirWrite();
   WDTCTL = WDTPW + WDTHOLD;
@@ -32,6 +34,6 @@ int main( void )
     else
       DebugPin::Clear();
     delay(10000);
-  }
+  }*/
   return 0;
 }

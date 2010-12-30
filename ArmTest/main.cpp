@@ -12,6 +12,7 @@ using namespace IO;
 using namespace IoPrivate;
 
 typedef IO::Pc8 led;
+typedef IO::Pc9 led2;
 
 static void delay_loop(unsigned long count)
 {
@@ -31,40 +32,25 @@ _delay_us(unsigned __us)
 }
 
 
-#include "HD44780.h"
+//#include "HD44780.h"
 
-using namespace IO;
-typedef PinList<Pa0, Pa1, Pa2, Pa3, Pa4, Pa5, Pa6> LcdBus;
-typedef Lcd<LcdBus> MyLcd;
+//typedef PinList<Pa0, Pa1, Pa2, Pa3, Pa4, Pa5, Pa6> LcdBus;
+//typedef Lcd<LcdBus> MyLcd;
 
 int main()
 {
-   MyLcd::Init();
-  MyLcd::Puts("Hello msp430", 8);
-  MyLcd::Goto(0x40);
-  MyLcd::Puts("Hello msp430"+8, 4);
-  
- // Pins::SetConfiguration(Pins::Out, 0xff);
-  //Pins::Write(0x0f);
+  RCC_APB2ENR |= 1 << 2 | 1 << 3 | 1 << 4;
  
- // Spi::ReadWrite(0xff); 
-  //Portc::DirSet(0xffff);
-  //Portc::DirSet(0x0);
-    //Portc::DirWrite(0xf);
-	 //Portc::DirWrite(0x0);
-  //Portc::DirClearAndSet(0x0ff0, 0x0f00);
-  //Portc::SetConfiguration(0x0ff0, Portc::Out);
-	//Portc::SetConfiguration(0x0ff0, Portc::Out);
-	//Porta::SetConfiguration(0x0ff0, Porta::Out);
-
- // led::SetDirWrite();
-//  led::SetConfiguration(led::Port::AltOut);
-  
- // led::Set();  
-  //Pins::DirSet(0xff);
-  //Pins::Write(0x1f);
- // Pins::DirClear(0xff);
-  //Pins::DirWrite(0xff);
+   
+  led::SetConfiguration(led::Port::Out);
+  led2::SetConfiguration(led2::Port::Out);
+  led::Set();
+	while(1)
+	{
+		_delay_ms(100);
+		led::Toggle();
+		led2::Toggle();
+	}
   
   return 0;
 }

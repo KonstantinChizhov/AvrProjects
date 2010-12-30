@@ -2,7 +2,7 @@
 #include <spi.h>
 
 #include <TextFormater.h>
-#include <usart.h>
+#include <Avr/usart.h>
 #include <util/delay.h>
 
 typedef WaitAdapter<Usart<16, 16> >  MyUsart;
@@ -37,6 +37,7 @@ __attribute__((OS_main))
 
 int main()
 {
+
 	Debug::SetDirWrite();
 
 	MyUsart::Init(19200);

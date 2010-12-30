@@ -4,11 +4,10 @@
 #include <static_assert.h>
 
 
-static inline void delay(unsigned count)
+static inline void delay(volatile unsigned count)
 {
-  volatile unsigned i = count;
   do{
-  }while(--i);
+  }while(--count);
 }
 
 enum Command
