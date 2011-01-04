@@ -43,18 +43,21 @@ namespace IO
 		typedef PORT Port;
 		typedef CONFIG_PORT ConfigPort;
 		typedef typename ConfigPort::Configuration Configuration;
+
 		enum{Number = PIN};
+		static const bool Inverted = false;
 
 		static void Set()
 		{
-			PORT::Set(1 << PIN);
+			Set(true);
 		}
 
-		static void Set(uint8_t val)
+		static void Set(bool val)
 		{
 			if(val)
-				Set();
-			else Clear();
+				PORT::Set(1 << PIN);
+			else
+				PORT::Clear(1 << PIN);
 		}
 
 		static void SetDir(uint8_t val)
@@ -66,7 +69,7 @@ namespace IO
 
 		static void Clear()
 		{
-			PORT::Clear(1 << PIN);
+			Set(false);
 		}
 
 		static void Toggle()
@@ -102,6 +105,31 @@ namespace IO
 		static void WaiteForClear()
 		{
 			while(IsSet()){}
+		}
+	};
+
+	template<class PORT, uint8_t PIN, class CONFIG_PORT = PORT>
+	class InvertedPin :public TPin<PORT, PIN, CONFIG_PORT>
+	{
+	public:
+		static const bool Inverted = true;
+
+		static void Set(bool val)
+		{
+			if(val)
+				PORT::Clear(1 << PIN);
+			else
+				PORT::Set(1 << PIN);
+		}
+
+		static void Set()
+		{
+			Set(true);
+		}
+
+		static void Clear()
+		{
+			Set(false);
 		}
 	};
 }

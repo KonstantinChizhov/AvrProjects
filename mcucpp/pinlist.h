@@ -294,7 +294,22 @@ namespace IO
             // Go all the way down the list removing the type
 			 typedef typename GetPinsWithPort<Tail, TPort>::Result Result;
         };
+////////////////////////////////////////////////////////////////////////////////
+//
+////////////////////////////////////////////////////////////////////////////////
 
+		template <class TList> struct GetInversionMask;
+
+        template <> struct GetInversionMask<NullType>
+        {
+            enum{value = 0};
+        };
+
+        template <class Head, class Tail>
+        struct GetInversionMask< Typelist<Head, Tail> >
+        {
+			enum{value = Head::Pin::Inverted ? (1 << Head::Pin::Number) : 0 | GetInversionMask<Tail>::value};
+        };
 ////////////////////////////////////////////////////////////////////////////////
 // class template GetPortMask
 // Computes port bit mask for pin list
@@ -442,14 +457,19 @@ namespace IO
 							Head::Position, 	//bit position in value
 							ValueToPort>::Shift(value) &
 						GetPortMask<Typelist<Head, Tail> >::value;
-					return result;
+					;
+					return result ^ GetInversionMask<Typelist<Head, Tail> >::value;
 				}
-
-				if((int)Head::Position == (int)Head::Pin::Number)
-					result |= value & (1 << Head::Position);
-				else
+				if(Head::Pin::Inverted == false)
+				{
 					if(value & (1 << Head::Position))
 						result |= (1 << Head::Pin::Number);
+				}
+				else
+				{
+					if(!(value & (1 << Head::Position)))
+						result |= (1 << Head::Pin::Number);
+				}
 
 				return PinWriteIterator<Tail>::UppendValue(value, result);
 			}
@@ -527,12 +547,14 @@ namespace IO
 			typedef typename GetPinsWithPort<PinList, Head>::Result Pins;
 
 			enum{Mask = GetPortMask<Pins>::value};
+			
 			typedef Head Port; //Head points to current port i the list.
 
 			template<class DataType>
 			static void Write(DataType value)
 			{
 				DataType result = PinWriteIterator<Pins>::UppendValue(value, DataType(0));
+
 				if((int)Length<Pins>::value == (int)Port::Width)// whole port
 					Port::Write(result);
 				else
