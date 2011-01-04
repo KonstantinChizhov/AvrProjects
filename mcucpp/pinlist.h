@@ -5,24 +5,24 @@
 // Date			: 2010
 // All rights reserved.
 
-// Redistribution and use in source and binary forms, with or without modification, 
+// Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// Redistributions of source code must retain the above copyright notice, 
+// Redistributions of source code must retain the above copyright notice,
 // this list of conditions and the following disclaimer.
 
-// Redistributions in binary form must reproduce the above copyright notice, 
-// this list of conditions and the following disclaimer in the documentation and/or 
+// Redistributions in binary form must reproduce the above copyright notice,
+// this list of conditions and the following disclaimer in the documentation and/or
 // other materials provided with the distribution.
 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
-// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
-// IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
-// INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
-// BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
-// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
-// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+// IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+// INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+// BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //*****************************************************************************
 
@@ -70,7 +70,7 @@ namespace IO
 // PlaceHolderType matchs any type in TList
 ////////////////////////////////////////////////////////////////////////////////
 
-		template <class TList, class CurrentConfig = typename TList::Head::Configuration> 
+		template <class TList, class CurrentConfig = typename TList::Head::Configuration>
 		struct CheckSameConfig;
 
 		template<class TList, class CurrentConfig, class NextConfig>
@@ -130,7 +130,7 @@ namespace IO
         struct ErisePortsHelper<Typelist<Head, Tail>, T, ConfigT>
         {
             // Go all the way down the list removing the type
-            typedef Typelist<Head, 
+            typedef Typelist<Head,
                     typename ErasePortsWithConfig<Tail, T>::Result>
                 Result;
         };
@@ -242,14 +242,18 @@ namespace IO
             typedef NullType Result;
         };
 
-        template <class Head, class Tail>
-        struct GetConfigPins< Typelist<Head, Tail> >
+        template <class TPort,
+				class Tail,
+				uint8_t PortBitPosition,
+				uint8_t ValueBitPosition,
+				class TConfigPort,
+				template<class, uint8_t, class> class PinClass>
+        struct GetConfigPins< Typelist<PinPositionHolder<PinClass<TPort, PortBitPosition, TConfigPort>, ValueBitPosition>, Tail> >
         {
         private:
-		  typedef PinPositionHolder<
-						TPin<	typename Head::Pin::ConfigPort,
-								Head::Pin::Number>,
-							Head::Position> Pin;
+			typedef PinPositionHolder<
+						PinClass<TConfigPort, PortBitPosition, TConfigPort>,
+						ValueBitPosition> Pin;
             typedef typename GetConfigPins<Tail>::Result L1;
         public:
             typedef Typelist<Pin, L1> Result;
@@ -270,11 +274,16 @@ namespace IO
             typedef NullType Result;
         };
 
-		template <class TPort, class Tail, uint8_t PortBitPosition, uint8_t ValueBitPosition, class TConfigPort>
-        struct GetPinsWithPort<Typelist<PinPositionHolder<TPin<TPort, PortBitPosition, TConfigPort>, ValueBitPosition>, Tail>, TPort>
+		template <class TPort,
+				class Tail,
+				uint8_t PortBitPosition,
+				uint8_t ValueBitPosition,
+				class TConfigPort,
+				template<class, uint8_t, class> class PinClass>
+        struct GetPinsWithPort<Typelist<PinPositionHolder<PinClass<TPort, PortBitPosition, TConfigPort>, ValueBitPosition>, Tail>, TPort>
         {
             // Go all the way down the list removing the type
-           typedef Typelist<PinPositionHolder<TPin<TPort, PortBitPosition, TConfigPort>, ValueBitPosition>,
+           typedef Typelist<PinPositionHolder<PinClass<TPort, PortBitPosition, TConfigPort>, ValueBitPosition>,
                     typename GetPinsWithPort<Tail, TPort>::Result>
                 Result;
         };
@@ -406,13 +415,15 @@ namespace IO
         template <> struct PinWriteIterator<NullType>
         {
 			template<class DataType, class PortDataType>
-			static inline void UppendValue(DataType value, PortDataType result)
+			static inline PortDataType UppendValue(DataType value, PortDataType result)
 			{
+				return result;
 			}
 
 			template<class DataType, class PortDataType>
-			static inline void UppendReadValue(PortDataType portValue, DataType result)
+			static inline DataType UppendReadValue(PortDataType portValue, DataType result)
 			{
+				return result;
 			}
         };
 
@@ -422,7 +433,7 @@ namespace IO
 			//typedef typename Head::Pin::Port::DataT PortDataType;
 
 			template<class DataType, class PortDataType>
-			static inline void UppendValue(DataType value, PortDataType &result)
+			static inline PortDataType UppendValue(DataType value, PortDataType result)
 			{
 				if(IsSerial<Typelist<Head, Tail> >::value && Length<Typelist<Head, Tail> >::value > 1)
 				{
@@ -431,7 +442,7 @@ namespace IO
 							Head::Position, 	//bit position in value
 							ValueToPort>::Shift(value) &
 						GetPortMask<Typelist<Head, Tail> >::value;
-					return;
+					return result;
 				}
 
 				if((int)Head::Position == (int)Head::Pin::Number)
@@ -440,11 +451,11 @@ namespace IO
 					if(value & (1 << Head::Position))
 						result |= (1 << Head::Pin::Number);
 
-				PinWriteIterator<Tail>::UppendValue(value, result);
+				return PinWriteIterator<Tail>::UppendValue(value, result);
 			}
 
 			template<class DataType, class PortDataType>
-			static inline void UppendReadValue(PortDataType portValue, DataType &result)
+			static inline DataType UppendReadValue(PortDataType portValue, DataType result)
 			{
 				using namespace IoPrivate;
 				if(IsSerial<Typelist<Head, Tail> >::value && Length<Typelist<Head, Tail> >::value > 1)
@@ -456,7 +467,7 @@ namespace IO
 
 					result |= AtctualShifter::Shift(DataType(portValue)) &
 						GetValueMask<Typelist<Head, Tail> >::value;
-					return;
+					return result;
 				}
 
 				if((int)Head::Position == (int)Head::Pin::Number)
@@ -465,7 +476,7 @@ namespace IO
 					if(portValue & (1 << Head::Pin::Number))
 						result |= (1 << Head::Position);
 
-				PinWriteIterator<Tail>::UppendReadValue(portValue, result);
+				return PinWriteIterator<Tail>::UppendReadValue(portValue, result);
 			}
         };
 
@@ -493,7 +504,7 @@ namespace IO
 			{   }
 
 			template<class DataType>
-			static DataType PinRead(DataType)
+			static DataType PinRead()
 			{
 				return 0;
 			}
@@ -503,7 +514,7 @@ namespace IO
 			{	}
 
 			template<class DataType>
-			static DataType OutRead(DataType dummy)
+			static DataType OutRead()
 			{
 				return 0;
 			}
@@ -521,8 +532,7 @@ namespace IO
 			template<class DataType>
 			static void Write(DataType value)
 			{
-				DataType result = 0;
-				PinWriteIterator<Pins>::UppendValue(value, result);
+				DataType result = PinWriteIterator<Pins>::UppendValue(value, DataType(0));
 				if((int)Length<Pins>::value == (int)Port::Width)// whole port
 					Port::Write(result);
 				else
@@ -536,8 +546,7 @@ namespace IO
 			template<class DataType>
 			static void Set(DataType value)
 			{
-				DataType result = 0;
-				PinWriteIterator<Pins>::UppendValue(value, result);
+				DataType result = PinWriteIterator<Pins>::UppendValue(value, DataType(0));
 				Port::Set(result);
 
 				PortWriteIterator<Tail, PinList>::Set(value);
@@ -546,8 +555,7 @@ namespace IO
 			template<class DataType>
 			static void Clear(DataType value)
 			{
-				DataType result = 0;
-				PinWriteIterator<Pins>::UppendValue(value, result);
+				DataType result = PinWriteIterator<Pins>::UppendValue(value, DataType(0));
 				Port::Clear(result);
 
 				PortWriteIterator<Tail, PinList>::Clear(value);
@@ -556,8 +564,7 @@ namespace IO
 			template<class Configuration, class DataType>
 			static void SetConfiguration(Configuration config, DataType mask)
 			{
-				DataType portMask = 0;
-				PinWriteIterator<Pins>::UppendValue(mask, portMask);
+				DataType portMask = PinWriteIterator<Pins>::UppendValue(mask, DataType(0));
 				Port::SetConfiguration(portMask, config);
 				PortWriteIterator<Tail, PinList>::SetConfiguration(config, mask);
 			}
@@ -565,26 +572,27 @@ namespace IO
 			template<class DataType>
 			static void SetConfiguration(GpioBase::GenericConfiguration config, DataType mask)
 			{
-				DataType portMask = 0;
-				PinWriteIterator<Pins>::UppendValue(mask, portMask);
+				DataType portMask = PinWriteIterator<Pins>::UppendValue(mask, DataType(0));
 				Port::SetConfiguration(portMask, Port::MapConfiguration(config) );
 				PortWriteIterator<Tail, PinList>::SetConfiguration(config, mask);
 			}
 
 			template<class DataType>
-			static void PinRead(DataType &value)
+			static DataType PinRead()
 			{
 				typename Port::DataT portValue = Port::PinRead();
-				PinWriteIterator<Pins>::UppendReadValue(portValue, value);
-				PortWriteIterator<Tail, PinList>::PinRead(value);
+				return PinWriteIterator<Pins>::UppendReadValue(
+							portValue,
+							PortWriteIterator<Tail, PinList>::template PinRead<DataType>());
 			}
 
 			template<class DataType>
-			static void OutRead(DataType &value)
+			static DataType OutRead()
 			{
 				typename Port::DataT portValue = Port::Read();
-				PinWriteIterator<Pins>::UppendReadValue(portValue, value);
-				PortWriteIterator<Tail, PinList>::OutRead(value);
+				return PinWriteIterator<Pins>::UppendReadValue(
+							portValue,
+							PortWriteIterator<Tail, PinList>::template OutRead<DataType>());
 			}
 
         };
@@ -673,8 +681,7 @@ namespace IO
 			static DataType Read()
 			{
 				typedef IoPrivate::PortWriteIterator<Ports, PINS> iter;
-				DataType result = 0;
-				iter::OutRead(result);
+				DataType result = iter::template OutRead<DataType>();
 				return result;
 			}
 			static void Set(DataType value)
@@ -690,11 +697,10 @@ namespace IO
 			static DataType PinRead()
 			{
 				typedef IoPrivate::PortWriteIterator<Ports, PINS> iter;
-				DataType result = 0;
-				iter::PinRead(result);
+				DataType result = iter::template PinRead<DataType>();
 				return result;
 			}
-			
+
 			template<class ConfigurationT>
 			static void SetConfiguration(ConfigurationT config, DataType mask = DataType(-1))
 			{
