@@ -71,7 +71,7 @@ namespace IO
 ////////////////////////////////////////////////////////////////////////////////
 
 		template <class TList, class CurrentConfig = typename TList::Head::Configuration>
-		struct CheckSameConfig;
+		struct CheckSameConfigImp;
 
 		template<class TList, class CurrentConfig, class NextConfig>
 		struct CheckSameConfigHelper
@@ -82,19 +82,31 @@ namespace IO
 		template<class Head, class Tail, class CurrentConfig>
 		struct CheckSameConfigHelper<Typelist<Head, Tail>, CurrentConfig, CurrentConfig>
 		{
-			enum{value = CheckSameConfig<Tail, CurrentConfig>::value};
+			enum{value = CheckSameConfigImp<Tail, CurrentConfig>::value};
 		};
 
-        template <class CurrentConfig> struct CheckSameConfig<NullType, CurrentConfig>
+        template <class CurrentConfig> struct CheckSameConfigImp<NullType, CurrentConfig>
         {
             enum{value = 1};
         };
 
         template <class Head, class Tail, class CurrentConfig>
-        struct CheckSameConfig<Typelist<Head, Tail>, CurrentConfig>
+        struct CheckSameConfigImp<Typelist<Head, Tail>, CurrentConfig>
         {
 			enum{value = CheckSameConfigHelper<Typelist<Head, Tail>, CurrentConfig, typename Head::Configuration>::value};
         };
+
+		template <class TList> 
+		struct CheckSameConfig
+		{
+				enum{value = CheckSameConfigImp<TList, typename TList::Head::Configuration>::value};
+		};
+
+		template <> 
+		struct CheckSameConfig<NullType>
+		{
+				enum{value = 1};
+		};
 
 
 ////////////////////////////////////////////////////////////////////////////////
