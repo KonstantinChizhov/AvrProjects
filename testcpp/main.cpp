@@ -1,5 +1,6 @@
 
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #include "iopins.h"
 #include "pinlist.h"
 #include "util.h"
@@ -40,9 +41,11 @@ int8_t mylog2 (uint32_t val) {
 //	PORTA = *v;
 //}
 
-
+__attribute((OS_main))
 int main()
 {
+
+//	Porta::ClearAndSet(0xf, 0x03);
 
 //Pa1Inv::Set();
 //Pa1Inv::Set(false);
@@ -52,8 +55,8 @@ int main()
 
 	//uint8_t c = 10;
 	//Foo(&c);
-	//Pins::SetConfiguration(Pins::Out);
-	Pins::Write(PORTB);
+//	Pins::SetConfiguration(Pins::Out);
+	Pins::Write<0x55>();
 //	PORTB = Pins::PinRead();
 
 	//PORTA = Bar(PORTB);

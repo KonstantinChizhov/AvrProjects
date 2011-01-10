@@ -128,68 +128,105 @@ namespace IO
 			}
 	};
 
-#define MAKE_PORT(portName, className, ID) \
-	class className: public NativePortBase{\
-	public:\
-		typedef uint8_t DataT;\
-	public:\
-		static void Write(DataT value)\
-		{\
-			portName.OUT = value;\
-		}\
-		static void ClearAndSet(DataT clearMask, DataT value)\
-		{\
-			Clear(clearMask);\
-			Set(value);\
-		}\
-		static DataT Read()\
-		{\
-			return portName.OUT;\
-		}\
-		static void Set(DataT value)\
-		{\
-			portName.OUTSET = value;\
-		}\
-		static void Clear(DataT value)\
-		{\
-			portName.OUTCLR = value;\
-		}\
-		static void Toggle(DataT value)\
-		{\
-			portName.OUTTGL = value;\
-		}\
-		static void DirSet(DataT value)\
-		{\
-			portName.DIRSET = value;\
-		}\
-		static void DirClear(DataT value)\
-		{\
-			portName.DIRCLR = value;\
-		}\
-		static DataT PinRead()\
-		{\
-			return portName.IN;\
-		}\
-		template<unsigned pin>\
-		static void SetPinConfiguration(Configuration configuration)\
-		{\
-			BOOST_STATIC_ASSERT(pin < Width);\
-			if(configuration)\
-				portName.DIRSET = 1 << pin;\
-			else\
-				portName.DIRCLR = 1 << pin;\
-		}\
-		static void SetConfiguration(DataT mask, Configuration configuration)\
-		{\
-			if(configuration)\
-				portName.DIRSET = mask;\
-			else\
-				portName.DIRCLR = mask;\
-		}\
-		enum{Id = ID};\
-		enum{Width=8};\
+	template<class Port>
+	class PortImplimentation: public NativePortBase{
+	public:
+		static void Write(DataT value)
+		{
+			Port::Port().OUT = value;
+		}
+
+		static void ClearAndSet(DataT clearMask, DataT value)
+		{
+			Clear(clearMask);
+			Set(value);
+		}
+
+		static DataT Read()
+		{
+			return Port::Port().OUT;
+		}
+
+		static void Set(DataT value)
+		{	
+			Port::Port().OUTSET = value;
+		}
+
+		static void Clear(DataT value)
+		{
+			Port::Port().OUTCLR = value;
+		}
+
+		static void Toggle(DataT value)
+		{
+			Port::Port().OUTTGL = value;
+		}
+
+		static DataT PinRead()
+		{
+			return Port::Port().IN;
+		}
+
+		template<unsigned pin>
+		static void SetPinConfiguration(Configuration configuration)
+		{
+			BOOST_STATIC_ASSERT(pin < Width);
+			if(configuration)
+				Port::Port().DIRSET = 1 << pin;
+			else
+				Port::Port().DIRCLR = 1 << pin;
+		}
+
+		static void SetConfiguration(DataT mask, Configuration configuration)
+		{
+			if(configuration)
+				Port::Port().DIRSET = mask;
+			else
+				Port::Port().DIRCLR = mask;
+		}
+		
+		template<DataT mask, Configuration configuration>
+		static void SetConfiguration()
+		{
+			if(configuration)
+				Port::Port().DIRSET = mask;
+			else
+				Port::Port().DIRCLR = mask;
+		}
+
+		template<DataT clearMask, DataT value>
+		static void ClearAndSet()
+		{
+			Port::Port().OUTCLR = clearMask;
+			Port::Port().OUTSET = value;
+		}
+
+		template<DataT value>
+		static void Toggle()
+		{
+			Port::Port().OUTTGL = value;
+		}
+
+		template<DataT value>
+		static void Set()
+		{
+			Port::Port().OUTSET = value;
+		}
+
+		template<DataT value>
+		static void Clear()
+		{
+			Port::Port().OUTCLR = value;
+		}
 	};
 
+#define MAKE_PORT(portName, className, ID) \
+			class className :public PortImplimentation<className>{\
+				static PORT_t &Port(){return portName;}\
+				friend class PortImplimentation<className>;\
+				public:\
+				enum{Id = ID};\
+			};\
 
 #ifdef USE_PORTA
 MAKE_PORT(PORTA, Porta, 'A')

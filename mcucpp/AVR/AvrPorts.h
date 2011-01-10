@@ -130,55 +130,127 @@ namespace IO
 	
 	//Port definitions for AtTiny, AtMega families.
 
-	#define MAKE_PORT(portName, ddrName, pinName, className, ID) \
-		class className :public NativePortBase{\
-		public:\
-			static void Write(DataT value)\
-			{\
-				portName = value;\
-			}\
-			static void ClearAndSet(DataT clearMask, DataT value)\
-			{\
-				portName = (portName & ~clearMask) | value;\
-			}\
-			static DataT Read()\
-			{\
-				return portName;\
-			}\
-			static void Set(DataT value)\
-			{\
-				portName |= value;\
-			}\
-			static void Clear(DataT value)\
-			{\
-				portName &= ~value;\
-			}\
-			static void Toggle(DataT value)\
-			{\
-				portName ^= value;\
-			}\
-			static DataT PinRead()\
-			{\
-				return pinName;\
-			}\
-			template<unsigned pin>\
-			static void SetPinConfiguration(Configuration configuration)\
-			{\
-				BOOST_STATIC_ASSERT(pin < Width);\
-				if(configuration)\
-					ddrName |= 1 << pin;\
-				else\
-					ddrName &= ~(1 << pin);\
-			}\
-			static void SetConfiguration(DataT mask, Configuration configuration)\
-			{\
-				if(configuration)\
-					ddrName |= mask;\
-				else\
-					ddrName &= ~mask;\
-			}\
-			enum{Id = ID};\
+		template<class Port>
+		class PortImplimentation :public NativePortBase
+		{
+			template<DataT value, DataT mask>
+			static void SetBitWize()
+			{
+				if(mask == 0) return;
+				if(value & mask)
+					Port::PortSet(Port::Port() | (value & mask));
+				SetBitWize<value, mask << 1>();
+			}
+		public:
+			static void Write(DataT value)
+			{
+				Port::PortSet(value);
+			}
+
+			static void ClearAndSet(DataT clearMask, DataT value)
+			{
+				Port::PortSet((Port::Port() & ~clearMask) | value);
+			}
+
+			static DataT Read()
+			{
+				return Port::Port();
+			}
+
+			static void Set(DataT value)
+			{
+				Port::PortSet(Port::Port() | value);
+			}
+
+			static void Clear(DataT value)
+			{
+				Port::PortSet(Port::Port() & ~value);
+			}
+
+			static void Toggle(DataT value)
+			{
+				Port::PortSet(Port::Port() ^ value);
+			}
+
+			static DataT PinRead()
+			{
+				return Port::Pin();
+			}
+
+			// constant interface
+
+			template<DataT clearMask, DataT value>
+			static void ClearAndSet()
+			{
+				Port::PortSet((Port::Port() & ~clearMask) | value);
+			}
+
+			template<DataT value>
+			static void Toggle()
+			{
+				Port::PortSet(Port::Port() ^ value);
+			}
+
+			template<DataT value>
+			static void Set()
+			{
+				if(PopulatedBits<value>::value < 4)
+					SetBitWize<value, 1>();
+				else
+					Port::PortSet(Port::Port() | value);
+			}
+
+			template<DataT value>
+			static void Clear()
+			{
+				Port::PortSet(Port::Port() & ~value);
+			}
+
+			
+			// Configuration interface
+
+			template<unsigned pin>
+			static void SetPinConfiguration(Configuration configuration)
+			{
+				BOOST_STATIC_ASSERT(pin < Width);
+				if(configuration)
+					Port::DirSet(Port::Dir() | 1 << pin);
+				else
+					Port::DirSet(Port::Dir() & ~(1 << pin));
+			}
+
+			static void SetConfiguration(DataT mask, Configuration configuration)
+			{
+				if(configuration)
+					Port::DirSet(Port::Dir() | mask);
+				else
+					Port::DirSet(Port::Dir() & ~mask);
+			}
+
+			template<DataT mask, Configuration configuration>
+			static void SetConfiguration()
+			{
+				if(configuration)
+					Port::DirSet(Port::Dir() | mask);
+				else
+					Port::DirSet(Port::Dir() & ~mask);
+			}
 		};
+
+	#define MAKE_PORT(portName, ddrName, pinName, className, ID) \
+			class className :public PortImplimentation<className>{\
+			public:\
+				using PortImplimentation<className>::DataT;\
+			protected:\
+				static DataT Port(){return portName;}\
+				static void PortSet(DataT value){portName = value;}\
+				static DataT Dir(){return ddrName;}\
+				static void DirSet(DataT value){ddrName = value;}\
+				static DataT Pin(){return pinName;}\
+				friend class PortImplimentation<className>;\
+			public:\
+				enum{Id = ID};\
+			};\
 
 	#ifdef USE_PORTA
 	MAKE_PORT(PORTA, DDRA, PINA, Porta, 'A')

@@ -511,7 +511,24 @@ namespace IO
 				return PinWriteIterator<Tail>::UppendReadValue(portValue, result);
 			}
         };
+////////////////////////////////////////////////////////////////////////////////
+// PinConstWriteIterator
+////////////////////////////////////////////////////////////////////////////////
+		template <class TList, class DataType, class PortDataType, DataType value> struct PinConstWriteIterator;
 
+        template <class DataType, class PortDataType, DataType value> 
+		struct PinConstWriteIterator<NullType, DataType, PortDataType, value>
+        {
+			static const PortDataType PortValue = 0;
+        };
+
+        template <class Head, class Tail, class DataType, class PortDataType, DataType value>
+        struct PinConstWriteIterator< Typelist<Head, Tail>, PortDataType, DataType, value>
+        {
+			static const PortDataType PortValue = (value & (1 << Head::Position) ? 
+					(1 << Head::Pin::Number) : 0) | 
+					PinConstWriteIterator<Tail, DataType, PortDataType, value>::PortValue;
+        };
 ////////////////////////////////////////////////////////////////////////////////
 // class template PortWriteIterator
 // Iterates througth port list and write value to them
@@ -550,6 +567,28 @@ namespace IO
 			{
 				return 0;
 			}
+
+			// constant writing interface
+			 
+			template<class DataType, DataType value>
+			static void Write()
+			{	}
+
+			template<class DataType, DataType value>
+			static void Set()
+			{	}
+
+			template<class DataType, DataType value>
+			static void Clear()
+			{	}
+
+			template<class Configuration, class DataType, Configuration config, DataType mask>
+			static void SetConfiguration()
+			{	}
+
+			template<class DataType, GpioBase::GenericConfiguration config, DataType mask>
+			static void SetConfiguration()
+			{	}
         };
 
         template <class Head, class Tail, class PinList>
@@ -627,6 +666,47 @@ namespace IO
 				return PinWriteIterator<Pins>::UppendReadValue(
 							portValue,
 							PortWriteIterator<Tail, PinList>::template OutRead<DataType>());
+			}
+			
+			// constant writing interface
+			 
+			template<class DataType, DataType value>
+			static void Write()
+			{
+				enum{ portValue = PinConstWriteIterator<Pins, DataType, typename Port::DataT, value>::PortValue};
+				Port::template ClearAndSet<Mask, portValue>();
+				PortWriteIterator<Tail, PinList>::template Write<DataType, value>();
+			}
+
+			template<class DataType, DataType value>
+			static void Set()
+			{
+				enum{ portValue = PinConstWriteIterator<Pins, DataType, typename Port::DataT, value>::PortValue};
+				Port::template Set<portValue>();
+				PortWriteIterator<Tail, PinList>::template Set<DataType, value>();
+			}
+
+			template<class DataType, DataType value>
+			static void Clear()
+			{
+				enum{ portValue = PinConstWriteIterator<Pins, DataType, typename Port::DataT, value>::PortValue};
+				Port::template Clear<portValue>();
+				PortWriteIterator<Tail, PinList>::template Clear<DataType, value>();
+			}
+
+			template<class Configuration, class DataType, Configuration config, DataType mask>
+			static void SetConfiguration()
+			{
+				enum{ portValue = PinConstWriteIterator<Pins, DataType, typename Port::DataT, mask>::PortValue};
+				Port::template SetConfiguration<portValue, config>();
+				PortWriteIterator<Tail, PinList>::template SetConfiguration<Configuration, DataType, config, mask>();
+			}
+
+			template<class DataType, GpioBase::GenericConfiguration config, DataType mask>
+			static void SetConfiguration()
+			{
+				
+				PortWriteIterator<Tail, PinList>::template SetConfiguration<DataType, config, mask>();
 			}
 
         };
@@ -739,6 +819,32 @@ namespace IO
 			static void SetConfiguration(ConfigurationT config, DataType mask = DataType(-1))
 			{
 				IoPrivate::PortWriteIterator<ConfigPorts, ConfigPins>::SetConfiguration(config, mask);
+			}
+
+			// constant writing interface
+
+			template<DataType value>
+			static void Write()
+			{
+				IoPrivate::PortWriteIterator<Ports, PINS>:: template Write<DataType, value>();
+			}
+			
+			template<DataType value>
+			static void Set()
+			{
+				IoPrivate::PortWriteIterator<Ports, PINS>:: template Set<DataType, value>();
+			}
+
+			template<DataType value>
+			static void Clear()
+			{
+				IoPrivate::PortWriteIterator<Ports, PINS>:: template Clear<DataType, value>();
+			}
+
+			template<class ConfigurationT, ConfigurationT config, DataType mask>
+			static void SetConfiguration()
+			{
+				IoPrivate::PortWriteIterator<ConfigPorts, ConfigPins>:: template SetConfiguration<DataType, ConfigurationT, config, mask>();
 			}
 		};
 
