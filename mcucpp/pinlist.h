@@ -673,7 +673,7 @@ namespace IO
 			template<class DataType, DataType value>
 			static void Write()
 			{
-				enum{ portValue = PinConstWriteIterator<Pins, DataType, typename Port::DataT, value>::PortValue};
+				const typename Port::DataT portValue = PinConstWriteIterator<Pins, DataType, typename Port::DataT, value>::PortValue;
 				Port::template ClearAndSet<Mask, portValue>();
 				PortWriteIterator<Tail, PinList>::template Write<DataType, value>();
 			}
@@ -681,7 +681,7 @@ namespace IO
 			template<class DataType, DataType value>
 			static void Set()
 			{
-				enum{ portValue = PinConstWriteIterator<Pins, DataType, typename Port::DataT, value>::PortValue};
+				const typename Port::DataT portValue = PinConstWriteIterator<Pins, DataType, typename Port::DataT, value>::PortValue;
 				Port::template Set<portValue>();
 				PortWriteIterator<Tail, PinList>::template Set<DataType, value>();
 			}
@@ -689,26 +689,63 @@ namespace IO
 			template<class DataType, DataType value>
 			static void Clear()
 			{
-				enum{ portValue = PinConstWriteIterator<Pins, DataType, typename Port::DataT, value>::PortValue};
+				const typename Port::DataT portValue = PinConstWriteIterator<Pins, DataType, typename Port::DataT, value>::PortValue;
 				Port::template Clear<portValue>();
 				PortWriteIterator<Tail, PinList>::template Clear<DataType, value>();
 			}
+        };
+////////////////////////////////////////////////////////////////////////////////
+// PortConfigurationIterator
+////////////////////////////////////////////////////////////////////////////////
 
-			template<class Configuration, class DataType, Configuration config, DataType mask>
+		template <class PortList, class PinList, class Configuration, Configuration config> 
+		struct PortConfigurationIterator;
+
+        template <class PinList, class Configuration, Configuration config> 
+		struct PortConfigurationIterator<NullType, PinList, Configuration, config>
+        {
+			template<class DataType, DataType mask>
+			static void SetConfiguration()
+			{	}
+        };
+
+        template <class Head, class Tail, class PinList, class Configuration, Configuration config>
+        struct PortConfigurationIterator< Typelist<Head, Tail>, PinList, Configuration, config>
+        {
+			//pins on current port
+			typedef typename GetPinsWithPort<PinList, Head>::Result Pins;
+			typedef Head Port; //Head points to current port i the list.
+
+			template<class DataType, DataType mask>
 			static void SetConfiguration()
 			{
-				enum{ portValue = PinConstWriteIterator<Pins, DataType, typename Port::DataT, mask>::PortValue};
+				const typename Port::DataT portValue = PinConstWriteIterator<Pins, DataType, typename Port::DataT, mask>::PortValue;
 				Port::template SetConfiguration<portValue, config>();
-				PortWriteIterator<Tail, PinList>::template SetConfiguration<Configuration, DataType, config, mask>();
+				PortConfigurationIterator<Tail, PinList, Configuration, config>::template SetConfiguration<DataType, mask>();
 			}
+        };
 
-			template<class DataType, GpioBase::GenericConfiguration config, DataType mask>
+		template <class Head, class Tail, class PinList, GpioBase::GenericConfiguration config>
+        struct PortConfigurationIterator< Typelist<Head, Tail>, PinList, GpioBase::GenericConfiguration, config>
+        {
+			//pins on current port
+			typedef typename GetPinsWithPort<PinList, Head>::Result Pins;
+			typedef Head Port; //Head points to current port i the list.
+
+			template<class DataType, DataType mask>
 			static void SetConfiguration()
 			{
-				
-				PortWriteIterator<Tail, PinList>::template SetConfiguration<DataType, config, mask>();
-			}
+				const typename Port::DataT portValue = 
+					PinConstWriteIterator<Pins, DataType, typename Port::DataT, mask>::PortValue;
 
+				const typename Port::Configuration portConfig = 
+					Port::template MapConfigurationConst<config>::value;
+
+				Port::template SetConfiguration<portValue, portConfig>();
+
+				PortConfigurationIterator<Tail, PinList, GpioBase::GenericConfiguration, config>::
+					template SetConfiguration<DataType, mask>();
+			}
         };
 	}
 ////////////////////////////////////////////////////////////////////////////////
@@ -762,6 +799,8 @@ namespace IO
 			typedef typename Config::Ports Ports;
 			typedef typename Config::ConfigPorts ConfigPorts;
 			typedef typename Config::ConfigPins ConfigPins;
+			typedef typename Config::BasePortType::Configuration PortConfiguration;
+
 			using Config::Length;
 
 			template<uint8_t Num>
@@ -841,10 +880,11 @@ namespace IO
 				IoPrivate::PortWriteIterator<Ports, PINS>:: template Clear<DataType, value>();
 			}
 
-			template<class ConfigurationT, ConfigurationT config, DataType mask>
+			template<PortConfiguration config, DataType mask>
 			static void SetConfiguration()
 			{
-				IoPrivate::PortWriteIterator<ConfigPorts, ConfigPins>:: template SetConfiguration<DataType, ConfigurationT, config, mask>();
+				IoPrivate::PortConfigurationIterator<ConfigPorts, ConfigPins, PortConfiguration, config>:: 
+					template SetConfiguration<DataType, mask>();
 			}
 		};
 
