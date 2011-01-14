@@ -126,7 +126,19 @@ namespace IO
 					return Out;
 				return In;
 			}
+			
+			template<GenericConfiguration config>
+			struct MapConfigurationConst
+			{
+				static const Configuration value = In;
+			};
 	};
+	
+
+	template<> struct NativePortBase::MapConfigurationConst<GpioBase::Out>{static const Configuration value = Out;};
+	template<> struct NativePortBase::MapConfigurationConst<GpioBase::OpenDrainOut>{static const Configuration value = Out;};
+	template<> struct NativePortBase::MapConfigurationConst<GpioBase::AltOut>{static const Configuration value = Out;};
+	template<> struct NativePortBase::MapConfigurationConst<GpioBase::AltOpenDrain>{static const Configuration value = Out;};
 	
 	//Port definitions for AtTiny, AtMega families.
 

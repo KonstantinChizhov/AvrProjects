@@ -320,7 +320,7 @@ namespace IO
         template <class Head, class Tail>
         struct GetInversionMask< Typelist<Head, Tail> >
         {
-			enum{value = Head::Pin::Inverted ? (1 << Head::Pin::Number) : 0 | GetInversionMask<Tail>::value};
+			enum{value = (Head::Pin::Inverted ? (1 << Head::Pin::Number) : 0) | GetInversionMask<Tail>::value};
         };
 ////////////////////////////////////////////////////////////////////////////////
 // class template GetPortMask
@@ -469,7 +469,7 @@ namespace IO
 							Head::Position, 	//bit position in value
 							ValueToPort>::Shift(value) &
 						GetPortMask<Typelist<Head, Tail> >::value;
-					;
+					
 					return result ^ GetInversionMask<Typelist<Head, Tail> >::value;
 				}
 				if(Head::Pin::Inverted == false)
@@ -673,7 +673,10 @@ namespace IO
 			template<class DataType, DataType value>
 			static void Write()
 			{
-				const typename Port::DataT portValue = PinConstWriteIterator<Pins, DataType, typename Port::DataT, value>::PortValue;
+				const typename Port::DataT portValue = 
+					PinConstWriteIterator<Pins, DataType, typename Port::DataT, value>::PortValue ^
+					GetInversionMask<Pins>::value;
+
 				Port::template ClearAndSet<Mask, portValue>();
 				PortWriteIterator<Tail, PinList>::template Write<DataType, value>();
 			}
@@ -681,7 +684,10 @@ namespace IO
 			template<class DataType, DataType value>
 			static void Set()
 			{
-				const typename Port::DataT portValue = PinConstWriteIterator<Pins, DataType, typename Port::DataT, value>::PortValue;
+				const typename Port::DataT portValue = 
+				PinConstWriteIterator<Pins, DataType, typename Port::DataT, value>::PortValue ^
+					GetInversionMask<Pins>::value;
+
 				Port::template Set<portValue>();
 				PortWriteIterator<Tail, PinList>::template Set<DataType, value>();
 			}
@@ -689,7 +695,10 @@ namespace IO
 			template<class DataType, DataType value>
 			static void Clear()
 			{
-				const typename Port::DataT portValue = PinConstWriteIterator<Pins, DataType, typename Port::DataT, value>::PortValue;
+				const typename Port::DataT portValue = 
+					PinConstWriteIterator<Pins, DataType, typename Port::DataT, value>::PortValue^
+					GetInversionMask<Pins>::value;
+
 				Port::template Clear<portValue>();
 				PortWriteIterator<Tail, PinList>::template Clear<DataType, value>();
 			}
