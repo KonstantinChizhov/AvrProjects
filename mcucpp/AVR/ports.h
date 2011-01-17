@@ -101,6 +101,8 @@
 #define USE_VPORT3
 #endif
 
+#include "atomic.h"
+
 namespace IO
 {
 
@@ -110,6 +112,7 @@ namespace IO
 			typedef uint8_t DataT;
 			typedef NativePortBase Base;
 			enum{Width=sizeof(DataT)*8};
+			static const unsigned MaxBitwiseOutput = 4;
 		public:
 			enum Configuration
 			{
@@ -146,12 +149,21 @@ namespace IO
 		class PortImplimentation :public NativePortBase
 		{
 			template<DataT value, DataT mask>
-			static void SetBitWize()
+			static void SetBitWise()
 			{
 				if(mask == 0) return;
 				if(value & mask)
 					Port::PortSet(Port::Port() | (value & mask));
-				SetBitWize<value, mask << 1>();
+				SetBitWise<value, mask << 1>();
+			}
+
+			template<DataT value, DataT mask>
+			static void ClearBitWise()
+			{
+				if(mask == 0) return;
+				if(value & mask)
+					Port::PortSet(Port::Port() & ~(value & mask));
+				SetBitWise<value, mask << 1>();
 			}
 		public:
 			static void Write(DataT value)
@@ -194,7 +206,18 @@ namespace IO
 			template<DataT clearMask, DataT value>
 			static void ClearAndSet()
 			{
-				Port::PortSet((Port::Port() & ~clearMask) | value);
+				const DataT bitsToSet = value & clearMask;
+				const DataT bitsToClear = ~value & clearMask;
+
+				const unsigned countBitsToChange = PopulatedBits<clearMask>::value;
+
+				if(countBitsToChange <= MaxBitwiseOutput)
+				{
+					SetBitWise<bitsToSet, 1>();
+					ClearBitWise<bitsToClear, 1>();
+				}
+				else
+					Port::PortSet((Port::Port() & ~clearMask) | value);
 			}
 
 			template<DataT value>
@@ -206,8 +229,8 @@ namespace IO
 			template<DataT value>
 			static void Set()
 			{
-				if(PopulatedBits<value>::value < 4)
-					SetBitWize<value, 1>();
+				if(PopulatedBits<value>::value <= MaxBitwiseOutput)
+					SetBitWise<value, 1>();
 				else
 					Port::PortSet(Port::Port() | value);
 			}
@@ -215,7 +238,10 @@ namespace IO
 			template<DataT value>
 			static void Clear()
 			{
-				Port::PortSet(Port::Port() & ~value);
+				if(PopulatedBits<value>::value <= MaxBitwiseOutput)
+					ClearBitWise<value, 1>();
+				else
+					Port::PortSet(Port::Port() & ~value);
 			}
 
 			

@@ -34,23 +34,8 @@
 
 #include "gpiobase.h"
 
-#if defined(__ICC430__) || defined(__MSP430__)
-#include "MSP430/Msp430Ports.h"
-#elif defined(__ICCAVR__) || defined(__AVR__)
-
-#if defined(PORTCFG_MPCMASK) //XMega family
-#include "AVR/XMegaPorts.h"
-#else
-#include "AVR/AvrPorts.h"
-#endif
-
-#elif defined(__ICCARM__) || defined ( __CC_ARM   ) || defined(__arm__)
-#include "ARM/Stm32Ports.h"
-#else
-
-#warning "Not supported arch. Test mode only."
-#include "TestPort.h"
-#endif
+#define RELATIVE_HEADER_NAME ports.h
+#include "select_arch.h"
 
 namespace IO
 {	

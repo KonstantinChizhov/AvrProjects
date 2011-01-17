@@ -3,7 +3,8 @@
 #include <avr/interrupt.h>
 #include "iopins.h"
 #include "pinlist.h"
-#include "util.h"
+//#include "util.h"
+
 
 using namespace IO;
 
@@ -55,7 +56,8 @@ int main()
 
 	//uint8_t c = 10;
 	//Foo(&c);
-//	Pins::SetConfiguration(Pins::Out);
+	Pins::SetConfiguration<Pins::In, 1>();
+
 	Pins::Write<0x55>();
 //	PORTB = Pins::PinRead();
 
