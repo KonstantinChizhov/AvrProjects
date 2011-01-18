@@ -103,6 +103,11 @@
 
 #include "atomic.h"
 
+#define PORT_REGS_WRAPPER(PORT_LETTER) \
+	IO_REG_WRAPPER(PORT ## PORT_LETTER, Out ## PORT_LETTER, uint8_t);\
+	IO_REG_WRAPPER(DDR ## PORT_LETTER, Dir ## PORT_LETTER, uint8_t);\
+	IO_REG_WRAPPER(PIN ## PORT_LETTER, In ## PORT_LETTER, uint8_t);
+
 namespace IO
 {
 
@@ -145,7 +150,7 @@ namespace IO
 	
 	//Port definitions for AtTiny, AtMega families.
 
-		template<class Port>
+		template<class Out, class Dir, class In, int ID>
 		class PortImplimentation :public NativePortBase
 		{
 			template<DataT value, DataT mask>
@@ -153,7 +158,7 @@ namespace IO
 			{
 				if(mask == 0) return;
 				if(value & mask)
-					Port::PortSet(Port::Port() | (value & mask));
+					Out::Or(value & mask);
 				SetBitWise<value, mask << 1>();
 			}
 
@@ -162,43 +167,43 @@ namespace IO
 			{
 				if(mask == 0) return;
 				if(value & mask)
-					Port::PortSet(Port::Port() & ~(value & mask));
+					Out::And(~(value & mask));
 				ClearBitWise<value, mask << 1>();
 			}
 		public:
 			static void Write(DataT value)
 			{
-				Port::PortSet(value);
+				Out::Set(value);
 			}
 
 			static void ClearAndSet(DataT clearMask, DataT value)
 			{
-				ATOMIC Port::PortSet((Port::Port() & ~clearMask) | value);
+				ATOMIC Out::AndOr(~clearMask, value);
 			}
 
 			static DataT Read()
 			{
-				return Port::Port();
+				return Out::Get();
 			}
 
 			static void Set(DataT value)
 			{
-				ATOMIC Port::PortSet(Port::Port() | value);
+				ATOMIC Out::Or(value);
 			}
 
 			static void Clear(DataT value)
 			{
-				ATOMIC Port::PortSet(Port::Port() & ~value);
+				ATOMIC Out::And(~value);
 			}
 
 			static void Toggle(DataT value)
 			{
-				ATOMIC Port::PortSet(Port::Port() ^ value);
+				ATOMIC Out::Xor(value);
 			}
 
 			static DataT PinRead()
 			{
-				return Port::Pin();
+				return In::Get();
 			}
 
 			// constant interface
@@ -217,13 +222,13 @@ namespace IO
 					ClearBitWise<bitsToClear, 1>();
 				}
 				else
-					ATOMIC Port::PortSet((Port::Port() & ~clearMask) | value);
+					ATOMIC Out::AndOr(~clearMask, value);
 			}
 
 			template<DataT value>
 			static void Toggle()
 			{
-				ATOMIC Port::PortSet(Port::Port() ^ value);
+				ATOMIC Out::Xor(value);
 			}
 
 			template<DataT value>
@@ -232,7 +237,7 @@ namespace IO
 				if(PopulatedBits<value>::value <= MaxBitwiseOutput)
 					SetBitWise<value, 1>();
 				else
-					ATOMIC Port::PortSet(Port::Port() | value);
+					ATOMIC Out::Or(value);
 			}
 
 			template<DataT value>
@@ -241,10 +246,9 @@ namespace IO
 				if(PopulatedBits<value>::value <= MaxBitwiseOutput)
 					ClearBitWise<value, 1>();
 				else
-					ATOMIC Port::PortSet(Port::Port() & ~value);
+					ATOMIC Out::And(~value);
 			}
 
-			
 			// Configuration interface
 
 			template<unsigned pin>
@@ -252,77 +256,99 @@ namespace IO
 			{
 				BOOST_STATIC_ASSERT(pin < Width);
 				if(configuration)
-					Port::DirSet(Port::Dir() | 1 << pin);
+					Dir::Or(1 << pin);
 				else
-					Port::DirSet(Port::Dir() & ~(1 << pin));
+					Dir::And(~(1 << pin));
 			}
 
 			static void SetConfiguration(DataT mask, Configuration configuration)
 			{
 				if(configuration)
-					Port::DirSet(Port::Dir() | mask);
+					Dir::Or(mask);
 				else
-					Port::DirSet(Port::Dir() & ~mask);
+					Dir::And(~mask);
 			}
 
 			template<DataT mask, Configuration configuration>
 			static void SetConfiguration()
 			{
 				if(configuration)
-					Port::DirSet(Port::Dir() | mask);
+					Dir::Or(mask);
 				else
-					Port::DirSet(Port::Dir() & ~mask);
+					Dir::And(~mask);
 			}
+
+			enum{Id = ID};
 		};
 
-	#define MAKE_PORT(portName, ddrName, pinName, className, ID) \
-			class className :public PortImplimentation<className>{\
-			public:\
-				using PortImplimentation<className>::DataT;\
-			protected:\
-				static DataT Port(){return portName;}\
-				static void PortSet(DataT value){portName = value;}\
-				static DataT Dir(){return ddrName;}\
-				static void DirSet(DataT value){ddrName = value;}\
-				static DataT Pin(){return pinName;}\
-				friend class PortImplimentation<className>;\
-			public:\
-				enum{Id = ID};\
-			};\
+	namespace Private
+	{
+		#ifdef USE_PORTA
+		PORT_REGS_WRAPPER(A)
+		#endif
+
+		#ifdef USE_PORTB
+		PORT_REGS_WRAPPER(B)
+		#endif
+
+		#ifdef USE_PORTC
+		PORT_REGS_WRAPPER(C)
+		#endif
+
+		#ifdef USE_PORTD
+		PORT_REGS_WRAPPER(D)
+		#endif
+
+		#ifdef USE_PORTE
+		PORT_REGS_WRAPPER(E)
+		#endif
+
+		#ifdef USE_PORTF
+		PORT_REGS_WRAPPER(F)
+		#endif
+
+		#ifdef USE_PORTG
+		PORT_REGS_WRAPPER(G)
+		#endif
+	}
+
+#define DECLARE_PORT(SUFFIX, CLASS_NAME, ID) \
+		typedef PortImplimentation<\
+			Private::Out ## SUFFIX,\
+			Private::Dir ## SUFFIX,\
+			Private::In ## SUFFIX,\
+			ID> CLASS_NAME;
 
 	#ifdef USE_PORTA
-	MAKE_PORT(PORTA, DDRA, PINA, Porta, 'A')
+	DECLARE_PORT(A, Porta, 0)
 	#endif
-
 
 	#ifdef USE_PORTB
-	MAKE_PORT(PORTB, DDRB, PINB, Portb, 'B')
+	DECLARE_PORT(B, Portb, 1)
 	#endif
-
 
 	#ifdef USE_PORTC
-	MAKE_PORT(PORTC, DDRC, PINC, Portc, 'C')
+	DECLARE_PORT(C, Portc, 2)
 	#endif
-
 
 	#ifdef USE_PORTD
-	MAKE_PORT(PORTD, DDRD, PIND, Portd, 'D')
+	DECLARE_PORT(D, Portd, 3)
 	#endif
-
 
 	#ifdef USE_PORTE
-	MAKE_PORT(PORTE, DDRE, PINE, Porte, 'E')
+	DECLARE_PORT(E, Porte, 4)
 	#endif
 
-
 	#ifdef USE_PORTF
-	MAKE_PORT(PORTF, DDRF, PINF, Portf, 'F')
+	DECLARE_PORT(F, Portf, 5)
 	#endif
 
 	#ifdef USE_PORTG
-	MAKE_PORT(PORTG, DDRG, PING, Portg, 'G')
+	DECLARE_PORT(G, Portg, 6)
 	#endif
-
 }
+
+#undef DECLARE_PORT
+#undef PORT_REGS_WRAPPER
 
 #endif
