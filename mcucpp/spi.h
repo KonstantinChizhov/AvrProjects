@@ -1,8 +1,4 @@
 
-#if defined(__ICCAVR__) || defined(__AVR__)
-#include "AVR/spi.h"
-#endif
-
 #include <iopins.h>
 #include <pinlist.h>
 

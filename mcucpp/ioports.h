@@ -25,17 +25,17 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //*****************************************************************************
 
-
-
 #pragma once
 
 #ifndef IOPORTS_HPP
 #define IOPORTS_HPP
 
+// Common base for all gpio ports
 #include "gpiobase.h"
 
-#define RELATIVE_HEADER_NAME ports.h
-#include "select_arch.h"
+// Platform specific io ports implementation
+// Add appropriate platform specific folder to your include paths
+#include "ports.h"
 
 namespace IO
 {	
