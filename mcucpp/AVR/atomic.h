@@ -1,10 +1,12 @@
+#pragma once
+
 class DisableInterrupts
 {
 public:
 	DisableInterrupts()
 	{
 		_sreg = SREG;
-		cli();
+		asm("cli");
 	}
 	~DisableInterrupts()
 	{

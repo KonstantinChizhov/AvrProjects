@@ -112,7 +112,7 @@ namespace IO
 			typedef uint8_t DataT;
 			typedef NativePortBase Base;
 			enum{Width=sizeof(DataT)*8};
-			static const unsigned MaxBitwiseOutput = 4;
+			static const unsigned MaxBitwiseOutput = 5;
 		public:
 			enum Configuration
 			{
@@ -149,7 +149,7 @@ namespace IO
 		class PortImplimentation :public NativePortBase
 		{
 			template<DataT value, DataT mask>
-			static void SetBitWise()
+			static inline void SetBitWise()
 			{
 				if(mask == 0) return;
 				if(value & mask)
@@ -158,12 +158,12 @@ namespace IO
 			}
 
 			template<DataT value, DataT mask>
-			static void ClearBitWise()
+			static inline void ClearBitWise()
 			{
 				if(mask == 0) return;
 				if(value & mask)
 					Port::PortSet(Port::Port() & ~(value & mask));
-				SetBitWise<value, mask << 1>();
+				ClearBitWise<value, mask << 1>();
 			}
 		public:
 			static void Write(DataT value)
@@ -173,7 +173,7 @@ namespace IO
 
 			static void ClearAndSet(DataT clearMask, DataT value)
 			{
-				Port::PortSet((Port::Port() & ~clearMask) | value);
+				ATOMIC Port::PortSet((Port::Port() & ~clearMask) | value);
 			}
 
 			static DataT Read()
@@ -183,17 +183,17 @@ namespace IO
 
 			static void Set(DataT value)
 			{
-				Port::PortSet(Port::Port() | value);
+				ATOMIC Port::PortSet(Port::Port() | value);
 			}
 
 			static void Clear(DataT value)
 			{
-				Port::PortSet(Port::Port() & ~value);
+				ATOMIC Port::PortSet(Port::Port() & ~value);
 			}
 
 			static void Toggle(DataT value)
 			{
-				Port::PortSet(Port::Port() ^ value);
+				ATOMIC Port::PortSet(Port::Port() ^ value);
 			}
 
 			static DataT PinRead()
@@ -217,13 +217,13 @@ namespace IO
 					ClearBitWise<bitsToClear, 1>();
 				}
 				else
-					Port::PortSet((Port::Port() & ~clearMask) | value);
+					ATOMIC Port::PortSet((Port::Port() & ~clearMask) | value);
 			}
 
 			template<DataT value>
 			static void Toggle()
 			{
-				Port::PortSet(Port::Port() ^ value);
+				ATOMIC Port::PortSet(Port::Port() ^ value);
 			}
 
 			template<DataT value>
@@ -232,7 +232,7 @@ namespace IO
 				if(PopulatedBits<value>::value <= MaxBitwiseOutput)
 					SetBitWise<value, 1>();
 				else
-					Port::PortSet(Port::Port() | value);
+					ATOMIC Port::PortSet(Port::Port() | value);
 			}
 
 			template<DataT value>
@@ -241,7 +241,7 @@ namespace IO
 				if(PopulatedBits<value>::value <= MaxBitwiseOutput)
 					ClearBitWise<value, 1>();
 				else
-					Port::PortSet(Port::Port() & ~value);
+					ATOMIC Port::PortSet(Port::Port() & ~value);
 			}
 
 			

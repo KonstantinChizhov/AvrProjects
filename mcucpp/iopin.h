@@ -55,9 +55,9 @@ namespace IO
 		static void Set(bool val)
 		{
 			if(val)
-				PORT::Set(1 << PIN);
+				PORT::template Set<1 << PIN>();
 			else
-				PORT::Clear(1 << PIN);
+				PORT::template Clear<1 << PIN>();
 		}
 
 		static void SetDir(uint8_t val)
@@ -117,9 +117,9 @@ namespace IO
 		static void Set(bool val)
 		{
 			if(val)
-				PORT::Clear(1 << PIN);
+				PORT::template Clear<1 << PIN>();
 			else
-				PORT::Set(1 << PIN);
+				PORT::template Set<1 << PIN>();
 		}
 
 		static void Set()

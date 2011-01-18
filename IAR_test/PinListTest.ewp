@@ -411,7 +411,8 @@
         </option>
         <option>
           <name>newCCIncludePaths</name>
-          <state></state>
+          <state>../mcucpp</state>
+          <state>../mcucpp/AVR</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -1103,12 +1104,12 @@
         </option>
         <option>
           <name>GGEepromUtilSize</name>
-          <state>2048</state>
+          <state>512</state>
         </option>
         <option>
           <name>New Variant Processor</name>
           <version>32</version>
-          <state>180</state>
+          <state>44</state>
         </option>
         <option>
           <name>GRuntimeLibSelect</name>
@@ -1125,11 +1126,11 @@
         </option>
         <option>
           <name>RTConfigPath</name>
-          <state>$TOOLKIT_DIR$\LIB\DLIB\dlAVR-3t-ec_mul-sf-n.h</state>
+          <state>$TOOLKIT_DIR$\LIB\DLIB\dlAVR-3s-ec_mul-sf-n.h</state>
         </option>
         <option>
           <name>RTLibraryPath</name>
-          <state>$TOOLKIT_DIR$\LIB\DLIB\dlAVR-3t-ec_mul-sf-n.r90</state>
+          <state>$TOOLKIT_DIR$\LIB\DLIB\dlAVR-3s-ec_mul-sf-n.r90</state>
         </option>
         <option>
           <name>Input variant</name>
@@ -1243,7 +1244,7 @@
         </option>
         <option>
           <name>CCListCFile</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>CCListCMnemonics</name>
@@ -1308,7 +1309,7 @@
         </option>
         <option>
           <name>CCOptSizeSpeed</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>CCOptimization</name>
@@ -1391,7 +1392,8 @@
         </option>
         <option>
           <name>newCCIncludePaths</name>
-          <state></state>
+          <state>../mcucpp</state>
+          <state>../mcucpp/AVR</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -1412,7 +1414,7 @@
         </option>
         <option>
           <name>CCOptSizeSpeedSlave</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>CCOptimizationSlave</name>
