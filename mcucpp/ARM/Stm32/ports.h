@@ -54,86 +54,186 @@ namespace IO
 		}
 	};
 
-#define MAKE_PORT(CRL, CRH, IDR, ODR, BSRR, BRR, LCKR, className, ID) \
-  class className :public NativePortBase{\
-	public:\
-		static DataT Read()\
-		{\
-			return ODR;\
-		}\
-		static void Write(DataT value)\
-		{\
-			ODR = value;\
-		}\
-		static void ClearAndSet(DataT clearMask, DataT value)\
-		{\
-			BSRR = value | (uint32_t)clearMask << 16;\
-		}\
-		static void Set(DataT value)\
-		{\
-			BSRR = value;\
-		}\
-		static void Clear(DataT value)\
-		{\
-			BSRR = (uint32_t)value << 16;\
-		}\
-		static void Toggle(DataT value)\
-		{\
-			ODR ^= value;\
-		}\
-		static DataT PinRead()\
-		{\
-			return IDR;\
-		}\
-		template<unsigned pin>\
-		static void SetPinConfiguration(Configuration configuration)\
-		{\
-			BOOST_STATIC_ASSERT(pin < Width);\
-			if(pin < 8)\
-			{\
-				CRL = (CRL & ~(0x0fu << pin*4)) | (unsigned)configuration << pin*4;\
-			}\
-			else\
-			{\
-				CRH = (CRH & ~(0x0fu << (pin-8)*4)) | (unsigned)configuration << (pin-8)*4;\
-			}\
-		}\
-		static void SetConfiguration(DataT mask, Configuration configuration)\
-		{\
-			CRL = UnpackConfig(mask, CRL, configuration);\
-			CRH = UnpackConfig(mask>>8, CRH, configuration);\
-		}\
-		enum{Id = ID};\
-	};\
-	/*Lower part of port. Need for effective configuration writing*/\
-	class className ## L :public className{\
-		public:\
-		template<unsigned pin>\
-		static void SetPinConfiguration(Configuration configuration)\
-		{\
-			BOOST_STATIC_ASSERT(pin < 8);\
-			CRL = (CRL & ~(0x0fu << pin*4)) | (unsigned)configuration << pin*4;\
-		}\
-		static void SetConfiguration(DataT mask, Configuration configuration)\
-		{\
-			CRL = UnpackConfig(mask, CRL, configuration);\
-		}\
-	};\
-	 /*Hight part of port. Need for effective configuration writing*/\
-	class className ## H :public className{\
-		public:\
-		template<unsigned pin>\
-		static void SetPinConfiguration(Configuration configuration)\
-		{\
-			BOOST_STATIC_ASSERT(pin >= 8 && pin < 16);\
-			CRH = (CRH & ~(0x0fu << (pin-8)*4)) | (unsigned)configuration << (pin-8)*4;\
-		}\
-		static void SetConfiguration(DataT mask, Configuration configuration)\
-		{\
-			CRH = UnpackConfig(mask>>8, CRH, configuration);\
-		}\
-	};
+	namespace Private
+	{
+		template<class CRL, class CRH, class IDR, class ODR, class BSRR, class BRR, class LCKR, int ID>
+		class PortImplementation :public NativePortBase
+		{
+		public:
+			static DataT Read()
+			{
+			  return ODR::Get();
+			}
+			static void Write(DataT value)
+			{
+				ODR::Set(value);
+			}
+			static void ClearAndSet(DataT clearMask, DataT value)
+			{
+				BSRR::Set(value | (uint32_t)clearMask << 16);
+			}
+			static void Set(DataT value)
+			{
+				BSRR::Set(value);
+			}
+			static void Clear(DataT value)
+			{
+				BSRR::Set((uint32_t)value << 16);
+			}
+			static void Toggle(DataT value)
+			{
+				ODR::Xor(value);
+			}
+			static DataT PinRead()
+			{
+				return IDR::Get();
+			}
+			
+			// constant interface
 
+			template<DataT clearMask, DataT value>
+			static void ClearAndSet()
+			{
+				BSRR::Set(value | (uint32_t)clearMask << 16);
+			}
+
+			template<DataT value>
+			static void Toggle()
+			{
+				ODR::Xor(value);
+			}
+
+			template<DataT value>
+			static void Set()
+			{
+				BSRR::Set(value);
+			}
+
+			template<DataT value>
+			static void Clear()
+			{
+				BSRR::Set((uint32_t)value << 16);
+			}
+			
+			template<unsigned pin>
+			static void SetPinConfiguration(Configuration configuration)
+			{
+				BOOST_STATIC_ASSERT(pin < Width);
+				if(pin < 8)
+				{
+					CRL::AndOr(~(0x0fu << pin*4), (unsigned)configuration << pin*4);
+				}
+				else
+				{
+					CRH::AndOr(~(0x0fu << (pin-8)*4), (unsigned)configuration << (pin-8)*4);
+				}
+			}
+			static void SetConfiguration(DataT mask, Configuration configuration)
+			{
+				CRL::Set(UnpackConfig(mask, CRL::Get(), configuration));
+				CRH::Set(UnpackConfig(mask>>8, CRH::Get(), configuration));
+			}
+			template<DataT mask, Configuration configuration>
+			static void SetConfiguration()
+			{
+				CRL::Set(UnpackConfig(mask, CRL::Get(), configuration));
+				CRH::Set(UnpackConfig(mask>>8, CRH::Get(), configuration));
+			}
+			enum{Id = ID};
+		};
+		
+		/*Lower part of port. Need for effective configuration writing*/
+		template<class CRL, class CRH, class IDR, class ODR, class BSRR, class BRR, class LCKR, int ID>
+		class PortImplementationL :public PortImplementation<CRL, CRH, IDR, ODR, BSRR, BRR, LCKR, ID>
+		{
+			typedef PortImplementation<CRL, CRH, IDR, ODR, BSRR, BRR, LCKR, ID> Base;
+			public:
+				typedef typename Base::Configuration Configuration;
+				typedef typename Base::DataT DataT;
+				
+				template<unsigned pin>
+				static void SetPinConfiguration(Configuration configuration)
+				{
+					BOOST_STATIC_ASSERT(pin < 8);
+					CRL::AndOr(~(0x0fu << pin*4), (uint32_t)configuration << pin*4);
+				}
+				static void SetConfiguration(DataT mask, Configuration configuration)
+				{
+					CRL::Set(UnpackConfig(mask, CRL::Get(), configuration));
+				}
+				template<DataT mask, Configuration configuration>
+				static void SetConfiguration()
+				{
+					CRL::Set(UnpackConfig(mask, CRL::Get(), configuration));
+				}
+		};
+		
+		 /*Hight part of port. Need for effective configuration writing*/
+		template<class CRL, class CRH, class IDR, class ODR, class BSRR, class BRR, class LCKR, int ID>
+		class PortImplementationH :public PortImplementation<CRL, CRH, IDR, ODR, BSRR, BRR, LCKR, ID>
+		{
+			typedef PortImplementation<CRL, CRH, IDR, ODR, BSRR, BRR, LCKR, ID> Base;
+			public:
+				typedef typename Base::Configuration Configuration;
+				typedef typename Base::DataT DataT;
+				
+			template<unsigned pin>
+			static void SetPinConfiguration(Configuration configuration)
+			{
+				BOOST_STATIC_ASSERT(pin >= 8 && pin < 16);
+				CRH::AndOr(~(0x0fu << (pin-8)*4), (uint32_t)configuration << (pin-8)*4);
+			}
+			static void SetConfiguration(DataT mask, Configuration configuration)
+			{
+			  CRH::Set(UnpackConfig(mask>>8, CRH::Get(), configuration));
+			}
+			template<DataT mask, Configuration configuration>
+			static void SetConfiguration()
+			{
+				CRH::Set(UnpackConfig(mask>>8, CRH::Get(), configuration));
+			}
+		};
+	}
+
+#define MAKE_PORT(CRL, CRH, IDR, ODR, BSRR, BRR, LCKR, className, ID) \
+   namespace Private{\
+		IO_REG_WRAPPER(CRL, CRL ## _t, uint32_t);\
+		IO_REG_WRAPPER(CRH, CRH ## _t, uint32_t);\
+		IO_REG_WRAPPER(IDR, IDR ## _t, uint16_t);\
+		IO_REG_WRAPPER(ODR, ODR ## _t, uint16_t);\
+		IO_REG_WRAPPER(BSRR, BSRR ## _t, uint32_t);\
+		IO_REG_WRAPPER(BRR, BRR ## _t, uint16_t);\
+		IO_REG_WRAPPER(LCKR, LCKR ## _t, uint16_t);\
+	}\
+	  typedef Private::PortImplementation<\
+			Private::CRL ## _t, \
+			Private::CRH ## _t, \
+			Private::IDR ## _t, \
+			Private::ODR ## _t, \
+			Private::BSRR ## _t, \
+			Private::BRR ## _t, \
+			Private::LCKR ## _t, \
+			ID> className; \
+		typedef Private::PortImplementationL<\
+			Private::CRL ## _t, \
+			Private::CRH ## _t, \
+			Private::IDR ## _t, \
+			Private::ODR ## _t, \
+			Private::BSRR ## _t, \
+			Private::BRR ## _t, \
+			Private::LCKR ## _t, \
+			ID> className ## L; \
+		typedef Private::PortImplementationH<\
+			Private::CRL ## _t, \
+			Private::CRH ## _t, \
+			Private::IDR ## _t, \
+			Private::ODR ## _t, \
+			Private::BSRR ## _t, \
+			Private::BRR ## _t, \
+			Private::LCKR ## _t, \
+			ID> className ## H; \
+		  
+	  
 //==================================================================================================
 #if defined(__ICCARM__)
 

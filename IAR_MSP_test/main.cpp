@@ -1,8 +1,9 @@
 
 #include "io430.h"
-#include "../mcucpp/pinlist.h"
-#include "../mcucpp/iopins.h"
-#include "../mcucpp/timer.h"
+#include "pinlist.h"
+#include "iopins.h"
+#include "timers.h"
+#include "timer_utils.h"
 
 using namespace IO;
 using namespace Timers;
@@ -17,11 +18,15 @@ void Delay(unsigned count)
     for(volatile unsigned i = 0; i<1000; i++);
 }
 
+typedef PinList<P1_0, P1_1, P1_2, P1_3, NullPin, P1_5> Pins;
+
 int main( void )
 {
-	Timer0::Start(T0Setup::Divider);
-	Timer0::OutputCompare<0>::Set(T0Setup::ReloadValue);
-	Timer0::SetMode(Timer0::ClearOnMatch0);
+	//Timer0::Start(T0Setup::Divider);
+	//Timer0::OutputCompare<0>::Set(T0Setup::ReloadValue);
+	//Timer0::SetMode(Timer0::ClearOnMatch0);
+//  Green::SetConfiguration(Green::Port::Out);
+  Pins::SetConfiguration<Pins::Out, 0xff>();
   
   while(1)
   {

@@ -990,11 +990,11 @@
         </option>
         <option>
           <name>GStackSize2</name>
-          <state>80</state>
+          <state>50</state>
         </option>
         <option>
           <name>GHeapSize2</name>
-          <state>80</state>
+          <state>0</state>
         </option>
         <option>
           <name>RadioDataModelType</name>
@@ -1198,7 +1198,8 @@
         </option>
         <option>
           <name>newCCIncludePaths</name>
-          <state></state>
+          <state>../mcucpp</state>
+          <state>../mcucpp/MSP430</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
