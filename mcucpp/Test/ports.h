@@ -68,6 +68,15 @@ namespace IO
 				else
 					DirReg &= ~mask;
 			}
+			
+			template<DataT mask, Configuration configuration>
+			static void SetConfiguration()
+			{
+				if(configuration)
+					DirReg |= mask;
+				else
+					DirReg &= ~mask;
+			}
 
 			static void Write(DataT value)
 			{
@@ -90,7 +99,7 @@ namespace IO
 			{
 				OutReg &= ~value;
 			}
-			static void Togle(DataT value)
+			static void Toggle(DataT value)
 			{
 				OutReg ^= value;
 			}
@@ -98,6 +107,39 @@ namespace IO
 			{
 				return InReg;
 			}
+			
+			template<DataT value>
+			static void Write()
+			{
+				OutReg = value;
+			}
+			
+			template<DataT clearMask, DataT value>
+			static void ClearAndSet()
+			{
+				OutReg &= ~clearMask;
+				OutReg |= value;
+			}
+	
+			
+			template<DataT value>
+			static void Set()
+			{
+				OutReg |= value;
+			}
+			
+			template<DataT value>
+			static void Clear()
+			{
+				OutReg &= ~value;
+			}
+			
+			template<DataT value>
+			static void Toggle()
+			{
+				OutReg ^= value;
+			}
+			
 			enum{Id = Identity};
 			enum{Width=sizeof(DataT)*8};
 

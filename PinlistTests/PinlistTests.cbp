@@ -32,6 +32,7 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 			<Add directory="..\mcucpp" />
+			<Add directory="..\mcucpp\Test" />
 		</Compiler>
 		<Unit filename="main.cpp" />
 		<Unit filename="..\mcucpp\TestPort.h" />

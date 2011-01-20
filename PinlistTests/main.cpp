@@ -100,6 +100,50 @@ void TestOnePortPinList(unsigned listValue, unsigned portValue)
     cout << "\tOK" << endl;
 }
 
+template<class Pins, unsigned listValue, unsigned portValue>
+void TestOnePortConstIface()
+{
+    typedef typename Pins::template Pin<0>::Port Port;
+    typename Pins::DataType val;
+    cout << __FUNCTION__ << "\t";
+    PrintPinList<Pins>::Print();
+
+    Port::template Write<0>();
+
+    Pins::template Write<listValue>();
+    ASSERT_EQUAL(Port::OutReg,  portValue);
+    val = Pins::Read();
+    ASSERT_EQUAL(val, listValue);
+
+    Port::DirReg = 0;
+    Pins::template SetConfiguration<Pins::Out, listValue>();
+    ASSERT_EQUAL(Port::DirReg, portValue);
+
+    Port::template Write<0>();
+    Port::DirReg = 0;
+
+    Port::InReg = portValue;
+    val = Pins::PinRead();
+    ASSERT_EQUAL(val, listValue);
+
+    Port::InReg = 0;
+    val = Pins::PinRead();
+    ASSERT_EQUAL(val, 0);
+
+    Port::template Write<0>();
+    ASSERT_EQUAL(Port::OutReg, 0);
+
+    Pins::template Set<listValue>();
+    ASSERT_EQUAL(Port::OutReg, portValue);
+
+    Pins::template Clear<listValue>();
+    ASSERT_EQUAL(Port::OutReg, 0);
+
+    Pins::template SetConfiguration<Pins::In, 0xff>();
+    ASSERT_EQUAL(Port::DirReg, 0);
+
+    cout << "\tOK" << endl;
+}
 
 int main()
 {
@@ -122,6 +166,20 @@ int main()
     TestOnePortPinList<PinList<Pa0, Pa1, Pa2, Pa3, Pa4, Pa5, Pa6, Pa7, Pa8>::Slice<5, 4> >(0x1e0, 0x1e0);
     cout << "Length = \t" <<PinList<Pa0, Pa1, Pa2, Pa3, Pa4, Pa5, Pa6, Pa7, Pa8>::Slice<5, 4>::Length;
     TestOnePortPinList<PinList<Pa0, Pa1, Pa2, Pa3, Pa4, Pa5, Pa6, Pa7, Pa8>::Slice<0, 4> >(0x0f, 0x0f);
+
+    typedef PinList<Pa2, Pa1, Pa3, Pa4, Pa6> Pins1;
+    typedef PinList<Pins1::Pin<0>, Pins1::Pin<1>, Pins1::Pin<2>, Pins1::Pin<3>, Pins1::Pin<4> > Pins1Clone;
+
+    TestOnePortPinList<Pins1Clone >(0x1f, 0x5e);
+
+    TestOnePortConstIface<PinList<Pa1, Pa3, Pa2, Pa0>, 0x0f, 0x0f>();
+    TestOnePortConstIface<PinList<Pa0, Pa2, Pa1, Pa3>, 0x0f, 0x0f>();
+    TestOnePortConstIface<PinList<Pa2, Pa1, Pa3, Pa4, Pa6>, 0x1f, 0x5e>();
+    TestOnePortConstIface<PinList<Pa5, Pa6, Pa7, Pa0, Pa1, Pa2, Pa3, Pa4>, 0xff, 0xff>();
+    TestOnePortConstIface<PinList<Pa2, Pa1, Pa3, Pa4, Pa6, Pa8, Pa7, Pa0, Pa5>, 0x1ff, 0x1ff>();
+    TestOnePortConstIface<PinList<Pa0, Pa1, Pa2, Pa3, Pa4, Pa5, Pa6, Pa7, Pa8>::Slice<5, 4>, 0x1e0, 0x1e0>();
+    TestOnePortConstIface<PinList<Pa0, Pa1, Pa2, Pa3, Pa4, Pa5, Pa6, Pa7, Pa8>::Slice<0, 4>, 0x0f, 0x0f>();
+    TestOnePortConstIface<Pins1Clone, 0x1f, 0x5e>();
 
     return 0;
 }

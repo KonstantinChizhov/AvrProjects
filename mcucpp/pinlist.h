@@ -284,7 +284,7 @@ namespace IO
             typedef NullType Result;
         };
 
-		template <class TPort,
+		/*template <class TPort,
 				class Tail,
 				uint8_t PortBitPosition,
 				uint8_t ValueBitPosition,
@@ -296,13 +296,20 @@ namespace IO
            typedef Typelist<PinPositionHolder<PinClass<TPort, PortBitPosition, TConfigPort>, ValueBitPosition>,
                     typename GetPinsWithPort<Tail, TPort>::Result>
                 Result;
-        };
+        };*/
 
         template <class Head, class Tail, class TPort>
-        struct GetPinsWithPort<Typelist<Head, Tail>, TPort>
+        class GetPinsWithPort<Typelist<Head, Tail>, TPort>
         {
-            // Go all the way down the list removing the type
-			 typedef typename GetPinsWithPort<Tail, TPort>::Result Result;
+			 typedef typename GetPinsWithPort<Tail, TPort>::Result NotMatch;
+			 typedef Typelist<Head,
+                    typename GetPinsWithPort<Tail, TPort>::Result>
+                Match;
+			 static const bool IsMatch = IsSameType<TPort, typename Head::Pin::Port>::value;
+		public:
+			 typedef typename Select<IsMatch,
+			 	Match,
+			 	NotMatch>::Result Result;
         };
 ////////////////////////////////////////////////////////////////////////////////
 //
