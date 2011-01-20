@@ -32,19 +32,26 @@ _delay_us(unsigned __us)
 }
 
 
-//#include "HD44780.h"
+#include "HD44780.h"
 
-//typedef PinList<Pa0, Pa1, Pa2, Pa3, Pa4, Pa5, Pa6> LcdBus;
-//typedef Lcd<LcdBus> MyLcd;
+typedef PinList<Pa0, Pa1, Pa2, Pa3, Pa4, Pa5, Pa6> LcdBus;
+typedef Lcd<LcdBus> MyLcd;
 
 int main()
 {
   RCC_APB2ENR |= 1 << 2 | 1 << 3 | 1 << 4;
- 
-   
-  led::SetConfiguration(led::Port::Out);
-  led2::SetConfiguration(led2::Port::Out);
-  led::Set();
+ // MyLcd::Init();
+  //LcdBus::SetConfiguration<LcdBus::Out, 0xff>();
+ // LcdBus::Pin<2>::Set();
+  //Porta::Set(PinList<LcdBus::Pin<0>, LcdBus::Pin<1> >::Length);
+	PinList<LcdBus::Pin<0>, LcdBus::Pin<1> >::Set<0xff>();
+	PinList<Pa0, Pa1>::Set<0xff>();
+ // led::SetConfiguration<led::Port::Out>();
+ // led2::SetConfiguration(led2::Port::Out);
+ // led2::SetConfiguration(led2::Port::In);
+ // led2::SetConfiguration(led2::Port::Out);
+ // led2::SetConfiguration(led2::Port::In);
+ // led::Set();
 	while(1)
 	{
 		_delay_ms(100);

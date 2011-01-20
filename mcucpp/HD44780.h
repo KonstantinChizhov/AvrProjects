@@ -46,10 +46,11 @@ class LcdBase
 template<class BUS, uint8_t LINE_WIDTH=8, uint8_t LINES=2>
 class Lcd: public LcdBase
 {
-	typedef typename BUS::template Pin<0> RS;
-	typedef typename BUS::template Pin<1> RW;
-	typedef typename BUS::template Pin<2> E;
-	typedef typename BUS::template Slice<3, 4> DATA_BUS;
+	enum{RsBit = 0, RwBit = 1, EBit = 2, BusBits = 3};
+	typedef typename BUS::template Pin<RsBit> RS;
+	typedef typename BUS::template Pin<RwBit> RW;
+	typedef typename BUS::template Pin<EBit> E;
+	typedef typename BUS::template Slice<BusBits, 4> DATA_BUS;
 
 public:
 	static uint8_t LineWidth()
@@ -64,15 +65,14 @@ public:
 
 	static void Init()
 	{
-		BUS::SetConfiguration(BUS::Out);
-		RW::Clear();
-		RS::Clear();
-		DATA_BUS::Write(0x03<<3); 
+		BUS::template SetConfiguration<BUS::Out, 0xff>();
+		PinList<RS, RW>::template Clear<0x03>();
+		DATA_BUS::template Write< 0x03<<BusBits >(); 
 		Strobe();
 		Strobe();
 		Strobe();
 		_delay_ms(60);
-		DATA_BUS::Write(0x02<<3); // set 4 bit mode 
+		DATA_BUS::template Write<0x02<<BusBits>(); // set 4 bit mode 
 		Strobe();
 		Write(0x28); // 4 bit mode, 1/16 duty, 5x8 font 
 	
@@ -146,9 +146,9 @@ protected:
 	{
 		RW::Clear();
 		DATA_BUS::SetConfiguration(DATA_BUS::Out);
-		DATA_BUS::Write(c>>1);
+		DATA_BUS::Write(c>>(4-BusBits));
 		Strobe();
-		DATA_BUS::Write(c<<3); 
+		DATA_BUS::Write(c<<BusBits); 
 		Strobe();
 	}
 

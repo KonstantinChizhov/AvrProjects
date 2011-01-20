@@ -56,6 +56,27 @@ namespace IO
 
 	namespace Private
 	{
+		template<unsigned mask>
+		class ConfigurationMask
+		{
+			static const unsigned mask1 = (mask & 0xf0) << 12 | (mask & 0x0f);
+			static const unsigned mask2 = (mask1 & 0x000C000C) << 6 | (mask1 & 0x00030003);
+			static const unsigned mask3 = (mask2 & 0x02020202) << 3 | (mask2 & 0x01010101);
+		public:
+			static const unsigned value = mask3;
+		};
+		
+		template<class ConfigReg, unsigned mask, NativePortBase::Configuration config>
+		struct WriteConfig
+		{
+			static void Write()
+			{
+			  const unsigned configMask = ConfigurationMask<mask>::value;
+			  unsigned result = (ConfigReg::Get() & ~(configMask*0x0f)) | configMask * config;
+			  ConfigReg::Set(result);
+			}
+		};
+		  
 		template<class CRL, class CRH, class IDR, class ODR, class BSRR, class BRR, class LCKR, int ID>
 		class PortImplementation :public NativePortBase
 		{
@@ -136,8 +157,8 @@ namespace IO
 			template<DataT mask, Configuration configuration>
 			static void SetConfiguration()
 			{
-				CRL::Set(UnpackConfig(mask, CRL::Get(), configuration));
-				CRH::Set(UnpackConfig(mask>>8, CRH::Get(), configuration));
+			  WriteConfig<CRL, mask, configuration>::Write();
+			  WriteConfig<CRH, mask>>8, configuration>::Write();
 			}
 			enum{Id = ID};
 		};
@@ -159,12 +180,12 @@ namespace IO
 				}
 				static void SetConfiguration(DataT mask, Configuration configuration)
 				{
-					CRL::Set(UnpackConfig(mask, CRL::Get(), configuration));
+					CRL::Set(NativePortBase::UnpackConfig(mask, CRL::Get(), configuration));
 				}
 				template<DataT mask, Configuration configuration>
 				static void SetConfiguration()
 				{
-					CRL::Set(UnpackConfig(mask, CRL::Get(), configuration));
+					 WriteConfig<CRL, mask, configuration>::Write();
 				}
 		};
 		
@@ -185,12 +206,12 @@ namespace IO
 			}
 			static void SetConfiguration(DataT mask, Configuration configuration)
 			{
-			  CRH::Set(UnpackConfig(mask>>8, CRH::Get(), configuration));
+			  CRH::Set(NativePortBase::UnpackConfig(mask>>8, CRH::Get(), configuration));
 			}
 			template<DataT mask, Configuration configuration>
 			static void SetConfiguration()
 			{
-				CRH::Set(UnpackConfig(mask>>8, CRH::Get(), configuration));
+				WriteConfig<CRH, mask>>8, configuration>::Write();
 			}
 		};
 	}

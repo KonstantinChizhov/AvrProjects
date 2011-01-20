@@ -91,6 +91,12 @@ namespace IO
 		{
 			ConfigPort:: template SetPinConfiguration<PIN>(configuration);
 		}
+		
+		template<Configuration configuration>
+		static void SetConfiguration()
+		{
+			ConfigPort:: template SetConfiguration<1 << PIN, configuration>();
+		}
 
 		static uint8_t IsSet()
 		{

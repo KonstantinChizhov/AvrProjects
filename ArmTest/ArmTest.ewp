@@ -276,6 +276,7 @@
         <option>
           <name>CCIncludePath2</name>
           <state>../mcucpp</state>
+          <state>../mcucpp/ARM/STM32</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -287,7 +288,7 @@
         </option>
         <option>
           <name>IInterwork2</name>
-          <state>1</state>
+          <state>0</state>
         </option>
         <option>
           <name>IProcessorMode2</name>
