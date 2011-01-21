@@ -96,13 +96,13 @@ namespace IO
 			enum{value = CheckSameConfigHelper<Typelist<Head, Tail>, CurrentConfig, typename Head::Configuration>::value};
         };
 
-		template <class TList> 
+		template <class TList>
 		struct CheckSameConfig
-		{		
+		{
 			enum{value = CheckSameConfigImp<TList, typename TList::Head::Configuration>::value};
 		};
 
-		template <> 
+		template <>
 		struct CheckSameConfig<NullType>
 		{
 				enum{value = 1};
@@ -284,20 +284,6 @@ namespace IO
             typedef NullType Result;
         };
 
-		/*template <class TPort,
-				class Tail,
-				uint8_t PortBitPosition,
-				uint8_t ValueBitPosition,
-				class TConfigPort,
-				template<class, uint8_t, class> class PinClass>
-        struct GetPinsWithPort<Typelist<PinPositionHolder<PinClass<TPort, PortBitPosition, TConfigPort>, ValueBitPosition>, Tail>, TPort>
-        {
-            // Go all the way down the list removing the type
-           typedef Typelist<PinPositionHolder<PinClass<TPort, PortBitPosition, TConfigPort>, ValueBitPosition>,
-                    typename GetPinsWithPort<Tail, TPort>::Result>
-                Result;
-        };*/
-
         template <class Head, class Tail, class TPort>
         class GetPinsWithPort<Typelist<Head, Tail>, TPort>
         {
@@ -474,7 +460,7 @@ namespace IO
 							Head::Position, 	//bit position in value
 							ValueToPort>::Shift(value) &
 						GetPortMask<Typelist<Head, Tail> >::value;
-					
+
 					return result ^ GetInversionMask<Typelist<Head, Tail> >::value;
 				}
 				if(Head::Pin::Inverted == false)
@@ -521,7 +507,7 @@ namespace IO
 ////////////////////////////////////////////////////////////////////////////////
 		template <class TList, class DataType, class PortDataType, DataType value> struct PinConstWriteIterator;
 
-        template <class DataType, class PortDataType, DataType value> 
+        template <class DataType, class PortDataType, DataType value>
 		struct PinConstWriteIterator<NullType, DataType, PortDataType, value>
         {
 			static const PortDataType PortValue = 0;
@@ -530,8 +516,8 @@ namespace IO
         template <class Head, class Tail, class DataType, class PortDataType, DataType value>
         struct PinConstWriteIterator< Typelist<Head, Tail>, DataType, PortDataType, value>
         {
-			static const PortDataType PortValue = (value & (1 << Head::Position) ? 
-					(1 << Head::Pin::Number) : 0) | 
+			static const PortDataType PortValue = (value & (1 << Head::Position) ?
+					(1 << Head::Pin::Number) : 0) |
 					PinConstWriteIterator<Tail, DataType, PortDataType, value>::PortValue;
         };
 ////////////////////////////////////////////////////////////////////////////////
@@ -574,7 +560,7 @@ namespace IO
 			}
 
 			// constant writing interface
-			 
+
 			template<class DataType, DataType value>
 			static void Write()
 			{	}
@@ -603,7 +589,7 @@ namespace IO
 			typedef typename GetPinsWithPort<PinList, Head>::Result Pins;
 
 			enum{Mask = GetPortMask<Pins>::value};
-			
+
 			typedef Head Port; //Head points to current port i the list.
 
 			template<class DataType>
@@ -672,13 +658,13 @@ namespace IO
 							portValue,
 							PortWriteIterator<Tail, PinList>::template OutRead<DataType>());
 			}
-			
+
 			// constant writing interface
-			 
+
 			template<class DataType, DataType value>
 			static void Write()
 			{
-				const typename Port::DataT portValue = 
+				const typename Port::DataT portValue =
 					PinConstWriteIterator<Pins, DataType, typename Port::DataT, value>::PortValue ^
 					GetInversionMask<Pins>::value;
 
@@ -689,7 +675,7 @@ namespace IO
 			template<class DataType, DataType value>
 			static void Set()
 			{
-				const typename Port::DataT portValue = 
+				const typename Port::DataT portValue =
 					PinConstWriteIterator<Pins, DataType, typename Port::DataT, value>::PortValue ^
 					GetInversionMask<Pins>::value;
 
@@ -700,7 +686,7 @@ namespace IO
 			template<class DataType, DataType value>
 			static void Clear()
 			{
-				const typename Port::DataT portValue = 
+				const typename Port::DataT portValue =
 					PinConstWriteIterator<Pins, DataType, typename Port::DataT, value>::PortValue^
 					GetInversionMask<Pins>::value;
 
@@ -712,10 +698,10 @@ namespace IO
 // PortConfigurationIterator
 ////////////////////////////////////////////////////////////////////////////////
 
-		template <class PortList, class PinList, class Configuration, Configuration config> 
+		template <class PortList, class PinList, class Configuration, Configuration config>
 		struct PortConfigurationIterator;
 
-        template <class PinList, class Configuration, Configuration config> 
+        template <class PinList, class Configuration, Configuration config>
 		struct PortConfigurationIterator<NullType, PinList, Configuration, config>
         {
 			template<class DataType, DataType mask>
@@ -749,10 +735,10 @@ namespace IO
 			template<class DataType, DataType mask>
 			static void SetConfiguration()
 			{
-				const typename Port::DataT portValue = 
+				const typename Port::DataT portValue =
 					PinConstWriteIterator<Pins, DataType, typename Port::DataT, mask>::PortValue;
 
-				const typename Port::Configuration portConfig = 
+				const typename Port::Configuration portConfig =
 					Port::template MapConfigurationConst<config>::value;
 
 				Port::template SetConfiguration<portValue, portConfig>();
@@ -881,7 +867,7 @@ namespace IO
 			{
 				IoPrivate::PortWriteIterator<Ports, PINS>:: template Write<DataType, value>();
 			}
-			
+
 			template<DataType value>
 			static void Set()
 			{
@@ -897,7 +883,7 @@ namespace IO
 			template<PortConfiguration config, DataType mask>
 			static void SetConfiguration()
 			{
-				IoPrivate::PortConfigurationIterator<ConfigPorts, ConfigPins, PortConfiguration, config>:: 
+				IoPrivate::PortConfigurationIterator<ConfigPorts, ConfigPins, PortConfiguration, config>::
 					template SetConfiguration<DataType, mask>();
 			}
 		};

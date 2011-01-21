@@ -11,7 +11,7 @@
 #define USE_SPLIT_PORT_CONFIGURATION 8
 
 namespace IO
-{	
+{
 	class NativePortBase :public GpioBase
 	{
 	public:
@@ -28,7 +28,7 @@ namespace IO
 			AltOut = 0x0B,
 			AltOpenDrain = 0x0f
 		};
-		
+
 		static inline unsigned UnpackConfig(unsigned mask, unsigned value, Configuration configuration)
 		{
 			mask = (mask & 0xf0) << 12 | (mask & 0x0f);
@@ -36,7 +36,7 @@ namespace IO
 			mask = (mask & 0x02020202) << 3 | (mask & 0x01010101);
 			return (value & ~(mask*0x0f)) | mask * configuration;
 		}
-		
+
 		static Configuration MapConfiguration(GenericConfiguration config)
 		{
 			switch(config)
@@ -47,7 +47,7 @@ namespace IO
 			case GpioBase::OpenDrainOut: return OpenDrainOut;
 			case GpioBase::AltOut: return AltOut;
 			case GpioBase::AltOpenDrain: return AltOpenDrain;
-			//case GpioBase::Out: 
+			//case GpioBase::Out:
 			default:
 			  return Out;
 			}
@@ -65,7 +65,7 @@ namespace IO
 		public:
 			static const unsigned value = mask3;
 		};
-		
+
 		template<class ConfigReg, unsigned mask, NativePortBase::Configuration config>
 		struct WriteConfig
 		{
@@ -76,7 +76,7 @@ namespace IO
 			  ConfigReg::Set(result);
 			}
 		};
-		  
+
 		template<class CRL, class CRH, class IDR, class ODR, class BSRR, class BRR, class LCKR, int ID>
 		class PortImplementation :public NativePortBase
 		{
@@ -109,7 +109,7 @@ namespace IO
 			{
 				return IDR::Get();
 			}
-			
+
 			// constant interface
 
 			template<DataT clearMask, DataT value>
@@ -135,7 +135,7 @@ namespace IO
 			{
 				BSRR::Set((uint32_t)value << 16);
 			}
-			
+
 			template<unsigned pin>
 			static void SetPinConfiguration(Configuration configuration)
 			{
@@ -152,17 +152,17 @@ namespace IO
 			static void SetConfiguration(DataT mask, Configuration configuration)
 			{
 				CRL::Set(UnpackConfig(mask, CRL::Get(), configuration));
-				CRH::Set(UnpackConfig(mask>>8, CRH::Get(), configuration));
+				CRH::Set(UnpackConfig((mask>>8), CRH::Get(), configuration));
 			}
 			template<DataT mask, Configuration configuration>
 			static void SetConfiguration()
 			{
 			  WriteConfig<CRL, mask, configuration>::Write();
-			  WriteConfig<CRH, mask>>8, configuration>::Write();
+			  WriteConfig<CRH, (mask>>8), configuration>::Write();
 			}
 			enum{Id = ID};
 		};
-		
+
 		/*Lower part of port. Need for effective configuration writing*/
 		template<class CRL, class CRH, class IDR, class ODR, class BSRR, class BRR, class LCKR, int ID>
 		class PortImplementationL :public PortImplementation<CRL, CRH, IDR, ODR, BSRR, BRR, LCKR, ID>
@@ -171,7 +171,7 @@ namespace IO
 			public:
 				typedef typename Base::Configuration Configuration;
 				typedef typename Base::DataT DataT;
-				
+
 				template<unsigned pin>
 				static void SetPinConfiguration(Configuration configuration)
 				{
@@ -188,7 +188,7 @@ namespace IO
 					 WriteConfig<CRL, mask, configuration>::Write();
 				}
 		};
-		
+
 		 /*Hight part of port. Need for effective configuration writing*/
 		template<class CRL, class CRH, class IDR, class ODR, class BSRR, class BRR, class LCKR, int ID>
 		class PortImplementationH :public PortImplementation<CRL, CRH, IDR, ODR, BSRR, BRR, LCKR, ID>
@@ -197,7 +197,7 @@ namespace IO
 			public:
 				typedef typename Base::Configuration Configuration;
 				typedef typename Base::DataT DataT;
-				
+
 			template<unsigned pin>
 			static void SetPinConfiguration(Configuration configuration)
 			{
@@ -211,50 +211,50 @@ namespace IO
 			template<DataT mask, Configuration configuration>
 			static void SetConfiguration()
 			{
-				WriteConfig<CRH, mask>>8, configuration>::Write();
+				WriteConfig<CRH, (mask>>8), configuration>::Write();
 			}
 		};
 	}
 
 #define MAKE_PORT(CRL, CRH, IDR, ODR, BSRR, BRR, LCKR, className, ID) \
    namespace Private{\
-		IO_REG_WRAPPER(CRL, CRL ## _t, uint32_t);\
-		IO_REG_WRAPPER(CRH, CRH ## _t, uint32_t);\
-		IO_REG_WRAPPER(IDR, IDR ## _t, uint16_t);\
-		IO_REG_WRAPPER(ODR, ODR ## _t, uint16_t);\
-		IO_REG_WRAPPER(BSRR, BSRR ## _t, uint32_t);\
-		IO_REG_WRAPPER(BRR, BRR ## _t, uint16_t);\
-		IO_REG_WRAPPER(LCKR, LCKR ## _t, uint16_t);\
+		IO_REG_WRAPPER(CRL, className ## Crl, uint32_t);\
+		IO_REG_WRAPPER(CRH, className ## Crh, uint32_t);\
+		IO_REG_WRAPPER(IDR, className ## Idr, uint16_t);\
+		IO_REG_WRAPPER(ODR, className ## Odr, uint16_t);\
+		IO_REG_WRAPPER(BSRR, className ## Bsrr, uint32_t);\
+		IO_REG_WRAPPER(BRR, className ## Brr, uint16_t);\
+		IO_REG_WRAPPER(LCKR, className ## Lckr, uint16_t);\
 	}\
 	  typedef Private::PortImplementation<\
-			Private::CRL ## _t, \
-			Private::CRH ## _t, \
-			Private::IDR ## _t, \
-			Private::ODR ## _t, \
-			Private::BSRR ## _t, \
-			Private::BRR ## _t, \
-			Private::LCKR ## _t, \
+			Private::className ## Crl, \
+			Private::className ## Crh, \
+			Private::className ## Idr, \
+			Private::className ## Odr, \
+			Private::className ## Bsrr, \
+			Private::className ## Brr, \
+			Private::className ## Lckr, \
 			ID> className; \
 		typedef Private::PortImplementationL<\
-			Private::CRL ## _t, \
-			Private::CRH ## _t, \
-			Private::IDR ## _t, \
-			Private::ODR ## _t, \
-			Private::BSRR ## _t, \
-			Private::BRR ## _t, \
-			Private::LCKR ## _t, \
+			Private::className ## Crl, \
+			Private::className ## Crh, \
+			Private::className ## Idr, \
+			Private::className ## Odr, \
+			Private::className ## Bsrr, \
+			Private::className ## Brr, \
+			Private::className ## Lckr, \
 			ID> className ## L; \
 		typedef Private::PortImplementationH<\
-			Private::CRL ## _t, \
-			Private::CRH ## _t, \
-			Private::IDR ## _t, \
-			Private::ODR ## _t, \
-			Private::BSRR ## _t, \
-			Private::BRR ## _t, \
-			Private::LCKR ## _t, \
+			Private::className ## Crl, \
+			Private::className ## Crh, \
+			Private::className ## Idr, \
+			Private::className ## Odr, \
+			Private::className ## Bsrr, \
+			Private::className ## Brr, \
+			Private::className ## Lckr, \
 			ID> className ## H; \
-		  
-	  
+
+
 //==================================================================================================
 #if defined(__ICCARM__)
 
