@@ -351,29 +351,25 @@ namespace IO
 			enum{value = (1 << Head::Position) | GetValueMask<Tail>::value};
         };
 ////////////////////////////////////////////////////////////////////////////////
-// class template IsSerial
-// Computes if pin list is seqental
+// class template GetSerialCount
+// Computes number of seqental pins in list
 // Assume that TList is type list of PinPositionHolder types.
 ////////////////////////////////////////////////////////////////////////////////
 
-		template <class TList> struct IsSerial;
+		template <class TList> struct GetSerialCount;
 
-        template <> struct IsSerial<NullType>
+        template <> struct GetSerialCount<NullType>
         {
-            enum{value = 1};
+            enum{value = 0};
 			enum{PinNumber = -1};
-			enum{EndOfList = 1};
         };
         template <class Head, class Tail>
 
-        struct IsSerial< Typelist<Head, Tail> >
+        struct GetSerialCount< Typelist<Head, Tail> >
         {
-		//private:
-			typedef IsSerial<Tail> I;
+			typedef GetSerialCount<Tail> I;
 			enum{PinNumber = Head::Pin::Number};
-			enum{EndOfList = 0};
-		//public:
-			enum{value = ((PinNumber == I::PinNumber - 1) && I::value) || I::EndOfList};
+			enum{value = ((PinNumber == I::PinNumber - 1) ? I::value + 1 : 1)};
         };
 ////////////////////////////////////////////////////////////////////////////////
 // Returns first Num elements from Typelist
@@ -453,16 +449,24 @@ namespace IO
 			template<class DataType, class PortDataType>
 			static inline PortDataType UppendValue(DataType value, PortDataType result)
 			{
-				if(IsSerial<Typelist<Head, Tail> >::value && Length<Typelist<Head, Tail> >::value > 1)
+				typedef Typelist<Head, Tail> CurrentList;
+				enum{SerialLength = GetSerialCount<CurrentList>::value};
+
+				if(SerialLength >= 2)
 				{
-					result |= Shifter<
+					typedef typename TakeFirst<CurrentList, SerialLength>::Result SerialList;
+					typedef typename SkipFirst<CurrentList, SerialLength>::Result RestList;
+
+					result |= (Shifter<
 							Head::Pin::Number, 	//bit position in port
 							Head::Position, 	//bit position in value
 							ValueToPort>::Shift(value) &
-						GetPortMask<Typelist<Head, Tail> >::value;
+                            GetPortMask<SerialList>::value) ^
+                            GetInversionMask<SerialList>::value;
 
-					return result ^ GetInversionMask<Typelist<Head, Tail> >::value;
+					return PinWriteIterator<RestList>::UppendValue(value, result);
 				}
+
 				if(Head::Pin::Inverted == false)
 				{
 					if(value & (1 << Head::Position))
@@ -480,17 +484,23 @@ namespace IO
 			template<class DataType, class PortDataType>
 			static inline DataType UppendReadValue(PortDataType portValue, DataType result)
 			{
-				using namespace IoPrivate;
-				if(IsSerial<Typelist<Head, Tail> >::value && Length<Typelist<Head, Tail> >::value > 1)
+				typedef Typelist<Head, Tail> CurrentList;
+				enum{SerialLength = GetSerialCount<CurrentList>::value};
+
+				if(SerialLength >= 2)
 				{
-					typedef Shifter<
+					typedef typename TakeFirst<CurrentList, SerialLength>::Result SerialList;
+					typedef typename SkipFirst<CurrentList, SerialLength>::Result RestList;
+
+                    typedef Shifter<
 							Head::Pin::Number, 	//bit position in port
 							Head::Position, 	//bit position in value
 							PortToValue> AtctualShifter;
 
-					result |= AtctualShifter::Shift(DataType(portValue)) &
-						GetValueMask<Typelist<Head, Tail> >::value;
-					return result;
+                    result |= AtctualShifter::Shift(portValue) &
+                    GetValueMask<SerialList>::value ^
+                    GetInversionMask<SerialList>::value;
+                    return PinWriteIterator<RestList>::UppendReadValue(portValue, result);
 				}
 
 				if((int)Head::Position == (int)Head::Pin::Number)

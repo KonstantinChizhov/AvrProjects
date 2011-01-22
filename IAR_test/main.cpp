@@ -9,15 +9,15 @@
 #include "pinlist.h"
 
 using namespace IO;
-typedef PinList<Pa1, Pa2, Pa3, Pa4, Pa5> Pins;
-
+typedef PinList<Pa1, Pa2, Pa3, Pa4, Pa5, Pa6>  Pins;
+volatile uint8_t v=0;
 int main()
 {
-  Pins::SetConfiguration<Pins::Out, 0xff>();
-  uint8_t i = 0;
-  Pins::Write<0x05>();
+  Pins::Write(v);
+Pins::Set(v);
+Pins::Clear(v);
   while(1)
   {
-	Pins::Write(i++); 
+	
   }	
 }

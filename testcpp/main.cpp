@@ -8,7 +8,7 @@
 
 using namespace IO;
 
-typedef PinList<Pa1, Pa2, Pa3, Pa6, Pa5>  Pins;
+typedef PinList<Pa5, Pa6, Pa1, Pa2, Pa3, Pa4 >  Pins;
 
 /*
 int8_t floorLog2(uint32_t n) 
@@ -42,11 +42,15 @@ int8_t mylog2 (uint32_t val) {
 //	PORTA = *v;
 //}
 
-
+volatile uint8_t v=0;
 __attribute((OS_main))
 int main()
 {
-	Pins::Write(0x0f);
+Pins::Write(v);
+Pins::Set(v);
+Pins::Clear(v);
+while(1)
+{}
 }
 
 
