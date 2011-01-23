@@ -15,8 +15,8 @@ DECLARE_PORT_PINS(Porta, Pa)
 DECLARE_PORT_PINS(Portb, Pb)
 
 #define ASSERT_EQUAL(value, expected) if((value) != (expected)){\
-    std::cout << "Assertion failed! "  << "\t File: " << __FILE__ << "\t function: " << __FUNCTION__ << "\t line: " << __LINE__ << std::endl;\
-    std::cout << std::hex << "Expacted: 0x" << (unsigned)(expected) << "\tgot: 0x" << (unsigned)(value);\
+    std::cout << "\nAssertion failed! "  << "\n\tFile: " << __FILE__ << std::endl << "\tfunction: " << __FUNCTION__ << "\n\tline: " << __LINE__ << std::endl;\
+    std::cout << std::hex << "\tExpacted: 0x" << (unsigned)(expected) << "\tgot: 0x" << (unsigned)(value);\
     exit(1);\
     }
 
@@ -145,6 +145,37 @@ void TestOnePortConstIface()
     cout << "\tOK" << endl;
 }
 
+template<class Pins, class Port1, class Port2>
+void Test2PortConfiguration(unsigned listValue, unsigned portValue, unsigned portValue2)
+{
+    typename Pins::DataType val;
+    cout << __FUNCTION__ << "\t";
+    PrintPinList<Pins>::Print();
+    Pins::Write(listValue);
+    ASSERT_EQUAL(Port1::OutReg, portValue);
+    ASSERT_EQUAL(Port2::OutReg, portValue2);
+    val = Pins::Read();
+    ASSERT_EQUAL(val, listValue);
+
+    Port1::OutReg = 0;
+    Pins::Set(listValue);
+    ASSERT_EQUAL(Port1::OutReg, portValue);
+    ASSERT_EQUAL(Port2::OutReg, portValue2);
+    val = Pins::Read();
+    ASSERT_EQUAL(val, listValue);
+
+    Pins::Clear(listValue);
+    ASSERT_EQUAL(Port1::OutReg, 0);
+    ASSERT_EQUAL(Port2::OutReg, 0);
+    val = Pins::Read();
+    ASSERT_EQUAL(val, 0);
+
+    Pins::SetConfiguration(Pins::Out, listValue);
+    ASSERT_EQUAL(Port1::DirReg, portValue);
+    ASSERT_EQUAL(Port2::DirReg, portValue2);
+    cout << "\tOK" << endl;
+}
+
 int main()
 {
     for(int i=0; i< 16; i++)
@@ -167,6 +198,10 @@ int main()
     cout << "Length = \t" <<PinList<Pa0, Pa1, Pa2, Pa3, Pa4, Pa5, Pa6, Pa7, Pa8>::Slice<5, 4>::Length;
     TestOnePortPinList<PinList<Pa0, Pa1, Pa2, Pa3, Pa4, Pa5, Pa6, Pa7, Pa8>::Slice<0, 4> >(0x0f, 0x0f);
 
+    TestOnePortPinList<PinList<Pa4, Pa1, Pa6, Pa3, Pa7, Pa5, Pa0 > >(0x7f, 0xfb);
+    TestOnePortPinList<PinList<Pa4, Pa1, Pa6, Pa3, Pa2, Pa5, Pa0, Pa7 > >(0xaa, 0xaa);
+    TestOnePortPinList<PinList<Pa4, Pa1, Pa6, Pa3, Pa2, Pa5, Pa0, Pa7 > >(0x55, 0x55);
+
     typedef PinList<Pa2, Pa1, Pa3, Pa4, Pa6> Pins1;
     typedef PinList<Pins1::Pin<0>, Pins1::Pin<1>, Pins1::Pin<2>, Pins1::Pin<3>, Pins1::Pin<4> > Pins1Clone;
 
@@ -181,5 +216,7 @@ int main()
     TestOnePortConstIface<PinList<Pa0, Pa1, Pa2, Pa3, Pa4, Pa5, Pa6, Pa7, Pa8>::Slice<0, 4>, 0x0f, 0x0f>();
     TestOnePortConstIface<Pins1Clone, 0x1f, 0x5e>();
 
+    Test2PortConfiguration<PinList<Pa1, Pa3, Pa2, Pa0, Pb1, Pb3, Pb2, Pb0>, Porta, Portb>(0xff, 0x0f, 0x0f);
+    Test2PortConfiguration<PinList<Pa1, Pa2, Pa3, Pa0, Pb0, Pb1, Pb2, Pb3>, Porta, Portb>(0xff, 0x0f, 0x0f);
     return 0;
 }

@@ -277,7 +277,7 @@ namespace IO
 // Assume that TList is type list of PinPositionHolder types.
 ////////////////////////////////////////////////////////////////////////////////
 
- 		template <class TList, template <class> class Predicate> 
+ 		template <class TList, template <class> class Predicate>
 		struct SelectPins;
 
         template <template <class> class Predicate>
@@ -315,7 +315,7 @@ namespace IO
 	{
 		static const bool value = Item::Position == Item::Pin::Number;
 	};
- 
+
  	template<class Item>
 	struct NotTransparentMappedPins
 	{
@@ -337,7 +337,7 @@ namespace IO
 		};
 	};
 
-      
+
 ////////////////////////////////////////////////////////////////////////////////
 //	Mask for inverted pins
 ////////////////////////////////////////////////////////////////////////////////
@@ -403,6 +403,7 @@ namespace IO
         {
             static const int value = 0;
 			static const int PinNumber = -1;
+			static const int BitPosition = -1;
         };
         template <class Head, class Tail>
 
@@ -410,7 +411,11 @@ namespace IO
         {
 			typedef GetSerialCount<Tail> I;
 			static const int PinNumber = Head::Pin::Number;
-			static const int value = ((PinNumber == I::PinNumber - 1) ? I::value + 1 : 1);
+			static const int BitPosition = Head::Position;
+			static const int value =
+                ((PinNumber == I::PinNumber - 1 &&
+                BitPosition == I::BitPosition) ?
+                I::value + 1 : 1);
         };
 ////////////////////////////////////////////////////////////////////////////////
 // Returns first Num elements from Typelist
@@ -549,7 +554,7 @@ namespace IO
 							GetValueMask<TransparentPins>::value) ^
 							GetInversionMask<TransparentPins>::value;
 
-					return PinWriteIterator<NotTransparentPins>::UppendValue(portValue, result);
+					return PinWriteIterator<NotTransparentPins>::UppendReadValue(portValue, result);
 				}
 				enum{SerialLength = GetSerialCount<CurrentList>::value};
 

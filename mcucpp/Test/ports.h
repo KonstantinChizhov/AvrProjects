@@ -29,7 +29,7 @@
 
 namespace IO
 {
-    class TestPortBase
+    class TestPortBase :public GpioBase
     {
         public:
         enum Configuration
@@ -40,7 +40,25 @@ namespace IO
             Out = 0x01,
             AltOut = 0x01,
         };
-    };
+
+        static Configuration MapConfiguration(GenericConfiguration config)
+        {
+            if(config & GpioBase::Out)
+                return Out;
+            return In;
+        }
+
+        template<GenericConfiguration config>
+        struct MapConfigurationConst
+        {
+            static const Configuration value = In;
+        };
+	};
+
+	template<> struct TestPortBase::MapConfigurationConst<GpioBase::Out>{static const Configuration value = Out;};
+	template<> struct TestPortBase::MapConfigurationConst<GpioBase::OpenDrainOut>{static const Configuration value = Out;};
+	template<> struct TestPortBase::MapConfigurationConst<GpioBase::AltOut>{static const Configuration value = Out;};
+	template<> struct TestPortBase::MapConfigurationConst<GpioBase::AltOpenDrain>{static const Configuration value = Out;};
 
 	namespace Test
 	{
@@ -68,7 +86,7 @@ namespace IO
 				else
 					DirReg &= ~mask;
 			}
-			
+
 			template<DataT mask, Configuration configuration>
 			static void SetConfiguration()
 			{
@@ -107,39 +125,39 @@ namespace IO
 			{
 				return InReg;
 			}
-			
+
 			template<DataT value>
 			static void Write()
 			{
 				OutReg = value;
 			}
-			
+
 			template<DataT clearMask, DataT value>
 			static void ClearAndSet()
 			{
 				OutReg &= ~clearMask;
 				OutReg |= value;
 			}
-	
-			
+
+
 			template<DataT value>
 			static void Set()
 			{
 				OutReg |= value;
 			}
-			
+
 			template<DataT value>
 			static void Clear()
 			{
 				OutReg &= ~value;
 			}
-			
+
 			template<DataT value>
 			static void Toggle()
 			{
 				OutReg ^= value;
 			}
-			
+
 			enum{Id = Identity};
 			enum{Width=sizeof(DataT)*8};
 
