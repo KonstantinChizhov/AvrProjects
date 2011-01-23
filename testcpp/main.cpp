@@ -8,7 +8,7 @@
 
 using namespace IO;
 
-typedef PinList<Pa5, Pa6, Pa1, Pa2, Pa3, Pa4 >  Pins;
+typedef PinList<Pa5, Pa1, Pa6, Pa3, Pa7, Pa5, Pa0 >  Pins;
 
 /*
 int8_t floorLog2(uint32_t n) 

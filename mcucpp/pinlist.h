@@ -56,7 +56,9 @@ namespace IO
 		template<unsigned sizeBits>
 		struct SelectSize
 		{
-			enum{LessOrEq8 = sizeBits <= 8, LessOrEq16 = sizeBits <= 16};
+			static const bool LessOrEq8 = sizeBits <= 8;
+			static const bool LessOrEq16 = sizeBits <= 16;
+
 			typedef typename StaticIf<
 					LessOrEq8,
 					uint8_t,
@@ -76,36 +78,36 @@ namespace IO
 		template<class TList, class CurrentConfig, class NextConfig>
 		struct CheckSameConfigHelper
 		{
-			enum{value = 0};
+			static const bool value = false;
 		};
 
 		template<class Head, class Tail, class CurrentConfig>
 		struct CheckSameConfigHelper<Typelist<Head, Tail>, CurrentConfig, CurrentConfig>
 		{
-			enum{value = CheckSameConfigImp<Tail, CurrentConfig>::value};
+			static const bool value = CheckSameConfigImp<Tail, CurrentConfig>::value;
 		};
 
         template <class CurrentConfig> struct CheckSameConfigImp<NullType, CurrentConfig>
         {
-            enum{value = 1};
+            static const bool value = true;
         };
 
         template <class Head, class Tail, class CurrentConfig>
         struct CheckSameConfigImp<Typelist<Head, Tail>, CurrentConfig>
         {
-			enum{value = CheckSameConfigHelper<Typelist<Head, Tail>, CurrentConfig, typename Head::Configuration>::value};
+			static const bool value = CheckSameConfigHelper<Typelist<Head, Tail>, CurrentConfig, typename Head::Configuration>::value;
         };
 
 		template <class TList>
 		struct CheckSameConfig
 		{
-			enum{value = CheckSameConfigImp<TList, typename TList::Head::Configuration>::value};
+			static const bool value = CheckSameConfigImp<TList, typename TList::Head::Configuration>::value;
 		};
 
 		template <>
 		struct CheckSameConfig<NullType>
 		{
-				enum{value = 1};
+				static const bool value = true;
 		};
 
 
@@ -180,7 +182,7 @@ namespace IO
 			typedef ShiftLeft<First - Second> LeftShifter1;
 			typedef ShiftLeft<Second - First> LeftShifter2;
 
-            enum{ShiftDirection = First > Second};
+            static const bool ShiftDirection = First > Second;
 			typedef typename StaticIf<ShiftDirection, LeftShifter1, RightShifter2>::Result FirstShifter;
 			typedef typename StaticIf<ShiftDirection, RightShifter1, LeftShifter2>::Result SecondShifter;
 
@@ -193,24 +195,25 @@ namespace IO
 			}
 		};
 
+////////////////////////////////////////////////////////////////////////////////
 		template<class PINS> struct GetLastBitPosition;
 
 		template<>
 		struct GetLastBitPosition<NullType>
 		{
-		    enum {value = 0};
+		    static const unsigned value = 0;
 		};
 
 		template<class Head>
 		struct GetLastBitPosition<Typelist<Head, NullType> >
 		{
-		    enum {value = Head::Position};
+		    static const unsigned value = Head::Position;
 		};
 
 		template<class Head, class Tail>
 		struct GetLastBitPosition<Typelist<Head, Tail> >
 		{
-		    enum {value = GetLastBitPosition<Tail>::value};
+		    static const unsigned value = GetLastBitPosition<Tail>::value;
 		};
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -221,7 +224,7 @@ namespace IO
 		struct PinPositionHolder
 		{
 			typedef TPIN Pin;
-			enum{Position = POSITION};
+			static const unsigned Position = POSITION;
 		};
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -270,35 +273,73 @@ namespace IO
         };
 
 ////////////////////////////////////////////////////////////////////////////////
-// class template GetPinsWithPort
-// Selects pins types form pin list which have givven port
+// class template SelectPins
 // Assume that TList is type list of PinPositionHolder types.
-// T - port type to select by.
 ////////////////////////////////////////////////////////////////////////////////
 
- 		template <class TList, class TPort> struct GetPinsWithPort;
+ 		template <class TList, template <class> class Predicate> 
+		struct SelectPins;
 
-        template <class TPort>
-        struct GetPinsWithPort<NullType, TPort>
+        template <template <class> class Predicate>
+        struct SelectPins<NullType, Predicate>
         {
             typedef NullType Result;
         };
 
-        template <class Head, class Tail, class TPort>
-        class GetPinsWithPort<Typelist<Head, Tail>, TPort>
+        template <class Head, class Tail, template <class> class Predicate>
+        class SelectPins<Typelist<Head, Tail>, Predicate>
         {
-			 typedef typename GetPinsWithPort<Tail, TPort>::Result NotMatch;
+			 typedef typename SelectPins<Tail, Predicate>::Result NotMatch;
 			 typedef Typelist<Head,
-                    typename GetPinsWithPort<Tail, TPort>::Result>
+                    typename SelectPins<Tail, Predicate>::Result>
                 Match;
-			 static const bool IsMatch = IsSameType<TPort, typename Head::Pin::Port>::value;
+			 static const bool IsMatch = Predicate<Head>::value;
 		public:
 			 typedef typename Select<IsMatch,
 			 	Match,
 			 	NotMatch>::Result Result;
         };
+
 ////////////////////////////////////////////////////////////////////////////////
 //
+// 			Select Predicates
+//
+////////////////////////////////////////////////////////////////////////////////
+// class template TransparentMappedPins
+// Selects pins types form pin list with port bit position equals to value bit position
+// Assume that TList is type list of PinPositionHolder types.
+////////////////////////////////////////////////////////////////////////////////
+
+	template<class Item>
+	struct TransparentMappedPins
+	{
+		static const bool value = Item::Position == Item::Pin::Number;
+	};
+ 
+ 	template<class Item>
+	struct NotTransparentMappedPins
+	{
+		static const bool value = Item::Position != Item::Pin::Number;
+	};
+
+////////////////////////////////////////////////////////////////////////////////
+// class template PinsWithPort
+// Selects with specified port
+// Assume that TList is type list of PinPositionHolder types.
+////////////////////////////////////////////////////////////////////////////////
+	template<class Port>
+	struct PinsWithPort
+	{
+		template<class Item>
+		struct Result
+		{
+			static const bool value = IsSameType<Port, typename Item::Pin::Port>::value;
+		};
+	};
+
+      
+////////////////////////////////////////////////////////////////////////////////
+//	Mask for inverted pins
 ////////////////////////////////////////////////////////////////////////////////
 
 		template <class TList> struct GetInversionMask;
@@ -360,16 +401,16 @@ namespace IO
 
         template <> struct GetSerialCount<NullType>
         {
-            enum{value = 0};
-			enum{PinNumber = -1};
+            static const int value = 0;
+			static const int PinNumber = -1;
         };
         template <class Head, class Tail>
 
         struct GetSerialCount< Typelist<Head, Tail> >
         {
 			typedef GetSerialCount<Tail> I;
-			enum{PinNumber = Head::Pin::Number};
-			enum{value = ((PinNumber == I::PinNumber - 1) ? I::value + 1 : 1)};
+			static const int PinNumber = Head::Pin::Number;
+			static const int value = ((PinNumber == I::PinNumber - 1) ? I::value + 1 : 1);
         };
 ////////////////////////////////////////////////////////////////////////////////
 // Returns first Num elements from Typelist
@@ -450,6 +491,19 @@ namespace IO
 			static inline PortDataType UppendValue(DataType value, PortDataType result)
 			{
 				typedef Typelist<Head, Tail> CurrentList;
+				typedef typename SelectPins<CurrentList, TransparentMappedPins>::Result TransparentPins;
+				typedef typename SelectPins<CurrentList, NotTransparentMappedPins>::Result NotTransparentPins;
+				const int TransparentCount = Length<TransparentPins>::value;
+
+				if(TransparentCount > 1)
+				{
+					result |= (value &
+							GetPortMask<TransparentPins>::value) ^
+							GetInversionMask<TransparentPins>::value;
+
+					return PinWriteIterator<NotTransparentPins>::UppendValue(value, result);
+				}
+
 				enum{SerialLength = GetSerialCount<CurrentList>::value};
 
 				if(SerialLength >= 2)
@@ -461,8 +515,8 @@ namespace IO
 							Head::Pin::Number, 	//bit position in port
 							Head::Position, 	//bit position in value
 							ValueToPort>::Shift(value) &
-                            GetPortMask<SerialList>::value) ^
-                            GetInversionMask<SerialList>::value;
+							GetPortMask<SerialList>::value) ^
+							GetInversionMask<SerialList>::value;
 
 					return PinWriteIterator<RestList>::UppendValue(value, result);
 				}
@@ -485,6 +539,18 @@ namespace IO
 			static inline DataType UppendReadValue(PortDataType portValue, DataType result)
 			{
 				typedef Typelist<Head, Tail> CurrentList;
+				typedef typename SelectPins<CurrentList, TransparentMappedPins>::Result TransparentPins;
+				typedef typename SelectPins<CurrentList, NotTransparentMappedPins>::Result NotTransparentPins;
+				const int TransparentCount = Length<TransparentPins>::value;
+
+				if(TransparentCount > 1)
+				{
+					result |= (portValue &
+							GetValueMask<TransparentPins>::value) ^
+							GetInversionMask<TransparentPins>::value;
+
+					return PinWriteIterator<NotTransparentPins>::UppendValue(portValue, result);
+				}
 				enum{SerialLength = GetSerialCount<CurrentList>::value};
 
 				if(SerialLength >= 2)
@@ -497,10 +563,10 @@ namespace IO
 							Head::Position, 	//bit position in value
 							PortToValue> AtctualShifter;
 
-                    result |= AtctualShifter::Shift(portValue) &
-                    GetValueMask<SerialList>::value ^
-                    GetInversionMask<SerialList>::value;
-                    return PinWriteIterator<RestList>::UppendReadValue(portValue, result);
+					result |= AtctualShifter::Shift(portValue) &
+					GetValueMask<SerialList>::value ^
+					GetInversionMask<SerialList>::value;
+					return PinWriteIterator<RestList>::UppendReadValue(portValue, result);
 				}
 
 				if((int)Head::Position == (int)Head::Pin::Number)
@@ -596,7 +662,7 @@ namespace IO
         struct PortWriteIterator< Typelist<Head, Tail>, PinList>
         {
 			//pins on current port
-			typedef typename GetPinsWithPort<PinList, Head>::Result Pins;
+			typedef typename SelectPins<PinList, PinsWithPort<Head>::template Result>::Result Pins;
 
 			enum{Mask = GetPortMask<Pins>::value};
 
@@ -723,7 +789,7 @@ namespace IO
         struct PortConfigurationIterator< Typelist<Head, Tail>, PinList, Configuration, config>
         {
 			//pins on current port
-			typedef typename GetPinsWithPort<PinList, Head>::Result Pins;
+			typedef typename SelectPins<PinList, PinsWithPort<Head>::template Result>::Result Pins;
 			typedef Head Port; //Head points to current port i the list.
 
 			template<class DataType, DataType mask>
@@ -739,7 +805,7 @@ namespace IO
         struct PortConfigurationIterator< Typelist<Head, Tail>, PinList, GpioBase::GenericConfiguration, config>
         {
 			//pins on current port
-			typedef typename GetPinsWithPort<PinList, Head>::Result Pins;
+			typedef typename SelectPins<PinList, PinsWithPort<Head>::template Result>::Result Pins;
 			typedef Head Port; //Head points to current port i the list.
 
 			template<class DataType, DataType mask>

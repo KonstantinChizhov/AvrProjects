@@ -44,7 +44,7 @@ namespace IO
 		typedef CONFIG_PORT ConfigPort;
 		typedef typename ConfigPort::Configuration Configuration;
 
-		enum{Number = PIN};
+		static const unsigned Number = PIN;
 		static const bool Inverted = false;
 
 		static void Set()
