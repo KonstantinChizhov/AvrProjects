@@ -52,7 +52,19 @@ namespace IO
 			  return Out;
 			}
 		}
+		template<GenericConfiguration config>
+		struct MapConfigurationConst
+		{
+			static const Configuration value = Out;
+		};
 	};
+	
+	template<> struct NativePortBase::MapConfigurationConst<GpioBase::In>{static const Configuration value = In;};
+	template<> struct NativePortBase::MapConfigurationConst<GpioBase::AnalogIn>{static const Configuration value = AnalogIn;};
+	template<> struct NativePortBase::MapConfigurationConst<GpioBase::OpenDrainOut>{static const Configuration value = OpenDrainOut;};
+	template<> struct NativePortBase::MapConfigurationConst<GpioBase::AltOut>{static const Configuration value = AltOut;};
+	template<> struct NativePortBase::MapConfigurationConst<GpioBase::AltOpenDrain>{static const Configuration value = AltOpenDrain;};
+	template<> struct NativePortBase::MapConfigurationConst<GpioBase::PullUpOrDownIn>{static const Configuration value = PullUpOrDownIn;};
 
 	namespace Private
 	{
