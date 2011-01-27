@@ -23,7 +23,10 @@ namespace IO
 			AnalogIn = 0,
 			In = 0x04,
 			PullUpOrDownIn = 0x08,
-			Out = 0x03,
+			Out = 0x03, // default Out is Out50Mhz
+			Out10Mhz = 0x01,
+			Out2Mhz = 0x02,
+			Out50Mhz = 0x03,
 			OpenDrainOut = 0x07,
 			AltOut = 0x0B,
 			AltOpenDrain = 0x0f
@@ -89,7 +92,7 @@ namespace IO
 			}
 		};
 
-		template<class CRL, class CRH, class IDR, class ODR, class BSRR, class BRR, class LCKR, int ID>
+		template<class CRL, class CRH, class IDR, class ODR, class BSRR, class BRR, class LCKR, uint32_t ClkEnMask, int ID>
 		class PortImplementation :public NativePortBase
 		{
 		public:
@@ -172,14 +175,24 @@ namespace IO
 			  WriteConfig<CRL, mask, configuration>::Write();
 			  WriteConfig<CRH, (mask>>8), configuration>::Write();
 			}
+			
+			static void Enable()
+			{
+				RCC_APB2ENR |= ClkEnMask;
+			}
+			
+			static void Disable()
+			{
+				RCC_APB2ENR &= ~ClkEnMask;
+			}
 			enum{Id = ID};
 		};
 
 		/*Lower part of port. Need for effective configuration writing*/
-		template<class CRL, class CRH, class IDR, class ODR, class BSRR, class BRR, class LCKR, int ID>
-		class PortImplementationL :public PortImplementation<CRL, CRH, IDR, ODR, BSRR, BRR, LCKR, ID>
+		template<class CRL, class CRH, class IDR, class ODR, class BSRR, class BRR, class LCKR, uint32_t ClkEnMask, int ID>
+		class PortImplementationL :public PortImplementation<CRL, CRH, IDR, ODR, BSRR, BRR, LCKR, ClkEnMask, ID>
 		{
-			typedef PortImplementation<CRL, CRH, IDR, ODR, BSRR, BRR, LCKR, ID> Base;
+			typedef PortImplementation<CRL, CRH, IDR, ODR, BSRR, BRR, LCKR, ClkEnMask, ID> Base;
 			public:
 				typedef typename Base::Configuration Configuration;
 				typedef typename Base::DataT DataT;
@@ -202,10 +215,10 @@ namespace IO
 		};
 
 		 /*Hight part of port. Need for effective configuration writing*/
-		template<class CRL, class CRH, class IDR, class ODR, class BSRR, class BRR, class LCKR, int ID>
-		class PortImplementationH :public PortImplementation<CRL, CRH, IDR, ODR, BSRR, BRR, LCKR, ID>
+		template<class CRL, class CRH, class IDR, class ODR, class BSRR, class BRR, class LCKR, uint32_t ClkEnMask, int ID>
+		class PortImplementationH :public PortImplementation<CRL, CRH, IDR, ODR, BSRR, BRR, LCKR, ClkEnMask, ID>
 		{
-			typedef PortImplementation<CRL, CRH, IDR, ODR, BSRR, BRR, LCKR, ID> Base;
+			typedef PortImplementation<CRL, CRH, IDR, ODR, BSRR, BRR, LCKR, ClkEnMask, ID> Base;
 			public:
 				typedef typename Base::Configuration Configuration;
 				typedef typename Base::DataT DataT;
@@ -228,7 +241,7 @@ namespace IO
 		};
 	}
 
-#define MAKE_PORT(CRL, CRH, IDR, ODR, BSRR, BRR, LCKR, className, ID) \
+#define MAKE_PORT(CRL, CRH, IDR, ODR, BSRR, BRR, LCKR, ClkEnMask, className, ID) \
    namespace Private{\
 		IO_REG_WRAPPER(CRL, className ## Crl, uint32_t);\
 		IO_REG_WRAPPER(CRH, className ## Crh, uint32_t);\
@@ -246,6 +259,7 @@ namespace IO
 			Private::className ## Bsrr, \
 			Private::className ## Brr, \
 			Private::className ## Lckr, \
+			ClkEnMask,\
 			ID> className; \
 		typedef Private::PortImplementationL<\
 			Private::className ## Crl, \
@@ -255,6 +269,7 @@ namespace IO
 			Private::className ## Bsrr, \
 			Private::className ## Brr, \
 			Private::className ## Lckr, \
+			ClkEnMask,\
 			ID> className ## L; \
 		typedef Private::PortImplementationH<\
 			Private::className ## Crl, \
@@ -264,6 +279,7 @@ namespace IO
 			Private::className ## Bsrr, \
 			Private::className ## Brr, \
 			Private::className ## Lckr, \
+			ClkEnMask,\
 			ID> className ## H; \
 
 
@@ -271,86 +287,64 @@ namespace IO
 #if defined(__ICCARM__)
 
 #ifdef USE_PORTA
-MAKE_PORT(GPIOA_CRL, GPIOA_CRH, GPIOA_IDR, GPIOA_ODR, GPIOA_BSRR, GPIOA_BRR, GPIOA_LCKR, Porta, 'A')
+MAKE_PORT(GPIOA_CRL, GPIOA_CRH, GPIOA_IDR, GPIOA_ODR, GPIOA_BSRR, GPIOA_BRR, GPIOA_LCKR, 1 << 2, Porta, 'A')
 #endif
 
 #ifdef USE_PORTB
-MAKE_PORT(GPIOB_CRL, GPIOB_CRH, GPIOB_IDR, GPIOB_ODR, GPIOB_BSRR, GPIOB_BRR, GPIOB_LCKR, Portb, 'B')
+MAKE_PORT(GPIOB_CRL, GPIOB_CRH, GPIOB_IDR, GPIOB_ODR, GPIOB_BSRR, GPIOB_BRR, GPIOB_LCKR, 1 << 3, Portb, 'B')
 #endif
 
 #ifdef USE_PORTC
-MAKE_PORT(GPIOC_CRL, GPIOC_CRH, GPIOC_IDR, GPIOC_ODR, GPIOC_BSRR, GPIOC_BRR, GPIOC_LCKR, Portc, 'C')
+MAKE_PORT(GPIOC_CRL, GPIOC_CRH, GPIOC_IDR, GPIOC_ODR, GPIOC_BSRR, GPIOC_BRR, GPIOC_LCKR, 1 << 4, Portc, 'C')
 #endif
 
 #ifdef USE_PORTD
-MAKE_PORT(GPIOD_CRL, GPIOD_CRH, GPIOD_IDR, GPIOD_ODR, GPIOD_BSRR, GPIOD_BRR, GPIOD_LCKR, Portd, 'D')
+MAKE_PORT(GPIOD_CRL, GPIOD_CRH, GPIOD_IDR, GPIOD_ODR, GPIOD_BSRR, GPIOD_BRR, GPIOD_LCKR, 1 << 5, Portd,'D')
 #endif
 
 #ifdef USE_PORTE
-MAKE_PORT(GPIOE_CRL, GPIOE_CRH, GPIOE_IDR, GPIOE_ODR, GPIOE_BSRR, GPIOE_BRR, GPIOE_LCKR, Porte, 'E')
+MAKE_PORT(GPIOE_CRL, GPIOE_CRH, GPIOE_IDR, GPIOE_ODR, GPIOE_BSRR, GPIOE_BRR, GPIOE_LCKR, 1 << 6, Porte, 'E')
 #endif
 
 #ifdef USE_PORTF
-MAKE_PORT(GPIOF_CRL, GPIOF_CRH, GPIOF_IDR, GPIOF_ODR, GPIOF_BSRR, GPIOF_BRR, GPIOF_LCKR, Portf, 'F')
+MAKE_PORT(GPIOF_CRL, GPIOF_CRH, GPIOF_IDR, GPIOF_ODR, GPIOF_BSRR, GPIOF_BRR, GPIOF_LCKR, 1 << 7, Portf,'F')
 #endif
 
 #ifdef USE_PORTG
-MAKE_PORT(GPIOG_CRL, GPIOG_CRH, GPIOG_IDR, GPIOG_ODR, GPIOG_BSRR, GPIOG_BRR, GPIOG_LCKR, Portg, 'G')
+MAKE_PORT(GPIOG_CRL, GPIOG_CRH, GPIOG_IDR, GPIOG_ODR, GPIOG_BSRR, GPIOG_BRR, GPIOG_LCKR, 1 << 8, Portg, 'G')
 #endif
 
-#ifdef USE_PORTH
-MAKE_PORT(GPIOH_CRL, GPIOH_CRH, GPIOH_IDR, GPIOH_ODR, GPIOH_BSRR, GPIOH_BRR, GPIOH_LCKR, Porth, 'H')
-#endif
-
-#ifdef USE_PORTJ
-MAKE_PORT(GPIOJ_CRL, GPIOJ_CRH, GPIOJ_IDR, GPIOJ_ODR, GPIOJ_BSRR, GPIOJ_BRR, GPIOJ_LCKR, Portj, 'J')
-#endif
-
-#ifdef USE_PORTK
-MAKE_PORT(GPIOK_CRL, GPIOK_CRH, GPIOK_IDR, GPIOK_ODR, GPIOK_BSRR, GPIOK_BRR, GPIOK_LCKR, Portk, 'K')
-#endif
 //==================================================================================================
 #elif defined(__CC_ARM) || defined (__arm__)
 
 #ifdef USE_PORTA
-MAKE_PORT(GPIOA->CRL, GPIOA->CRH, GPIOA->IDR, GPIOA->ODR, GPIOA->BSRR, GPIOA->BRR, GPIOA->LCKR, Porta, 'A')
+MAKE_PORT(GPIOA->CRL, GPIOA->CRH, GPIOA->IDR, GPIOA->ODR, GPIOA->BSRR, GPIOA->BRR, GPIOA->LCKR, 1 << 2, Porta, 'A')
 #endif
 
 #ifdef USE_PORTB
-MAKE_PORT(GPIOB->CRL, GPIOB->CRH, GPIOB->IDR, GPIOB->ODR, GPIOB->BSRR, GPIOB->BRR, GPIOB->LCKR, Portb, 'B')
+MAKE_PORT(GPIOB->CRL, GPIOB->CRH, GPIOB->IDR, GPIOB->ODR, GPIOB->BSRR, GPIOB->BRR, GPIOB->LCKR, 1 << 3, Portb, 'B')
 #endif
 
 #ifdef USE_PORTC
-MAKE_PORT(GPIOC->CRL, GPIOC->CRH, GPIOC->IDR, GPIOC->ODR, GPIOC->BSRR, GPIOC->BRR, GPIOC->LCKR, Portc, 'C')
+MAKE_PORT(GPIOC->CRL, GPIOC->CRH, GPIOC->IDR, GPIOC->ODR, GPIOC->BSRR, GPIOC->BRR, GPIOC->LCKR, 1 << 4, Portc, 'C')
 #endif
 
 #ifdef USE_PORTD
-MAKE_PORT(GPIOD->CRL, GPIOD->CRH, GPIOD->IDR, GPIOD->ODR, GPIOD->BSRR, GPIOD->BRR, GPIOD->LCKR, Portd, 'D')
+MAKE_PORT(GPIOD->CRL, GPIOD->CRH, GPIOD->IDR, GPIOD->ODR, GPIOD->BSRR, GPIOD->BRR, GPIOD->LCKR, 1 << 4, Portd, 'D')
 #endif
 
 #ifdef USE_PORTE
-MAKE_PORT(GPIOE->CRL, GPIOE->CRH, GPIOE->IDR, GPIOE->ODR, GPIOE->BSRR, GPIOE->BRR, GPIOE->LCKR, Porte, 'E')
+MAKE_PORT(GPIOE->CRL, GPIOE->CRH, GPIOE->IDR, GPIOE->ODR, GPIOE->BSRR, GPIOE->BRR, GPIOE->LCKR, 1 << 5, Porte, 'E')
 #endif
 
 #ifdef USE_PORTF
-MAKE_PORT(GPIOF->CRL, GPIOF->CRH, GPIOF->IDR, GPIOF->ODR, GPIOF->BSRR, GPIOF->BRR, GPIOF->LCKR, Portf, 'F')
+MAKE_PORT(GPIOF->CRL, GPIOF->CRH, GPIOF->IDR, GPIOF->ODR, GPIOF->BSRR, GPIOF->BRR, GPIOF->LCKR, 1 << 6, Portf, 'F')
 #endif
 
 #ifdef USE_PORTG
-MAKE_PORT(GPIOG->CRL, GPIOG->CRH, GPIOG->IDR, GPIOG->ODR, GPIOG->BSRR, GPIOG->BRR, GPIOG->LCKR, Portg, 'G')
+MAKE_PORT(GPIOG->CRL, GPIOG->CRH, GPIOG->IDR, GPIOG->ODR, GPIOG->BSRR, GPIOG->BRR, GPIOG->LCKR, 1 << 7, Portg, 'G')
 #endif
 
-#ifdef USE_PORTH
-MAKE_PORT(GPIOH->CRL, GPIOH->CRH, GPIOH->IDR, GPIOH->ODR, GPIOH->BSRR, GPIOH->BRR, GPIOH->LCKR, Porth, 'H')
-#endif
-
-#ifdef USE_PORTJ
-MAKE_PORT(GPIOJ->CRL, GPIOJ->CRH, GPIOJ->IDR, GPIOJ->ODR, GPIOJ->BSRR, GPIOJ->BRR, GPIOJ->LCKR, Portj, 'J')
-#endif
-
-#ifdef USE_PORTK
-MAKE_PORT(GPIOK->CRL, GPIOK->CRH, GPIOK->IDR, GPIOK->ODR, GPIOK->BSRR, GPIOK->BRR, GPIOK->LCKR, Portk, 'K')
-#endif
 //==================================================================================================
 #else
 #error Not supported compiler
