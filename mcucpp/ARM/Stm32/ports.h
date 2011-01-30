@@ -7,6 +7,9 @@
 #ifndef STM32_PORTS_H
 #define STM32_PORTS_H
 
+#include "ioreg.h"
+#include "stm32f10x.h"
+
 #include <static_assert.h>
 #define USE_SPLIT_PORT_CONFIGURATION 8
 
@@ -28,8 +31,17 @@ namespace IO
 			Out2Mhz = 0x02,
 			Out50Mhz = 0x03,
 			OpenDrainOut = 0x07,
+			OpenDrainOut10Mhz = 0x05,
+			OpenDrainOut2Mhz = 0x06,
+			OpenDrainOut50Mhz = 0x07,
 			AltOut = 0x0B,
-			AltOpenDrain = 0x0f
+			AltOut10Mhz = 0x09,
+			AltOut2Mhz = 0x0A,
+			AltOut50Mhz = 0x0B,
+			AltOpenDrain = 0x0f,
+			AltOpenDrain10Mhz = 0x0C,
+			AltOpenDrain2Mhz = 0x0E,
+			AltOpenDrain50Mhz = 0x0f
 		};
 
 		static inline unsigned UnpackConfig(unsigned mask, unsigned value, Configuration configuration)
@@ -178,12 +190,12 @@ namespace IO
 			
 			static void Enable()
 			{
-				RCC_APB2ENR |= ClkEnMask;
+				RCC->APB2ENR |= ClkEnMask;
 			}
 			
 			static void Disable()
 			{
-				RCC_APB2ENR &= ~ClkEnMask;
+				RCC->APB2ENR &= ~ClkEnMask;
 			}
 			enum{Id = ID};
 		};
@@ -245,11 +257,11 @@ namespace IO
    namespace Private{\
 		IO_REG_WRAPPER(CRL, className ## Crl, uint32_t);\
 		IO_REG_WRAPPER(CRH, className ## Crh, uint32_t);\
-		IO_REG_WRAPPER(IDR, className ## Idr, uint16_t);\
-		IO_REG_WRAPPER(ODR, className ## Odr, uint16_t);\
+		IO_REG_WRAPPER(IDR, className ## Idr, uint32_t);\
+		IO_REG_WRAPPER(ODR, className ## Odr, uint32_t);\
 		IO_REG_WRAPPER(BSRR, className ## Bsrr, uint32_t);\
-		IO_REG_WRAPPER(BRR, className ## Brr, uint16_t);\
-		IO_REG_WRAPPER(LCKR, className ## Lckr, uint16_t);\
+		IO_REG_WRAPPER(BRR, className ## Brr, uint32_t);\
+		IO_REG_WRAPPER(LCKR, className ## Lckr, uint32_t);\
 	}\
 	  typedef Private::PortImplementation<\
 			Private::className ## Crl, \
@@ -282,41 +294,6 @@ namespace IO
 			ClkEnMask,\
 			ID> className ## H; \
 
-
-//==================================================================================================
-#if defined(__ICCARM__)
-
-#ifdef USE_PORTA
-MAKE_PORT(GPIOA_CRL, GPIOA_CRH, GPIOA_IDR, GPIOA_ODR, GPIOA_BSRR, GPIOA_BRR, GPIOA_LCKR, 1 << 2, Porta, 'A')
-#endif
-
-#ifdef USE_PORTB
-MAKE_PORT(GPIOB_CRL, GPIOB_CRH, GPIOB_IDR, GPIOB_ODR, GPIOB_BSRR, GPIOB_BRR, GPIOB_LCKR, 1 << 3, Portb, 'B')
-#endif
-
-#ifdef USE_PORTC
-MAKE_PORT(GPIOC_CRL, GPIOC_CRH, GPIOC_IDR, GPIOC_ODR, GPIOC_BSRR, GPIOC_BRR, GPIOC_LCKR, 1 << 4, Portc, 'C')
-#endif
-
-#ifdef USE_PORTD
-MAKE_PORT(GPIOD_CRL, GPIOD_CRH, GPIOD_IDR, GPIOD_ODR, GPIOD_BSRR, GPIOD_BRR, GPIOD_LCKR, 1 << 5, Portd,'D')
-#endif
-
-#ifdef USE_PORTE
-MAKE_PORT(GPIOE_CRL, GPIOE_CRH, GPIOE_IDR, GPIOE_ODR, GPIOE_BSRR, GPIOE_BRR, GPIOE_LCKR, 1 << 6, Porte, 'E')
-#endif
-
-#ifdef USE_PORTF
-MAKE_PORT(GPIOF_CRL, GPIOF_CRH, GPIOF_IDR, GPIOF_ODR, GPIOF_BSRR, GPIOF_BRR, GPIOF_LCKR, 1 << 7, Portf,'F')
-#endif
-
-#ifdef USE_PORTG
-MAKE_PORT(GPIOG_CRL, GPIOG_CRH, GPIOG_IDR, GPIOG_ODR, GPIOG_BSRR, GPIOG_BRR, GPIOG_LCKR, 1 << 8, Portg, 'G')
-#endif
-
-//==================================================================================================
-#elif defined(__CC_ARM) || defined (__arm__)
-
 #ifdef USE_PORTA
 MAKE_PORT(GPIOA->CRL, GPIOA->CRH, GPIOA->IDR, GPIOA->ODR, GPIOA->BSRR, GPIOA->BRR, GPIOA->LCKR, 1 << 2, Porta, 'A')
 #endif
@@ -346,10 +323,6 @@ MAKE_PORT(GPIOG->CRL, GPIOG->CRH, GPIOG->IDR, GPIOG->ODR, GPIOG->BSRR, GPIOG->BR
 #endif
 
 //==================================================================================================
-#else
-#error Not supported compiler
-#endif
-
 }//namespace IO
 
 #endif

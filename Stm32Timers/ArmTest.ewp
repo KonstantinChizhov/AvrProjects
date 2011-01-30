@@ -146,7 +146,7 @@
         <debug>1</debug>
         <option>
           <name>CCDefines</name>
-          <state></state>
+          <state>STM32F10X_MD_VL</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -661,11 +661,11 @@
         </option>
         <option>
           <name>IlinkIcfOverride</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>IlinkIcfFile</name>
-          <state>$TOOLKIT_DIR$\CONFIG\generic.icf</state>
+          <state>E:\Projects\McuProjects\Stm32Timers\ArmTest.icf</state>
         </option>
         <option>
           <name>IlinkIcfFileSlave</name>
@@ -1004,6 +1004,7 @@
         <option>
           <name>CCDefines</name>
           <state>NDEBUG</state>
+          <state>STM32F10X_MD_VL</state>
         </option>
         <option>
           <name>CCPreprocFile</name>

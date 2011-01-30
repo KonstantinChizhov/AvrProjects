@@ -39,7 +39,7 @@ typedef Lcd<LcdBus> MyLcd;
 
 int main()
 {
-  RCC_APB2ENR |= 1 << 2 | 1 << 3 | 1 << 4;
+  Porta::Enable();
   MyLcd::Init();
 
   MyLcd::Puts("Hello STM32", 13);

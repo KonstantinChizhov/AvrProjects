@@ -37,10 +37,10 @@ namespace Timers
 		{
 			Normal = MC_2,
 			ClearOnMatch0 = MC_1,
-                        UpDown = MC_3
+			UpDown = MC_3
 		};
                 
-                enum {TimerModeMask = ~UpDown};
+		enum {TimerModeMask = ~UpDown};
 
 		template<unsigned Number> struct Divider;
 

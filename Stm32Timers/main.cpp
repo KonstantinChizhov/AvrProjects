@@ -1,15 +1,17 @@
-#include <ST/iostm32f10xxB.h>
+
 
 #define USE_PORTA
 #define USE_PORTC
 #define USE_PORTB
+#define USE_TIM1
 #include <iopins.h>
 #include <pinlist.h>
 #include <spi.h>
 #include <latch.h>
+#include <timers.h>
 
 using namespace IO;
-using namespace IoPrivate;
+using namespace Timers;
 
 typedef IO::Pc8 led;
 typedef IO::Pc9 led2;
@@ -31,25 +33,20 @@ _delay_us(unsigned __us)
   delay_loop(__us);
 }
 
-
-#include "HD44780.h"
-
-typedef PinList<Pa6, Pa1, Pa4, Pa3, Pa2, Pa5, Pa0> LcdBus;
-typedef Lcd<LcdBus> MyLcd;
-
 int main()
 {
-  Porta::Enable();
+  //Porta::Enable();
+  Portc::Enable();
+  led::SetConfiguration(led::Port::Out);
+  led2::SetConfiguration(led2::Port::Out);
   
-  MyLcd::Init();
-
-  MyLcd::Puts("Hello STM32", 13);
+  led::Set();
+  
+ Timer1::Start(Timer1::Div1);
 	while(1)
 	{
-		//_delay_ms(100);
-		//led::Toggle();
-		//led2::Toggle();
+		//_delay_ms(1000);
+		led::Set(Timer1::Get() & 0x0400);
+		led2::Toggle();
 	}
-  
-  return 0;
 }
