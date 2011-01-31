@@ -98,12 +98,18 @@ template<
 		
 		enum TimerMode
 		{
-			Up		= 0,
-			Normal	= 0,
-			Down	= TIM_CR1_DIR,
+			UpMode		= 0,
+			NormalMode	= 0,
+			DownMode	= TIM_CR1_DIR,
 			CenterAligned1	= TIM_CR1_CMS_0,
 			CenterAligned2	= TIM_CR1_CMS_1,
 			CenterAligned3	= TIM_CR1_CMS
+		};
+		
+		enum TimerDir
+		{
+			Up = 0,
+			Down = 1
 		};
 		
 		enum ClockSrc
@@ -124,6 +130,7 @@ template<
 		static void SetPeriod(DataT val)
 		{
 			Arr::Set(val);
+			Egr::Or(TIM_EGR_UG);
 		}
 
 		static void Stop()
@@ -135,15 +142,19 @@ template<
 		{
 			
 		}
+		
+		static TimerDir Direction()
+		{
+		  return Cr1::Get() & TIM_CR1_DIR ? Down : Up;
+		}
 
-		static void Start(ClockDivider divider, TimerMode mode = Normal, ClockSrc clockSrc = MainClock)
+		static void Start(ClockDivider divider, TimerMode mode = NormalMode, ClockSrc clockSrc = MainClock)
 		{
 			ClockEnReg::Or(ClockEnMask);
-			//Cr1::And(CR1_CKD_Mask & CR1_CounterMode_Mask);
-			SetPeriod(0);
-			Psc::Set(1);
-			Egr::Set(TIM_EGR_UG); 
-			Cr1::Set(divider | mode | TIM_CR1_CEN | TIM_CR1_ARPE);
+			Cr2::Set(0);
+			Psc::Set(0);
+			SetPeriod(MaxValue);
+			Cr1::Set(TIM_CR1_CEN | divider | mode);
 		}
 
 		static void EnableInterrupt()

@@ -42,11 +42,13 @@ int main()
   
   led::Set();
   
- Timer1::Start(Timer1::Div1);
+  Timer1::Start(Timer1::Div1, Timer1::CenterAligned3);
+ // Timer1::SetPeriod(1000);
+  
+ uint32_t c=0;
 	while(1)
 	{
-		//_delay_ms(1000);
-		led::Set(Timer1::Get() & 0x0400);
-		led2::Toggle();
+		led::Set(Timer1::Direction());
+		led2::Set(c++ & 0x4000);
 	}
 }

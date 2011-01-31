@@ -665,7 +665,7 @@
         </option>
         <option>
           <name>IlinkIcfFile</name>
-          <state>E:\Projects\McuProjects\Stm32Timers\ArmTest.icf</state>
+          <state>$PROJ_DIR$\ArmTest.icf</state>
         </option>
         <option>
           <name>IlinkIcfFileSlave</name>
