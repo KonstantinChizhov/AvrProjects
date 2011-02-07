@@ -102,6 +102,7 @@
 #endif
 
 #include "atomic.h"
+#include "ioreg.h"
 
 #define PORT_REGS_WRAPPER(PORT_LETTER) \
 	IO_REG_WRAPPER(PORT ## PORT_LETTER, Out ## PORT_LETTER, uint8_t);\
