@@ -1,56 +1,113 @@
 
 #include <avr/io.h>
-#include <avr/interrupt.h>
 #include "iopins.h"
 #include "pinlist.h"
-//#include "util.h"
 
 
 using namespace IO;
 
-typedef PinList<Pa4, Pa1, Pa6, Pa3, Pa2, Pa5, Pa0, Pa7 >  Pins;
+typedef PinList<Pa4, Pa1, Pa6, Pa3>  Pins1;
+typedef PinList<Pa2, Pa5, Pa0, Pa7>  Pins2;
 
-/*
-int8_t floorLog2(uint32_t n) 
+class ListBase
 {
-  if (n == 0)
-    return -1;
- 
-  int pos = 0;
-  if (n >= 1<<16) { n >>= 16; pos += 16; }
-  if (n >= 1<< 8) { n >>=  8; pos +=  8; }
-  if (n >= 1<< 4) { n >>=  4; pos +=  4; }
-  if (n >= 1<< 2) { n >>=  2; pos +=  2; }
-  if (n >= 1<< 1) {           pos +=  1; }
-  return pos;
-}
-*/
-/*
-int8_t mylog2 (uint32_t val) {
-    unsigned int ret = -1;
-    while (val != 0) {
-        val >>= 1;
-        ret++;
-    }
-    return ret;
-}
-*/
+	public:
+	typedef uint8_t DataT;
+	typedef NativePortBase::Configuration Configuration;
+	virtual void Write(DataT value)=0;
+	virtual void Set(DataT value)=0;
+	virtual void Clear(DataT value)=0;
+	virtual void SetConfiguration(Configuration value, DataT mask)=0;
+	virtual DataT Read()=0;
+	virtual DataT PinRead()=0;
+};
 
-//__attribute((noinline))
-//void Foo(uint8_t *v)
-//{
-//	PORTA = *v;
-//}
+template<class List>
+class ListOfPins : public ListBase
+{
+	public:
+	virtual void Write(DataT value)
+	{
+		List::Write(value);
+	}
+	virtual void Set(DataT value)
+	{	
+		List::Set(value);
+	}
+	virtual void Clear(DataT value)
+	{
+		List::Clear(value);
+	}
+	virtual void SetConfiguration(Configuration value, DataT mask)
+	{
+		List::SetConfiguration(value, mask);
+	}
+	virtual DataT Read()
+	{
+		return List::Read();
+	}
+	virtual DataT PinRead()
+	{
+		return List::PinRead();
+	}
+};
 
-volatile uint8_t v=0;
+
+typedef void (* WriteFuncPtr)(uint8_t value);
+
+class Bar
+{
+	public:
+	Bar(WriteFuncPtr func)
+	:_func(func)
+	{}
+	
+	void Foo()
+	{
+		_func(0x55);
+		_func(1);
+		_func(2);
+		_func(3);
+	}
+
+	WriteFuncPtr _func;
+};
+
+class B
+{
+	public:
+	B(ListBase *list)
+	:_list(list)
+	{}
+	
+	void Foo()
+	{
+		_list->Write(0x55);	
+	}
+
+	ListBase *_list;
+};
+
 __attribute((OS_main))
 int main()
 {
-Pins::Write(v);
-Pins::Set(v);
-Pins::Clear(v);
-while(1)
-{}
+
+
+	ListOfPins<Pins1> list1;
+	ListOfPins<Pins2> list2;
+
+
+	B b1(&list1);
+	B b2(&list2);
+
+	b1.Foo();
+	b2.Foo();
+
+	while(1)
+	{}
 }
 
+extern "C" void __cxa_pure_virtual()
+{
 
+}

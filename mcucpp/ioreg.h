@@ -11,3 +11,4 @@
 		static void Xor(DataT value){REG_NAME ^= value;}\
 		static void AndOr(DataT andMask, DataT orMask){REG_NAME = (REG_NAME & andMask) | orMask;}\
 	}
+

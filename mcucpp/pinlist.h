@@ -568,8 +568,8 @@ namespace IO
 							Head::Position, 	//bit position in value
 							PortToValue> AtctualShifter;
 
-					result |= AtctualShifter::Shift(portValue) &
-					GetValueMask<SerialList>::value ^
+					result |= (AtctualShifter::Shift(portValue) &
+					GetValueMask<SerialList>::value) ^
 					GetInversionMask<SerialList>::value;
 					return PinWriteIterator<RestList>::AppendReadValue(portValue, result);
 				}
