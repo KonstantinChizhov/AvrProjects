@@ -217,7 +217,8 @@ namespace IO
 
 				const unsigned countBitsToChange = PopulatedBits<clearMask>::value;
 
-				if(countBitsToChange <= MaxBitwiseOutput)
+				if(countBitsToChange <= MaxBitwiseOutput && 
+					Id < 4)
 				{
 					SetBitWise<bitsToSet, 1>();
 					ClearBitWise<bitsToClear, 1>();
@@ -235,7 +236,8 @@ namespace IO
 			template<DataT value>
 			static void Set()
 			{
-				if(PopulatedBits<value>::value <= MaxBitwiseOutput)
+				if(PopulatedBits<value>::value <= MaxBitwiseOutput && 
+					Id < 4)
 					SetBitWise<value, 1>();
 				else
 					ATOMIC Out::Or(value);
@@ -244,7 +246,8 @@ namespace IO
 			template<DataT value>
 			static void Clear()
 			{
-				if(PopulatedBits<value>::value <= MaxBitwiseOutput)
+				if(PopulatedBits<value>::value <= MaxBitwiseOutput && 
+					Id < 4)
 					ClearBitWise<value, 1>();
 				else
 					ATOMIC Out::And(~value);
