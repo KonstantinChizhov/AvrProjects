@@ -14,7 +14,7 @@ class ProgmemPtr
 {
 	typedef ProgmemPtr Self;
 public:
-	ProgmemPtr(T *address)
+	ProgmemPtr(T *address=0)
 		:_address(address)
 	{
 	}
@@ -25,7 +25,7 @@ public:
 		return *this;
 	}
 
-	inline Self& operator ++(int)
+	inline Self operator ++(int)
 	{
 		Self tmp = *this;
 		_address++;
@@ -38,7 +38,7 @@ public:
 		return *this;
 	}
 
-	inline Self& operator --(int)
+	inline Self operator --(int)
 	{
 		Self tmp = *this;
 		_address--;

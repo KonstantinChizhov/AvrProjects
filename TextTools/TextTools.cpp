@@ -1,19 +1,38 @@
 #include <avr/io.h>
 #include <flashptr.h>
 
-FLASH char Str[] = "Hello world";
+
+
 
 template<class T>
-void Put2(const T begin, const T end)
+void UsartPuts(T str)
 {
-  	for(T ptr = begin; ptr != end; ++ptr)
-		PORTA = *ptr;
+  	while(char tmp = *str)
+	{
+		while(UCSRA & (1<<UDRE));
+		UDR = tmp;
+		str++;
+	}
 }
+
+
+	PROGMEM char Str[] = "Hello world";
 
 int main()
 {
 
-	Put2(FLASH_PTR(Str), FLASH_PTR(Str + 11));
+/*	ProgmemPtr<char> pStr(Str), tmp;
+	tmp = pStr + 11;
+	while(pStr  != tmp)
+	{
+		while(UCSRA & (1<<UDRE));
+		UDR = *pStr++;
+	}*/
+
+	ProgmemPtr<char> pStr(Str);
+	
+	UsartPuts(ProgmemPtr<char>(Str));
+	UsartPuts("12345");
 
 	while(1);
 }
