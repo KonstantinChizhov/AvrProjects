@@ -1,9 +1,6 @@
 #include <avr/io.h>
 #include <flashptr.h>
 
-
-
-
 template<class T>
 void UsartPuts(T str)
 {
@@ -16,23 +13,18 @@ void UsartPuts(T str)
 }
 
 
-	PROGMEM char Str[] = "Hello world";
+PROGMEM char Str[] = "Hello world!\n";
 
 int main()
 {
 
-/*	ProgmemPtr<char> pStr(Str), tmp;
-	tmp = pStr + 11;
-	while(pStr  != tmp)
-	{
-		while(UCSRA & (1<<UDRE));
-		UDR = *pStr++;
-	}*/
-
 	ProgmemPtr<char> pStr(Str);
-	
+	// put string for flash
 	UsartPuts(ProgmemPtr<char>(Str));
-	UsartPuts("12345");
+	// from flash again
+	UsartPuts(ProgmemPtr<char>(PSTR("From flash\n")));
+	// and from ram
+	UsartPuts("From ram");
 
 	while(1);
 }

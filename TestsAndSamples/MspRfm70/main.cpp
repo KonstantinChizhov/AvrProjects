@@ -14,8 +14,6 @@ const uint8_t buffer[32] = {'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l
 
 int main( void )
 {
-  delay(1000);
-  /*
   // Stop watchdog timer to prevent time out reset
   DebugPin::SetDirWrite();
   WDTCTL = WDTPW + WDTHOLD;
@@ -29,11 +27,8 @@ int main( void )
   {
     Transiver1::ClearInterruptStatus();
     Transiver1::Write(buffer, 32);
-    if(Transiver1::Status() & TxDataSent)
-      DebugPin::Set();
-    else
-      DebugPin::Clear();
+ 	DebugPin::Set(Transiver1::Status() & TxDataSent);
     delay(10000);
-  }*/
+  }
   return 0;
 }

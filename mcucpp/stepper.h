@@ -167,7 +167,7 @@ public:
 
 	static void Enable()
 	{
-		OUTPUTS::DirSet(0x3f);
+		OUTPUTS::SetConfiguration(OUTPUTS::Out, 0x3f);
 		OUTPUTS::Write(0x30);
 	}
 

@@ -66,7 +66,7 @@ public:
 	static void Init()
 	{
 		BUS::template SetConfiguration<BUS::Out, 0xff>();
-		PinList<RS, RW>::template Clear<0x03>();
+		IO::PinList<RS, RW>::template Clear<0x03>();
 		DATA_BUS::template Write< 0x03<<BusBits >(); 
 		Strobe();
 		Strobe();

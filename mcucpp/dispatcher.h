@@ -28,7 +28,7 @@
 
 
 #include "containers.h"
-#include "util.h"
+#include "atomic.h"
 
 typedef void (*task_t)();
 

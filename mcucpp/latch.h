@@ -59,7 +59,7 @@
 		{
 			Write(_currentValue &= ~value);
 		}
-		static void Togle(DataT value)
+		static void Toggle(DataT value)
 		{
 			Write(_currentValue ^= value);
 		}
@@ -69,33 +69,32 @@
 			return 0xff;
 		}
 
-		static void DirClearAndSet(DataT clearMask, DataT value)
-		{	}
+		template<DataT clearMask, DataT value>
+		static void ClearAndSet()
+		{ClearAndSet(clearMask, value);}
 
-		static void DirWrite(DataT value)
-		{	}
+		template<DataT value>
+		static void Toggle()
+		{Toggle(value);}
 
-		static void DirSet(DataT value)
-		{	}
+		template<DataT value>
+		static void Set()
+		{Set(value);}
 
-		static void DirClear(DataT value)
-		{	}
+		template<DataT value>
+		static void Clear()
+		{Clear(value);}
 
-		static void DirTogle(DataT value)
-		{	}
+		template<unsigned pin, class Configuration>
+		static void SetPinConfiguration(Configuration configuration)
+		{}
+		template<class Configuration>
+		static void SetConfiguration(DataT mask, Configuration configuration)
+		{}
 		
-		template<unsigned pin, class ConfigurationT>
-		static void SetPinConfiguration(ConfigurationT configuration)
-		{
-			BOOST_STATIC_ASSERT(pin < Width);
-			//Nothing to do
-		}
-		
-		template<class ConfigurationT>
-		static void SetConfiguration(DataT mask, ConfigurationT configuration)
-		{
-			//Nothing to do
-		}
+		template<DataT mask, Configuration configuration>
+		static void SetConfiguration()
+		{}
 		protected:
 		static DataT _currentValue;
 	};

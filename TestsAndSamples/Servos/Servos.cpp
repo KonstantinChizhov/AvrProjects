@@ -1,5 +1,5 @@
 #include <avr/io.h>
-#include <timer.h>
+#include <timers.h>
 #include <dispatcher.h>
 #include <iopins.h>
 #include <avr/interrupt.h>

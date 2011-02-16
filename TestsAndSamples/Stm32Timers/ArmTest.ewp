@@ -275,8 +275,8 @@
         </option>
         <option>
           <name>CCIncludePath2</name>
-          <state>../mcucpp</state>
-          <state>../mcucpp/ARM/STM32</state>
+          <state>../../mcucpp</state>
+          <state>../../mcucpp/ARM/STM32</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -1133,8 +1133,8 @@
         </option>
         <option>
           <name>CCIncludePath2</name>
-          <state>../mcucpp</state>
-          <state>../mcucpp/ARM/STM32</state>
+          <state>../../mcucpp</state>
+          <state>../../mcucpp/ARM/STM32</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>

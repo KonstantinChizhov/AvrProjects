@@ -46,7 +46,8 @@
 			<Add option="-MD" />
 			<Add option="-MF $(TARGET_OUTPUT_FILE).dep" />
 			<Add option="-DF_CPU=16000000UL" />
-			<Add directory="..\..\AvrProjects\avrcpp" />
+			<Add directory="..\..\mcucpp" />
+			<Add directory="..\..\mcucpp\MSP430" />
 		</Compiler>
 		<ExtraCommands>
 			<Add after="msp430-size $(TARGET_OUTPUT_FILE)" />

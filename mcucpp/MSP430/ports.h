@@ -23,6 +23,7 @@
 #ifndef IOPORTS_HPP
 #error "Do not include this file directly. Use ioports.h instead."
 #endif
+#include <ioreg.h>
 
 #ifndef MSP430_PORTS_H
 #define MSP430_PORTS_H

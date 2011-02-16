@@ -63,18 +63,32 @@ namespace IO
 		{
 			return 0;
 		}
-
-		template<unsigned pin, class Configuration>
-		static void SetPinConfiguration(Configuration configuration)
-		{
-			//Nothing to do
-		}
 		
-		template<class Configuration>
+		template<DataT clearMask, DataT value>
+		static void ClearAndSet()
+		{}
+
+		template<DataT value>
+		static void Toggle()
+		{}
+
+		template<DataT value>
+		static void Set()
+		{}
+
+		template<DataT value>
+		static void Clear()
+		{}
+
+		template<unsigned pin>
+		static void SetPinConfiguration(Configuration configuration)
+		{}
 		static void SetConfiguration(DataT mask, Configuration configuration)
-		{
-			//Nothing to do
-		}
+		{}
+		
+		template<DataT mask, Configuration configuration>
+		static void SetConfiguration()
+		{}
 		enum{Id = '-'};
 		enum{Width=sizeof(DataT)*8};
 	};

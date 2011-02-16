@@ -2,7 +2,7 @@
 	<MANAGEMENT>
 		<ProjectName>StepperTest</ProjectName>
 		<Created>21-Mar-2010 12:24:11</Created>
-		<LastEdit>30-Sep-2010 17:09:22</LastEdit>
+		<LastEdit>16-Feb-2011 19:16:08</LastEdit>
 		<ICON>241</ICON>
 		<ProjectType>0</ProjectType>
 		<Created>21-Mar-2010 12:24:11</Created>
@@ -13,7 +13,7 @@
 	<CODE_CREATION>
 		<ObjectFile>default\StepperTest.elf</ObjectFile>
 		<EntryFile></EntryFile>
-		<SaveFolder>D:\Projects\McuProjects\StepperTest\</SaveFolder></CODE_CREATION>
+		<SaveFolder>D:\Projects\McuProjects\TestsAndSamples\StepperTest\</SaveFolder></CODE_CREATION>
 	<DEBUG_TARGET>
 		<CURRENT_TARGET>AVR Simulator</CURRENT_TARGET>
 		<CURRENT_PART>ATmega16.xml</CURRENT_PART>
@@ -29,7 +29,7 @@
 		<FILES>
 			<SOURCEFILE>StepperTest.cpp</SOURCEFILE><OTHERFILE>default\StepperTest.lss</OTHERFILE><OTHERFILE>default\StepperTest.map</OTHERFILE></FILES>
 		<CONFIGS>
-			<CONFIG><NAME>default</NAME><USESEXTERNALMAKEFILE>NO</USESEXTERNALMAKEFILE><EXTERNALMAKEFILE></EXTERNALMAKEFILE><PART>atmega16</PART><HEX>1</HEX><LIST>1</LIST><MAP>1</MAP><OUTPUTFILENAME>StepperTest.elf</OUTPUTFILENAME><OUTPUTDIR>default\</OUTPUTDIR><ISDIRTY>1</ISDIRTY><OPTIONS/><INCDIRS><INCLUDE>..\mcucpp\</INCLUDE></INCDIRS><LIBDIRS/><LIBS/><LINKOBJECTS/><OPTIONSFORALL>-Wall -gdwarf-2 -Os -std=gnu99 -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums</OPTIONSFORALL><LINKEROPTIONS></LINKEROPTIONS><SEGMENTS/></CONFIG></CONFIGS>
+			<CONFIG><NAME>default</NAME><USESEXTERNALMAKEFILE>NO</USESEXTERNALMAKEFILE><EXTERNALMAKEFILE></EXTERNALMAKEFILE><PART>atmega16</PART><HEX>1</HEX><LIST>1</LIST><MAP>1</MAP><OUTPUTFILENAME>StepperTest.elf</OUTPUTFILENAME><OUTPUTDIR>default\</OUTPUTDIR><ISDIRTY>0</ISDIRTY><OPTIONS/><INCDIRS><INCLUDE>..\..\mcucpp\</INCLUDE><INCLUDE>..\..\mcucpp\AVR\</INCLUDE></INCDIRS><LIBDIRS/><LIBS/><LINKOBJECTS/><OPTIONSFORALL>-Wall -gdwarf-2 -Os -std=gnu99 -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums</OPTIONSFORALL><LINKEROPTIONS></LINKEROPTIONS><SEGMENTS/></CONFIG></CONFIGS>
 		<LASTCONFIG>default</LASTCONFIG>
 		<USES_WINAVR>1</USES_WINAVR><GCC_LOC>C:\WinAVR-20100110\bin\avr-gcc.exe</GCC_LOC><MAKE_LOC>C:\WinAVR-20100110\utils\bin\make.exe</MAKE_LOC></AVRGCCPLUGIN>
-	<IOView><usergroups/><sort sorted="0" column="0" ordername="0" orderaddress="0" ordergroup="0"/></IOView><Files><File00000><FileId>00000</FileId><FileName>StepperTest.cpp</FileName><Status>1</Status></File00000></Files><Events><Bookmarks></Bookmarks></Events><Trace><Filters></Filters></Trace></AVRStudio>
+	<IOView><usergroups/><sort sorted="0" column="0" ordername="1" orderaddress="1" ordergroup="1"/></IOView><Files><File00000><FileId>00000</FileId><FileName>StepperTest.cpp</FileName><Status>1</Status></File00000><File00001><FileId>00001</FileId><FileName>d:\Projects\mcuprojects\mcucpp\stepper.h</FileName><Status>1</Status></File00001></Files><Events><Bookmarks></Bookmarks></Events><Trace><Filters></Filters></Trace></AVRStudio>
