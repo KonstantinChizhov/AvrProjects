@@ -31,7 +31,8 @@
 #include "iopin.h"
 #include "loki\Typelist.h"
 #include "gpiobase.h"
-
+#include <static_if.h>
+#include <select_size.h>
 
 namespace IO
 {
@@ -40,32 +41,7 @@ namespace IO
 
 	namespace IoPrivate
 	{
-
-		template<bool condition, class TypeIfTrue, class TypeIfFale>
-		struct StaticIf
-		{
-			typedef TypeIfTrue Result;
-		};
-
-		template<class TypeIfTrue, class TypeIfFale>
-		struct StaticIf<false, TypeIfTrue, TypeIfFale>
-		{
-			 typedef TypeIfFale Result;
-		};
-
-		template<unsigned sizeBits>
-		struct SelectSize
-		{
-			static const bool LessOrEq8 = sizeBits <= 8;
-			static const bool LessOrEq16 = sizeBits <= 16;
-
-			typedef typename StaticIf<
-					LessOrEq8,
-					uint8_t,
-					typename StaticIf<LessOrEq16, uint16_t, uint32_t>::Result>
-					::Result Result;
-		};
-
+	
 ////////////////////////////////////////////////////////////////////////////////
 // class template CheckSameConfig
 // Checks if all ports has the same configuration enum
@@ -861,14 +837,14 @@ namespace IO
 			enum {PortsHasSameConfig =
 			  IoPrivate::CheckSameConfig<ConfigPorts>::value};
 
-			typedef typename IoPrivate::StaticIf
+			typedef typename StaticIf
 			  		<
 					  PortsHasSameConfig,
 					  typename Ports::Head::Base,
 					  GpioBase
 					 >::Result BasePortType;
 
-			typedef typename IoPrivate::SelectSize<LastBitPosition+1>::Result DataType;
+			typedef typename SelectSize<LastBitPosition+1>::Result DataType;
 		};
 
 		template<class PINS>

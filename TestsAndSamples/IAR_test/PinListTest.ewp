@@ -1392,8 +1392,8 @@
         </option>
         <option>
           <name>newCCIncludePaths</name>
-          <state>../mcucpp</state>
-          <state>../mcucpp/AVR</state>
+          <state>../../mcucpp</state>
+          <state>../../mcucpp/AVR</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>

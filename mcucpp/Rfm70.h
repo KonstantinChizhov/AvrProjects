@@ -4,7 +4,7 @@
 #include <static_assert.h>
 
 
-static inline void delay(volatile unsigned count)
+static inline void delay(volatile unsigned long count)
 {
   do{
   }while(--count);

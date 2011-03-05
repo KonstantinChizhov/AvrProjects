@@ -1,6 +1,7 @@
 #include "main.h"
 
 using namespace Timers;
+
 /*
 ISR(SIG_INTERRUPT0)
 {
@@ -13,35 +14,30 @@ ISR(SIG_OVERFLOW0)
 }
 
 
-ISR(SIG_OUTPUT_COMPARE1A)
+ISR(SIG_OVERFLOW0)
 {
+	Timer0::Set(T0Setup::ReloadValue);
 	Sheduller::TimerHandler();
-	Encoder1::CaptureHandler();
 }
-*/
 
+*/
 
 int main()
 {
-	DDRB = 0xff;
 	//Timer1::Start(Timer1::Div64);
 	//Timer1::SetMode(Timer1::Normal);
-
+//
 	//Sheduller::Init();
 	
-	//Timer0::Start(T0Setup::Divider);
-	//Timer0::Set(T0Setup::ReloadValue);
+//	Timer0::Start(T0Setup::Divider);
+//	Timer0::Set(T0Setup::ReloadValue);
 
-//	
+
 
 	while(1)
 	{
-		//EncoderScan();
-//		Enc2();
-		Encoder1::CaptureHandler();
+	Util::delay_us<10000000, F_CPU>();
 
-		PORTB = Encoder1::Value(0)>>8;
-		//RTB = EncData;
-		//Sheduller::Poll();
+	//	Sheduller::Poll();
 	}	
 }

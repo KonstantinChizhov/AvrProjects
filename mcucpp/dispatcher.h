@@ -25,7 +25,7 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //*****************************************************************************
 
-
+#pragma once
 
 #include "containers.h"
 #include "atomic.h"

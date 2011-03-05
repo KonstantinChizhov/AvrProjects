@@ -28,14 +28,6 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //*****************************************************************************
 
-
-
-#include <stdlib.h>
-#include <avr/io.h>
-#include <avr/interrupt.h>
-#include <avr/eeprom.h>
-#include <avr/pgmspace.h>
-
 union Int32
 {
 	uint32_t Dword;
@@ -48,19 +40,6 @@ union Int16
 	uint16_t Word;
 	uint8_t Bytes[2];
 };
-
-	template<bool condition, class TypeIfTrue, class TypeIfFale>
-	struct StaticIf
-	{
-		typedef TypeIfTrue Result;
-	};
-
-	template<class TypeIfTrue, class TypeIfFale>
-	struct StaticIf<false, TypeIfTrue, TypeIfFale>
-	{
-		 typedef TypeIfFale Result;
-	};
-
 
 //integer part of decimal logarithm
 template <unsigned long Arg>

@@ -997,7 +997,7 @@
         <debug>0</debug>
         <option>
           <name>GGEnhancedCore</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>Variant Memory</name>
@@ -1099,16 +1099,16 @@
         </option>
         <option>
           <name>GGEepromUtil</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>GGEepromUtilSize</name>
-          <state>0</state>
+          <state>512</state>
         </option>
         <option>
           <name>New Variant Processor</name>
           <version>32</version>
-          <state>0</state>
+          <state>44</state>
         </option>
         <option>
           <name>GRuntimeLibSelect</name>
@@ -1125,11 +1125,11 @@
         </option>
         <option>
           <name>RTConfigPath</name>
-          <state>$TOOLKIT_DIR$\LIB\DLIB\dlAVR-0t-n.h</state>
+          <state>$TOOLKIT_DIR$\LIB\DLIB\dlAVR-3t-ec_mul-sf-n.h</state>
         </option>
         <option>
           <name>RTLibraryPath</name>
-          <state>$TOOLKIT_DIR$\LIB\DLIB\dlAVR-0t-n.r90</state>
+          <state>$TOOLKIT_DIR$\LIB\DLIB\dlAVR-3t-ec_mul-sf-n.r90</state>
         </option>
         <option>
           <name>Input variant</name>
@@ -1243,7 +1243,7 @@
         </option>
         <option>
           <name>CCListCFile</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>CCListCMnemonics</name>
@@ -1425,7 +1425,7 @@
         </option>
         <option>
           <name>CCLangSelect</name>
-          <state>1</state>
+          <state>2</state>
         </option>
         <option>
           <name>CompilerMisraOverride</name>
@@ -1683,7 +1683,7 @@
         </option>
         <option>
           <name>OutputFile</name>
-          <state>templproj.a90</state>
+          <state>ProgmemTest.a90</state>
         </option>
         <option>
           <name>OutputFormat</name>
@@ -1749,7 +1749,7 @@
         </option>
         <option>
           <name>XclFile</name>
-          <state>$TOOLKIT_DIR$\src\template\lnk0t.xcl</state>
+          <state>$TOOLKIT_DIR$\src\template\cfgm16.xcl</state>
         </option>
         <option>
           <name>XclFileSlave</name>
@@ -1865,7 +1865,7 @@
         </option>
         <option>
           <name>ExtraOutputFile</name>
-          <state>templproj.a90</state>
+          <state>ProgmemTest.a90</state>
         </option>
         <option>
           <name>ExtraOutputFormat</name>
