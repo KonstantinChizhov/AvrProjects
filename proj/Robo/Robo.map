@@ -1,0 +1,1056 @@
+Archive member included because of file (symbol)
+
+/usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_mulsi3.o)
+                              .objs/Robo.o (__mulsi3)
+/usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_udivmodsi4.o)
+                              .objs/Robo.o (__udivmodsi4)
+/usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_exit.o)
+                              /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o (exit)
+/usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_copy_data.o)
+                              .objs/Robo.o (__do_copy_data)
+/usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_clear_bss.o)
+                              .objs/Robo.o (__do_clear_bss)
+/usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/libc.a(itoa.o)
+                              .objs/Robo.o (itoa)
+/usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/libc.a(utoa.o)
+                              .objs/Robo.o (utoa)
+/usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/libc.a(strrev.o)
+                              /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/libc.a(itoa.o) (strrev)
+/usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_udivmodhi4.o)
+                              /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/libc.a(itoa.o) (__udivmodhi4)
+
+Allocating common symbols
+Common symbol       size              file
+
+Usart<8, 8, Usart0Traits>::_rx
+                    0xa               .objs/Robo.o
+Usart<8, 8, Usart0Traits>::_tx
+                    0xa               .objs/Robo.o
+Dispatcher<(unsigned char)16, (unsigned char)10>::_tasks
+                    0x22              .objs/Robo.o
+Dispatcher<(unsigned char)16, (unsigned char)10>::_timers
+                    0x28              .objs/Robo.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+text             0x00000000         0x00002000         xr
+data             0x00800060         0x0000ffa0         rw !x
+eeprom           0x00810000         0x00010000         rw !x
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+LOAD .objs/Robo.o
+LOAD /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a
+LOAD /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/libc.a
+LOAD /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a
+
+.hash
+ *(.hash)
+
+.dynsym
+ *(.dynsym)
+
+.dynstr
+ *(.dynstr)
+
+.gnu.version
+ *(.gnu.version)
+
+.gnu.version_d
+ *(.gnu.version_d)
+
+.gnu.version_r
+ *(.gnu.version_r)
+
+.rel.init
+ *(.rel.init)
+
+.rela.init
+ *(.rela.init)
+
+.rel.text
+ *(.rel.text)
+ *(.rel.text.*)
+ *(.rel.gnu.linkonce.t*)
+
+.rela.text
+ *(.rela.text)
+ *(.rela.text.*)
+ *(.rela.gnu.linkonce.t*)
+
+.rel.fini
+ *(.rel.fini)
+
+.rela.fini
+ *(.rela.fini)
+
+.rel.rodata
+ *(.rel.rodata)
+ *(.rel.rodata.*)
+ *(.rel.gnu.linkonce.r*)
+
+.rela.rodata
+ *(.rela.rodata)
+ *(.rela.rodata.*)
+ *(.rela.gnu.linkonce.r*)
+
+.rel.data
+ *(.rel.data)
+ *(.rel.data.*)
+ *(.rel.gnu.linkonce.d*)
+
+.rela.data
+ *(.rela.data)
+ *(.rela.data.*)
+ *(.rela.gnu.linkonce.d*)
+
+.rel.ctors
+ *(.rel.ctors)
+
+.rela.ctors
+ *(.rela.ctors)
+
+.rel.dtors
+ *(.rel.dtors)
+
+.rela.dtors
+ *(.rela.dtors)
+
+.rel.got
+ *(.rel.got)
+
+.rela.got
+ *(.rela.got)
+
+.rel.bss
+ *(.rel.bss)
+
+.rela.bss
+ *(.rela.bss)
+
+.rel.plt
+ *(.rel.plt)
+
+.rela.plt
+ *(.rela.plt)
+
+.text           0x00000000     0x27f2
+ *(.vectors)
+ .vectors       0x00000000       0x26 /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+                0x00000000                __vectors
+                0x00000000                __vector_default
+ *(.vectors)
+ *(.progmem.gcc*)
+ *(.progmem*)
+                0x00000026                . = ALIGN (0x2)
+                0x00000026                __trampolines_start = .
+ *(.trampolines)
+ .trampolines   0x00000026        0x0 linker stubs
+ *(.trampolines*)
+                0x00000026                __trampolines_end = .
+ *(.jumptables)
+ *(.jumptables*)
+ *(.lowtext)
+ *(.lowtext*)
+                0x00000026                __ctors_start = .
+ *(.ctors)
+                0x00000026                __ctors_end = .
+                0x00000026                __dtors_start = .
+ *(.dtors)
+                0x00000026                __dtors_end = .
+ SORT(*)(.ctors)
+ SORT(*)(.dtors)
+ *(.init0)
+ .init0         0x00000026        0x0 /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+                0x00000026                __init
+ *(.init0)
+ *(.init1)
+ *(.init1)
+ *(.init2)
+ .init2         0x00000026        0xc /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+ *(.init2)
+ *(.init3)
+ *(.init3)
+ *(.init4)
+ .init4         0x00000032       0x16 /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_copy_data.o)
+                0x00000032                __do_copy_data
+ .init4         0x00000048       0x10 /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_clear_bss.o)
+                0x00000048                __do_clear_bss
+ *(.init4)
+ *(.init5)
+ *(.init5)
+ *(.init6)
+ *(.init6)
+ *(.init7)
+ *(.init7)
+ *(.init8)
+ *(.init8)
+ *(.init9)
+ .init9         0x00000058        0x4 /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+ *(.init9)
+ *(.text)
+ .text          0x0000005c        0x2 /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+                0x0000005c                __vector_1
+                0x0000005c                __bad_interrupt
+                0x0000005c                __vector_6
+                0x0000005c                __vector_3
+                0x0000005c                __vector_13
+                0x0000005c                __vector_17
+                0x0000005c                __vector_7
+                0x0000005c                __vector_5
+                0x0000005c                __vector_4
+                0x0000005c                __vector_2
+                0x0000005c                __vector_15
+                0x0000005c                __vector_8
+                0x0000005c                __vector_14
+                0x0000005c                __vector_10
+                0x0000005c                __vector_16
+                0x0000005c                __vector_18
+ .text          0x0000005e     0x2660 .objs/Robo.o
+                0x0000005e                DisableInterrupts::DisableInterrupts()
+                0x00000088                DisableInterrupts::~DisableInterrupts()
+                0x000000b0                DisableInterrupts::operator bool()
+                0x000000ca                IO::Private::OutB::Or(unsigned char)
+                0x000000f2                IO::Private::OutB::And(unsigned char)
+                0x0000011a                IO::Private::DirB::Or(unsigned char)
+                0x00000142                IO::Private::DirB::And(unsigned char)
+                0x0000016a                IO::Private::InB::Get()
+                0x00000180                IO::Private::OutD::Or(unsigned char)
+                0x000001a8                IO::Private::OutD::And(unsigned char)
+                0x000001d0                IO::Private::DirD::Or(unsigned char)
+                0x000001f8                IO::Private::DirD::And(unsigned char)
+                0x00000220                Timers::BaseTimer0::Set(unsigned char)
+                0x0000023e                Timers::BaseTimer0::Start(Timers::BaseTimer0::ClockDivider)
+                0x0000026e                Timers::BaseTimer0::EnableInterrupt()
+                0x0000028e                PlatformDelayCycle16(unsigned int)
+                0x000002b2                Usart0Traits::Read()
+                0x000002c8                Usart0Traits::Write(unsigned char)
+                0x000002e6                Usart0Traits::SetBaundRate(unsigned long)
+                0x00000570                Usart0Traits::EnableTxRx()
+                0x0000059a                Usart0Traits::CanWriteData()
+                0x000005c2                Usart0Traits::TXIntDisable()
+                0x000005e2                Usart0Traits::TXIntEnable()
+                0x00000602                __vector_11
+                0x00000654                __vector_12
+                0x000006a6                __vector_9
+                0x000006fc                Start()
+                0x0000072c                main
+                0x00000794                Usart<8, 8, Usart0Traits>::RxHandler()
+                0x000007be                Usart<8, 8, Usart0Traits>::TxHandler()
+                0x000007ea                Dispatcher<(unsigned char)16, (unsigned char)10>::TimerHandler()
+                0x0000088c                SimpleDriver<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)6, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)7, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >::Forward()
+                0x000008aa                SimpleDriver<IO::TPin<IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3> >, IO::TPin<IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>, (unsigned char)6, IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3> > >::Forward()
+                0x000008c8                Dispatcher<(unsigned char)16, (unsigned char)10>::SetTimer(void (*)(), unsigned int)
+                0x000009b2                SimpleDriver<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)6, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)7, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >::Break()
+                0x000009d0                SimpleDriver<IO::TPin<IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3> >, IO::TPin<IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>, (unsigned char)6, IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3> > >::Break()
+                0x000009ee                Usart<8, 8, Usart0Traits>::Init(unsigned long)
+                0x00000a20                TextFormater<WaitAdapter<Usart<8, 8, Usart0Traits> >, 16, (unsigned char)8>::operator<<(char const*)
+                0x00000a52                Dispatcher<(unsigned char)16, (unsigned char)10>::Init()
+                0x00000ab2                Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::Init()
+                0x00000af2                Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::SwitchToRxMode()
+                0x00000b10                void Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::SetRxAddress<0>(unsigned long, unsigned char)
+                0x00000b4a                void Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::DumpRegs<TextFormater<WaitAdapter<Usart<8, 8, Usart0Traits> >, 16, (unsigned char)8> >(TextFormater<WaitAdapter<Usart<8, 8, Usart0Traits> >, 16, (unsigned char)8>&)
+                0x00000c6a                Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::Recive(void*)
+                0x00000cb4                Dispatcher<(unsigned char)16, (unsigned char)10>::Poll()
+                0x00000ce2                void Util::delay_ms<1ul, 1000000ul>()
+                0x00000cf2                Queue<8, unsigned char>::Write(unsigned char)
+                0x00000d28                RingBuffer<8, unsigned char>::Clear()
+                0x00000d50                Queue<8, unsigned char>::Read(unsigned char&)
+                0x00000d92                Array<10, TimerData, unsigned char>::Size()
+                0x00000dae                Array<10, TimerData, unsigned char>::operator[](unsigned char)
+                0x00000de2                Queue<16, void (*)()>::Write(void (*)())
+                0x00000e20                IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)6, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::SetConfiguration(IO::NativePortBase::Configuration)
+                0x00000e3e                IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)7, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::SetConfiguration(IO::NativePortBase::Configuration)
+                0x00000e5c                IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)6, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Set()
+                0x00000e6e                IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)7, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Clear()
+                0x00000e80                IO::TPin<IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3> >::SetConfiguration(IO::NativePortBase::Configuration)
+                0x00000e9e                IO::TPin<IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>, (unsigned char)6, IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3> >::SetConfiguration(IO::NativePortBase::Configuration)
+                0x00000ebc                IO::TPin<IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3> >::Set()
+                0x00000ece                IO::TPin<IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>, (unsigned char)6, IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3> >::Clear()
+                0x00000ee0                IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)6, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Clear()
+                0x00000ef2                IO::TPin<IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3> >::Clear()
+                0x00000f04                TextFormater<WaitAdapter<Usart<8, 8, Usart0Traits> >, 16, (unsigned char)8>::Puts(char const*)
+                0x00000f4e                RingBuffer<16, void (*)()>::Clear()
+                0x00000f76                IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Set()
+                0x00000f88                IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Set()
+                0x00000f9a                IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::SetDirWrite()
+                0x00000fae                IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::SetDirWrite()
+                0x00000fc2                IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>::SetDirRead()
+                0x00000fd6                IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>::Clear()
+                0x00000fe8                void Util::delay_ms<50ul, 1000000ul>()
+                0x00000ff8                Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::Activate()
+                0x0000100c                Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::InitBank1Regs()
+                0x00001096                Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::SwitchBank(bool)
+                0x000010c8                Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::WriteReg(unsigned char, unsigned char)
+                0x000010ee                Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::SetRfChannel(unsigned char)
+                0x00001108                Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::RfSetup(unsigned char)
+                0x00001122                Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::EnableDinamicPayload()
+                0x0000113c                Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::FlushRx()
+                0x0000114e                Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::ClearInterruptStatus()
+                0x00001164                IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Clear()
+                0x00001176                Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::ModifyReg(unsigned char, unsigned char, unsigned char)
+                0x000011ac                Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::SetAddresess(unsigned char, unsigned long, unsigned char)
+                0x000011f4                Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::ReadBuffer(unsigned char, unsigned char*, unsigned char)
+                0x00001266                TextFormater<WaitAdapter<Usart<8, 8, Usart0Traits> >, 16, (unsigned char)8>::operator<<(unsigned int)
+                0x000012b8                TextFormater<WaitAdapter<Usart<8, 8, Usart0Traits> >, 16, (unsigned char)8>::operator<<(int)
+                0x0000130a                Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::ReadReg(unsigned char)
+                0x00001330                Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::RecivedDataLength()
+                0x00001342                Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::Status()
+                0x00001354                Queue<16, void (*)()>::Read(void (*&)())
+                0x00001398                void Util::delay_us<1000ul, 1000000ul>()
+                0x000013f4                RingBuffer<8, unsigned char>::IsFull() const
+                0x00001434                RingBuffer<8, unsigned char>::Write(unsigned char)
+                0x0000147c                RingBuffer<8, unsigned char>::IsEmpty() const
+                0x000014ac                RingBuffer<8, unsigned char>::Read()
+                0x000014ee                RingBuffer<16, void (*)()>::IsFull() const
+                0x0000152e                RingBuffer<16, void (*)()>::Write(void (*)())
+                0x00001582                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetPinConfiguration<6u>(IO::NativePortBase::Configuration)
+                0x000015ac                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetPinConfiguration<7u>(IO::NativePortBase::Configuration)
+                0x000015d6                IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)6, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Set(bool)
+                0x000015f6                IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)7, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Set(bool)
+                0x00001616                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetPinConfiguration<5u>(IO::NativePortBase::Configuration)
+                0x00001640                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetPinConfiguration<6u>(IO::NativePortBase::Configuration)
+                0x0000166a                IO::TPin<IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3> >::Set(bool)
+                0x0000168a                IO::TPin<IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>, (unsigned char)6, IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3> >::Set(bool)
+                0x000016aa                Usart<8, 8, Usart0Traits>::Putch(unsigned char)
+                0x000016e6                IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Set(bool)
+                0x00001706                IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Set(bool)
+                0x00001726                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetPinConfiguration<2u>(IO::NativePortBase::Configuration)
+                0x00001750                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetPinConfiguration<1u>(IO::NativePortBase::Configuration)
+                0x0000177a                void IO::NullPort::SetPinConfiguration<0u, IO::GpioBase::GenericConfiguration>(IO::GpioBase::GenericConfiguration)
+                0x00001792                IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>::Set(bool)
+                0x000017b2                void Util::delay_us<50000ul, 1000000ul>()
+                0x0000180e                Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::WriteBuffer(unsigned char, unsigned char const*, unsigned char)
+                0x0000187c                Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::WriteReg32(unsigned char, unsigned long)
+                0x000018bc                IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Clear()
+                0x000018ce                SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >::ReadWrite(unsigned char)
+                0x00001934                Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::Write(unsigned long)
+                0x00001982                RingBuffer<16, void (*)()>::IsEmpty() const
+                0x000019b2                RingBuffer<16, void (*)()>::Read()
+                0x000019f6                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::Set<(unsigned char)64>()
+                0x00001a0a                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::Clear<(unsigned char)64>()
+                0x00001a1e                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::Set<(unsigned char)128>()
+                0x00001a32                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::Clear<(unsigned char)128>()
+                0x00001a46                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::Set<(unsigned char)32>()
+                0x00001a5a                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::Clear<(unsigned char)32>()
+                0x00001a6e                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::Set<(unsigned char)64>()
+                0x00001a82                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::Clear<(unsigned char)64>()
+                0x00001a96                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::Set<(unsigned char)4>()
+                0x00001aaa                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::Clear<(unsigned char)4>()
+                0x00001abe                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::Set<(unsigned char)2>()
+                0x00001ad2                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::Clear<(unsigned char)2>()
+                0x00001ae6                void IO::NullPort::Set<(unsigned char)1>()
+                0x00001af4                void IO::NullPort::Clear<(unsigned char)1>()
+                0x00001b02                void IO::PinSet<Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)0>, Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)1>, Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)2>, Loki::NullType> > > >::SetConfiguration<IO::NativePortBase::Configuration>(IO::NativePortBase::Configuration, unsigned char)
+                0x00001b28                IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::SetConfiguration(IO::NativePortBase::Configuration)
+                0x00001b46                IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Set(bool)
+                0x00001b66                IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Set()
+                0x00001b78                IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::IsSet()
+                0x00001b8a                IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Clear()
+                0x00001b9c                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)64, (unsigned char)1>()
+                0x00001bac                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)64, (unsigned char)1>()
+                0x00001bbc                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)128, (unsigned char)1>()
+                0x00001bcc                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)128, (unsigned char)1>()
+                0x00001bdc                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)32, (unsigned char)1>()
+                0x00001bec                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)32, (unsigned char)1>()
+                0x00001bfc                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)64, (unsigned char)1>()
+                0x00001c0c                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)64, (unsigned char)1>()
+                0x00001c1c                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)4, (unsigned char)1>()
+                0x00001c2c                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)4, (unsigned char)1>()
+                0x00001c3c                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)2, (unsigned char)1>()
+                0x00001c4c                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)2, (unsigned char)1>()
+                0x00001c5c                void IO::IoPrivate::PortWriteIterator<Loki::Typelist<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, Loki::NullType>, Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)0>, Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)1>, Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)2>, Loki::NullType> > > >::SetConfiguration<IO::NativePortBase::Configuration, unsigned char>(IO::NativePortBase::Configuration, unsigned char)
+                0x00001c96                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetPinConfiguration<4u>(IO::NativePortBase::Configuration)
+                0x00001cc0                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::Set<(unsigned char)8>()
+                0x00001cd4                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::Clear<(unsigned char)8>()
+                0x00001ce8                IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Set(bool)
+                0x00001d08                IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::PinRead()
+                0x00001d18                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)64, (unsigned char)2>()
+                0x00001d28                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)64, (unsigned char)2>()
+                0x00001d38                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)128, (unsigned char)2>()
+                0x00001d48                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)128, (unsigned char)2>()
+                0x00001d58                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)32, (unsigned char)2>()
+                0x00001d68                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)32, (unsigned char)2>()
+                0x00001d78                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)64, (unsigned char)2>()
+                0x00001d88                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)64, (unsigned char)2>()
+                0x00001d98                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)4, (unsigned char)2>()
+                0x00001da8                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)4, (unsigned char)2>()
+                0x00001db8                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)2, (unsigned char)2>()
+                0x00001dcc                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)2, (unsigned char)2>()
+                0x00001de0                unsigned char IO::IoPrivate::PinWriteIterator<Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)0>, Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)1>, Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)2>, Loki::NullType> > > >::UppendValue<unsigned char, unsigned char>(unsigned char, unsigned char)
+                0x00001e1c                IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetConfiguration(unsigned char, IO::NativePortBase::Configuration)
+                0x00001e4e                void IO::IoPrivate::PortWriteIterator<Loki::NullType, Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)0>, Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)1>, Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)2>, Loki::NullType> > > >::SetConfiguration<IO::NativePortBase::Configuration, unsigned char>(IO::NativePortBase::Configuration, unsigned char)
+                0x00001e6c                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)8, (unsigned char)1>()
+                0x00001e7c                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)8, (unsigned char)1>()
+                0x00001e8c                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::Set<(unsigned char)32>()
+                0x00001ea0                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::Clear<(unsigned char)32>()
+                0x00001eb4                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)64, (unsigned char)4>()
+                0x00001ec4                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)64, (unsigned char)4>()
+                0x00001ed4                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)128, (unsigned char)4>()
+                0x00001ee4                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)128, (unsigned char)4>()
+                0x00001ef4                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)32, (unsigned char)4>()
+                0x00001f04                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)32, (unsigned char)4>()
+                0x00001f14                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)64, (unsigned char)4>()
+                0x00001f24                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)64, (unsigned char)4>()
+                0x00001f34                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)4, (unsigned char)4>()
+                0x00001f48                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)4, (unsigned char)4>()
+                0x00001f5c                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)2, (unsigned char)4>()
+                0x00001f6c                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)2, (unsigned char)4>()
+                0x00001f7c                unsigned char IO::IoPrivate::PinWriteIterator<Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)1>, Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)2>, Loki::NullType> > >::UppendValue<unsigned char, unsigned char>(unsigned char, unsigned char)
+                0x00001fb8                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)8, (unsigned char)2>()
+                0x00001fc8                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)8, (unsigned char)2>()
+                0x00001fd8                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)32, (unsigned char)1>()
+                0x00001fe8                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)32, (unsigned char)1>()
+                0x00001ff8                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)64, (unsigned char)8>()
+                0x00002008                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)64, (unsigned char)8>()
+                0x00002018                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)128, (unsigned char)8>()
+                0x00002028                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)128, (unsigned char)8>()
+                0x00002038                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)32, (unsigned char)8>()
+                0x00002048                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)32, (unsigned char)8>()
+                0x00002058                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)64, (unsigned char)8>()
+                0x00002068                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)64, (unsigned char)8>()
+                0x00002078                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)4, (unsigned char)8>()
+                0x00002088                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)4, (unsigned char)8>()
+                0x00002098                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)2, (unsigned char)8>()
+                0x000020a8                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)2, (unsigned char)8>()
+                0x000020b8                unsigned char IO::IoPrivate::PinWriteIterator<Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)2>, Loki::NullType> >::UppendValue<unsigned char, unsigned char>(unsigned char, unsigned char)
+                0x000020f4                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)8, (unsigned char)4>()
+                0x00002104                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)8, (unsigned char)4>()
+                0x00002114                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)32, (unsigned char)2>()
+                0x00002124                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)32, (unsigned char)2>()
+                0x00002134                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)64, (unsigned char)16>()
+                0x00002144                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)64, (unsigned char)16>()
+                0x00002154                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)128, (unsigned char)16>()
+                0x00002164                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)128, (unsigned char)16>()
+                0x00002174                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)32, (unsigned char)16>()
+                0x00002184                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)32, (unsigned char)16>()
+                0x00002194                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)64, (unsigned char)16>()
+                0x000021a4                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)64, (unsigned char)16>()
+                0x000021b4                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)4, (unsigned char)16>()
+                0x000021c4                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)4, (unsigned char)16>()
+                0x000021d4                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)2, (unsigned char)16>()
+                0x000021e4                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)2, (unsigned char)16>()
+                0x000021f4                unsigned char IO::IoPrivate::PinWriteIterator<Loki::NullType>::UppendValue<unsigned char, unsigned char>(unsigned char, unsigned char)
+                0x0000220e                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)8, (unsigned char)8>()
+                0x00002222                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)8, (unsigned char)8>()
+                0x00002236                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)32, (unsigned char)4>()
+                0x00002246                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)32, (unsigned char)4>()
+                0x00002256                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)64, (unsigned char)32>()
+                0x00002266                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)64, (unsigned char)32>()
+                0x00002276                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)128, (unsigned char)32>()
+                0x00002286                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)128, (unsigned char)32>()
+                0x00002296                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)32, (unsigned char)32>()
+                0x000022aa                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)32, (unsigned char)32>()
+                0x000022be                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)64, (unsigned char)32>()
+                0x000022ce                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)64, (unsigned char)32>()
+                0x000022de                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)4, (unsigned char)32>()
+                0x000022ee                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)4, (unsigned char)32>()
+                0x000022fe                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)2, (unsigned char)32>()
+                0x0000230e                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)2, (unsigned char)32>()
+                0x0000231e                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)8, (unsigned char)16>()
+                0x0000232e                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)8, (unsigned char)16>()
+                0x0000233e                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)32, (unsigned char)8>()
+                0x0000234e                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)32, (unsigned char)8>()
+                0x0000235e                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)64, (unsigned char)64>()
+                0x00002372                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)64, (unsigned char)64>()
+                0x00002386                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)128, (unsigned char)64>()
+                0x00002396                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)128, (unsigned char)64>()
+                0x000023a6                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)32, (unsigned char)64>()
+                0x000023b6                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)32, (unsigned char)64>()
+                0x000023c6                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)64, (unsigned char)64>()
+                0x000023da                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)64, (unsigned char)64>()
+                0x000023ee                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)4, (unsigned char)64>()
+                0x000023fe                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)4, (unsigned char)64>()
+                0x0000240e                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)2, (unsigned char)64>()
+                0x0000241e                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)2, (unsigned char)64>()
+                0x0000242e                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)8, (unsigned char)32>()
+                0x0000243e                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)8, (unsigned char)32>()
+                0x0000244e                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)32, (unsigned char)16>()
+                0x0000245e                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)32, (unsigned char)16>()
+                0x0000246e                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)64, (unsigned char)128>()
+                0x0000247e                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)64, (unsigned char)128>()
+                0x0000248e                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)128, (unsigned char)128>()
+                0x000024a2                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)128, (unsigned char)128>()
+                0x000024b6                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)32, (unsigned char)128>()
+                0x000024c6                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)32, (unsigned char)128>()
+                0x000024d6                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)64, (unsigned char)128>()
+                0x000024e6                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)64, (unsigned char)128>()
+                0x000024f6                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)4, (unsigned char)128>()
+                0x00002506                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)4, (unsigned char)128>()
+                0x00002516                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)2, (unsigned char)128>()
+                0x00002526                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)2, (unsigned char)128>()
+                0x00002536                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)8, (unsigned char)64>()
+                0x00002546                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)8, (unsigned char)64>()
+                0x00002556                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)32, (unsigned char)32>()
+                0x0000256a                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)32, (unsigned char)32>()
+                0x0000257e                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)64, (unsigned char)0>()
+                0x0000258c                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)64, (unsigned char)0>()
+                0x0000259a                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)128, (unsigned char)0>()
+                0x000025a8                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)128, (unsigned char)0>()
+                0x000025b6                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)32, (unsigned char)0>()
+                0x000025c4                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)32, (unsigned char)0>()
+                0x000025d2                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)64, (unsigned char)0>()
+                0x000025e0                void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)64, (unsigned char)0>()
+                0x000025ee                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)4, (unsigned char)0>()
+                0x000025fc                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)4, (unsigned char)0>()
+                0x0000260a                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)2, (unsigned char)0>()
+                0x00002618                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)2, (unsigned char)0>()
+                0x00002626                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)8, (unsigned char)128>()
+                0x00002636                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)8, (unsigned char)128>()
+                0x00002646                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)32, (unsigned char)64>()
+                0x00002656                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)32, (unsigned char)64>()
+                0x00002666                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)8, (unsigned char)0>()
+                0x00002674                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)8, (unsigned char)0>()
+                0x00002682                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)32, (unsigned char)128>()
+                0x00002692                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)32, (unsigned char)128>()
+                0x000026a2                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)32, (unsigned char)0>()
+                0x000026b0                void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)32, (unsigned char)0>()
+ .text          0x000026be        0x0 /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_mulsi3.o)
+ .text          0x000026be        0x0 /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_udivmodsi4.o)
+ .text          0x000026be        0x0 /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_exit.o)
+ .text          0x000026be        0x0 /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_copy_data.o)
+ .text          0x000026be        0x0 /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_clear_bss.o)
+ .text          0x000026be        0x0 /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/libc.a(itoa.o)
+ .text          0x000026be        0x0 /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/libc.a(utoa.o)
+ .text          0x000026be        0x0 /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/libc.a(strrev.o)
+ .text          0x000026be        0x0 /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_udivmodhi4.o)
+                0x000026be                . = ALIGN (0x2)
+ *(.text.*)
+ .text.libgcc   0x000026be       0x3e /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_mulsi3.o)
+                0x000026be                __mulsi3
+ .text.libgcc   0x000026fc       0x44 /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_udivmodsi4.o)
+                0x000026fc                __udivmodsi4
+ .text.libgcc   0x00002740        0x0 /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_exit.o)
+ .text.libgcc   0x00002740        0x0 /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_copy_data.o)
+ .text.libgcc   0x00002740        0x0 /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_clear_bss.o)
+ .text.avr-libc
+                0x00002740       0x3e /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/libc.a(itoa.o)
+                0x00002740                itoa
+ .text.avr-libc
+                0x0000277e       0x28 /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/libc.a(utoa.o)
+                0x0000277e                utoa
+ .text.avr-libc
+                0x000027a6       0x20 /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/libc.a(strrev.o)
+                0x000027a6                strrev
+ .text.libgcc   0x000027c6       0x28 /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_udivmodhi4.o)
+                0x000027c6                __udivmodhi4
+                0x000027ee                . = ALIGN (0x2)
+ *(.fini9)
+ .fini9         0x000027ee        0x0 /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_exit.o)
+                0x000027ee                exit
+                0x000027ee                _exit
+ *(.fini9)
+ *(.fini8)
+ *(.fini8)
+ *(.fini7)
+ *(.fini7)
+ *(.fini6)
+ *(.fini6)
+ *(.fini5)
+ *(.fini5)
+ *(.fini4)
+ *(.fini4)
+ *(.fini3)
+ *(.fini3)
+ *(.fini2)
+ *(.fini2)
+ *(.fini1)
+ *(.fini1)
+ *(.fini0)
+ .fini0         0x000027ee        0x4 /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_exit.o)
+ *(.fini0)
+                0x000027f2                _etext = .
+
+.data           0x00800060       0x3c load address 0x000027f2
+                0x00800060                PROVIDE (__data_start, .)
+ *(.data)
+ .data          0x00800060        0x0 /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+ .data          0x00800060       0x3c .objs/Robo.o
+ .data          0x0080009c        0x0 /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_mulsi3.o)
+ .data          0x0080009c        0x0 /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_udivmodsi4.o)
+ .data          0x0080009c        0x0 /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_exit.o)
+ .data          0x0080009c        0x0 /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_copy_data.o)
+ .data          0x0080009c        0x0 /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_clear_bss.o)
+ .data          0x0080009c        0x0 /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/libc.a(itoa.o)
+ .data          0x0080009c        0x0 /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/libc.a(utoa.o)
+ .data          0x0080009c        0x0 /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/libc.a(strrev.o)
+ .data          0x0080009c        0x0 /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_udivmodhi4.o)
+ *(.data*)
+ *(.rodata)
+ *(.rodata*)
+ *(.gnu.linkonce.d*)
+                0x0080009c                . = ALIGN (0x2)
+                0x0080009c                _edata = .
+                0x0080009c                PROVIDE (__data_end, .)
+
+.bss            0x0080009c       0x7f
+                0x0080009c                PROVIDE (__bss_start, .)
+ *(.bss)
+ .bss           0x0080009c        0x0 /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+ .bss           0x0080009c       0x21 .objs/Robo.o
+                0x0080009c                debug
+                0x0080009d                keys
+                0x0080009f                buffer
+ .bss           0x008000bd        0x0 /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_mulsi3.o)
+ .bss           0x008000bd        0x0 /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_udivmodsi4.o)
+ .bss           0x008000bd        0x0 /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_exit.o)
+ .bss           0x008000bd        0x0 /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_copy_data.o)
+ .bss           0x008000bd        0x0 /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_clear_bss.o)
+ .bss           0x008000bd        0x0 /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/libc.a(itoa.o)
+ .bss           0x008000bd        0x0 /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/libc.a(utoa.o)
+ .bss           0x008000bd        0x0 /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/libc.a(strrev.o)
+ .bss           0x008000bd        0x0 /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_udivmodhi4.o)
+ *(.bss*)
+ *(COMMON)
+ COMMON         0x008000bd       0x5e .objs/Robo.o
+                0x008000bd                Usart<8, 8, Usart0Traits>::_rx
+                0x008000c7                Usart<8, 8, Usart0Traits>::_tx
+                0x008000d1                Dispatcher<(unsigned char)16, (unsigned char)10>::_tasks
+                0x008000f3                Dispatcher<(unsigned char)16, (unsigned char)10>::_timers
+                0x0080011b                PROVIDE (__bss_end, .)
+                0x000027f2                __data_load_start = LOADADDR (.data)
+                0x0000282e                __data_load_end = (__data_load_start + SIZEOF (.data))
+
+.noinit         0x0080011b        0x0
+                0x0080011b                PROVIDE (__noinit_start, .)
+ *(.noinit*)
+                0x0080011b                PROVIDE (__noinit_end, .)
+                0x0080011b                _end = .
+                0x0080011b                PROVIDE (__heap_start, .)
+
+.eeprom         0x00810000        0x0
+ *(.eeprom*)
+                0x00810000                __eeprom_end = .
+
+.stab           0x00000000      0xa80
+ *(.stab)
+ .stab          0x00000000      0x6cc /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+ .stab          0x000006cc      0x1b0 /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/libc.a(itoa.o)
+                                0x1bc (size before relaxing)
+ .stab          0x0000087c      0x12c /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/libc.a(utoa.o)
+                                0x138 (size before relaxing)
+ .stab          0x000009a8       0xd8 /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/libc.a(strrev.o)
+                                 0xe4 (size before relaxing)
+
+.stabstr        0x00000000       0xea
+ *(.stabstr)
+ .stabstr       0x00000000       0xea /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+
+.stab.excl
+ *(.stab.excl)
+
+.stab.exclstr
+ *(.stab.exclstr)
+
+.stab.index
+ *(.stab.index)
+
+.stab.indexstr
+ *(.stab.indexstr)
+
+.comment
+ *(.comment)
+
+.debug
+ *(.debug)
+
+.line
+ *(.line)
+
+.debug_srcinfo
+ *(.debug_srcinfo .zdebug_srcinfo)
+
+.debug_sfnames
+ *(.debug_sfnames .zdebug_sfnames)
+
+.debug_aranges
+ *(.debug_aranges .zdebug_aranges)
+
+.debug_pubnames
+ *(.debug_pubnames .zdebug_pubnames)
+
+.debug_info
+ *(.debug_info .gnu.linkonce.wi.* .zdebug_info)
+
+.debug_abbrev
+ *(.debug_abbrev .zdebug_abbrev)
+
+.debug_line
+ *(.debug_line .zdebug_line)
+
+.debug_frame
+ *(.debug_frame .zdebug_frame)
+
+.debug_str
+ *(.debug_str .zdebug_str)
+
+.debug_loc
+ *(.debug_loc .zdebug_loc)
+
+.debug_macinfo
+ *(.debug_macinfo .zdebug_macinfo)
+OUTPUT(Robo elf32-avr)
+LOAD linker stubs
+
+Cross Reference Table
+
+Symbol                                            File
+Array<10, TimerData, unsigned char>::Size()       .objs/Robo.o
+Array<10, TimerData, unsigned char>::operator[](unsigned char) .objs/Robo.o
+DisableInterrupts::DisableInterrupts()            .objs/Robo.o
+DisableInterrupts::operator bool()                .objs/Robo.o
+DisableInterrupts::~DisableInterrupts()           .objs/Robo.o
+Dispatcher<(unsigned char)16, (unsigned char)10>::Init() .objs/Robo.o
+Dispatcher<(unsigned char)16, (unsigned char)10>::Poll() .objs/Robo.o
+Dispatcher<(unsigned char)16, (unsigned char)10>::SetTimer(void (*)(), unsigned int) .objs/Robo.o
+Dispatcher<(unsigned char)16, (unsigned char)10>::TimerHandler() .objs/Robo.o
+Dispatcher<(unsigned char)16, (unsigned char)10>::_tasks .objs/Robo.o
+Dispatcher<(unsigned char)16, (unsigned char)10>::_timers .objs/Robo.o
+IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::PinRead() .objs/Robo.o
+IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetConfiguration(unsigned char, IO::NativePortBase::Configuration) .objs/Robo.o
+IO::Private::DirB::And(unsigned char)             .objs/Robo.o
+IO::Private::DirB::Or(unsigned char)              .objs/Robo.o
+IO::Private::DirD::And(unsigned char)             .objs/Robo.o
+IO::Private::DirD::Or(unsigned char)              .objs/Robo.o
+IO::Private::InB::Get()                           .objs/Robo.o
+IO::Private::OutB::And(unsigned char)             .objs/Robo.o
+IO::Private::OutB::Or(unsigned char)              .objs/Robo.o
+IO::Private::OutD::And(unsigned char)             .objs/Robo.o
+IO::Private::OutD::Or(unsigned char)              .objs/Robo.o
+IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>::Clear() .objs/Robo.o
+IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>::Set(bool) .objs/Robo.o
+IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>::SetDirRead() .objs/Robo.o
+IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Clear() .objs/Robo.o
+IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Set() .objs/Robo.o
+IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Set(bool) .objs/Robo.o
+IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::SetDirWrite() .objs/Robo.o
+IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Clear() .objs/Robo.o
+IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Set() .objs/Robo.o
+IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Set(bool) .objs/Robo.o
+IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::SetDirWrite() .objs/Robo.o
+IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Set(bool) .objs/Robo.o
+IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::IsSet() .objs/Robo.o
+IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::SetConfiguration(IO::NativePortBase::Configuration) .objs/Robo.o
+IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Clear() .objs/Robo.o
+IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Set() .objs/Robo.o
+IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Set(bool) .objs/Robo.o
+IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)6, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Clear() .objs/Robo.o
+IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)6, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Set() .objs/Robo.o
+IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)6, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Set(bool) .objs/Robo.o
+IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)6, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::SetConfiguration(IO::NativePortBase::Configuration) .objs/Robo.o
+IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)7, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Clear() .objs/Robo.o
+IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)7, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::Set(bool) .objs/Robo.o
+IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)7, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >::SetConfiguration(IO::NativePortBase::Configuration) .objs/Robo.o
+IO::TPin<IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3> >::Clear() .objs/Robo.o
+IO::TPin<IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3> >::Set() .objs/Robo.o
+IO::TPin<IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3> >::Set(bool) .objs/Robo.o
+IO::TPin<IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3> >::SetConfiguration(IO::NativePortBase::Configuration) .objs/Robo.o
+IO::TPin<IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>, (unsigned char)6, IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3> >::Clear() .objs/Robo.o
+IO::TPin<IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>, (unsigned char)6, IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3> >::Set(bool) .objs/Robo.o
+IO::TPin<IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>, (unsigned char)6, IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3> >::SetConfiguration(IO::NativePortBase::Configuration) .objs/Robo.o
+PlatformDelayCycle16(unsigned int)                .objs/Robo.o
+Queue<16, void (*)()>::Read(void (*&)())          .objs/Robo.o
+Queue<16, void (*)()>::Write(void (*)())          .objs/Robo.o
+Queue<8, unsigned char>::Read(unsigned char&)     .objs/Robo.o
+Queue<8, unsigned char>::Write(unsigned char)     .objs/Robo.o
+Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::Activate() .objs/Robo.o
+Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::ClearInterruptStatus() .objs/Robo.o
+Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::EnableDinamicPayload() .objs/Robo.o
+Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::FlushRx() .objs/Robo.o
+Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::Init() .objs/Robo.o
+Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::InitBank1Regs() .objs/Robo.o
+Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::ModifyReg(unsigned char, unsigned char, unsigned char) .objs/Robo.o
+Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::ReadBuffer(unsigned char, unsigned char*, unsigned char) .objs/Robo.o
+Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::ReadReg(unsigned char) .objs/Robo.o
+Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::Recive(void*) .objs/Robo.o
+Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::RecivedDataLength() .objs/Robo.o
+Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::RfSetup(unsigned char) .objs/Robo.o
+Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::SetAddresess(unsigned char, unsigned long, unsigned char) .objs/Robo.o
+Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::SetRfChannel(unsigned char) .objs/Robo.o
+Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::Status() .objs/Robo.o
+Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::SwitchBank(bool) .objs/Robo.o
+Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::SwitchToRxMode() .objs/Robo.o
+Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::Write(unsigned long) .objs/Robo.o
+Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::WriteBuffer(unsigned char, unsigned char const*, unsigned char) .objs/Robo.o
+Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::WriteReg(unsigned char, unsigned char) .objs/Robo.o
+Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::WriteReg32(unsigned char, unsigned long) .objs/Robo.o
+RingBuffer<16, void (*)()>::Clear()               .objs/Robo.o
+RingBuffer<16, void (*)()>::IsEmpty() const       .objs/Robo.o
+RingBuffer<16, void (*)()>::IsFull() const        .objs/Robo.o
+RingBuffer<16, void (*)()>::Read()                .objs/Robo.o
+RingBuffer<16, void (*)()>::Write(void (*)())     .objs/Robo.o
+RingBuffer<8, unsigned char>::Clear()             .objs/Robo.o
+RingBuffer<8, unsigned char>::IsEmpty() const     .objs/Robo.o
+RingBuffer<8, unsigned char>::IsFull() const      .objs/Robo.o
+RingBuffer<8, unsigned char>::Read()              .objs/Robo.o
+RingBuffer<8, unsigned char>::Write(unsigned char) .objs/Robo.o
+SimpleDriver<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)6, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)7, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >::Break() .objs/Robo.o
+SimpleDriver<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)6, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)7, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >::Forward() .objs/Robo.o
+SimpleDriver<IO::TPin<IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3> >, IO::TPin<IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>, (unsigned char)6, IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3> > >::Break() .objs/Robo.o
+SimpleDriver<IO::TPin<IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3> >, IO::TPin<IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>, (unsigned char)6, IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3> > >::Forward() .objs/Robo.o
+SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >::ReadWrite(unsigned char) .objs/Robo.o
+Start()                                           .objs/Robo.o
+TextFormater<WaitAdapter<Usart<8, 8, Usart0Traits> >, 16, (unsigned char)8>::Puts(char const*) .objs/Robo.o
+TextFormater<WaitAdapter<Usart<8, 8, Usart0Traits> >, 16, (unsigned char)8>::operator<<(char const*) .objs/Robo.o
+TextFormater<WaitAdapter<Usart<8, 8, Usart0Traits> >, 16, (unsigned char)8>::operator<<(int) .objs/Robo.o
+TextFormater<WaitAdapter<Usart<8, 8, Usart0Traits> >, 16, (unsigned char)8>::operator<<(unsigned int) .objs/Robo.o
+Timers::BaseTimer0::EnableInterrupt()             .objs/Robo.o
+Timers::BaseTimer0::Set(unsigned char)            .objs/Robo.o
+Timers::BaseTimer0::Start(Timers::BaseTimer0::ClockDivider) .objs/Robo.o
+Usart0Traits::CanWriteData()                      .objs/Robo.o
+Usart0Traits::EnableTxRx()                        .objs/Robo.o
+Usart0Traits::Read()                              .objs/Robo.o
+Usart0Traits::SetBaundRate(unsigned long)         .objs/Robo.o
+Usart0Traits::TXIntDisable()                      .objs/Robo.o
+Usart0Traits::TXIntEnable()                       .objs/Robo.o
+Usart0Traits::Write(unsigned char)                .objs/Robo.o
+Usart<8, 8, Usart0Traits>::Init(unsigned long)    .objs/Robo.o
+Usart<8, 8, Usart0Traits>::Putch(unsigned char)   .objs/Robo.o
+Usart<8, 8, Usart0Traits>::RxHandler()            .objs/Robo.o
+Usart<8, 8, Usart0Traits>::TxHandler()            .objs/Robo.o
+Usart<8, 8, Usart0Traits>::_rx                    .objs/Robo.o
+Usart<8, 8, Usart0Traits>::_tx                    .objs/Robo.o
+__bad_interrupt                                   /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+__bss_end                                         /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_clear_bss.o)
+__bss_start                                       /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_clear_bss.o)
+__data_end                                        /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_copy_data.o)
+__data_load_start                                 /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_copy_data.o)
+__data_start                                      /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_copy_data.o)
+__do_clear_bss                                    /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_clear_bss.o)
+                                                  .objs/Robo.o
+__do_copy_data                                    /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_copy_data.o)
+                                                  .objs/Robo.o
+__heap_end                                        /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+__init                                            /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+__mulsi3                                          /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_mulsi3.o)
+                                                  .objs/Robo.o
+__stack                                           /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+__udivmodhi4                                      /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_udivmodhi4.o)
+                                                  /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/libc.a(utoa.o)
+                                                  /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/libc.a(itoa.o)
+__udivmodsi4                                      /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_udivmodsi4.o)
+                                                  .objs/Robo.o
+__vector_1                                        /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+__vector_10                                       /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+__vector_11                                       .objs/Robo.o
+                                                  /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+__vector_12                                       .objs/Robo.o
+                                                  /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+__vector_13                                       /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+__vector_14                                       /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+__vector_15                                       /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+__vector_16                                       /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+__vector_17                                       /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+__vector_18                                       /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+__vector_2                                        /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+__vector_3                                        /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+__vector_4                                        /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+__vector_5                                        /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+__vector_6                                        /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+__vector_7                                        /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+__vector_8                                        /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+__vector_9                                        .objs/Robo.o
+                                                  /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+__vector_default                                  /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+__vectors                                         /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+_exit                                             /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_exit.o)
+buffer                                            .objs/Robo.o
+debug                                             .objs/Robo.o
+exit                                              /usr/local/lib/gcc/avr/4.4.5/avr4/libgcc.a(_exit.o)
+                                                  /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+itoa                                              /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/libc.a(itoa.o)
+                                                  .objs/Robo.o
+keys                                              .objs/Robo.o
+main                                              .objs/Robo.o
+                                                  /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/crtm8.o
+strrev                                            /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/libc.a(strrev.o)
+                                                  /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/libc.a(utoa.o)
+                                                  /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/libc.a(itoa.o)
+unsigned char IO::IoPrivate::PinWriteIterator<Loki::NullType>::UppendValue<unsigned char, unsigned char>(unsigned char, unsigned char) .objs/Robo.o
+unsigned char IO::IoPrivate::PinWriteIterator<Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)0>, Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)1>, Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)2>, Loki::NullType> > > >::UppendValue<unsigned char, unsigned char>(unsigned char, unsigned char) .objs/Robo.o
+unsigned char IO::IoPrivate::PinWriteIterator<Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)1>, Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)2>, Loki::NullType> > >::UppendValue<unsigned char, unsigned char>(unsigned char, unsigned char) .objs/Robo.o
+unsigned char IO::IoPrivate::PinWriteIterator<Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)2>, Loki::NullType> >::UppendValue<unsigned char, unsigned char>(unsigned char, unsigned char) .objs/Robo.o
+utoa                                              /usr/local/lib/gcc/avr/4.4.5/../../../../avr/lib/avr4/libc.a(utoa.o)
+                                                  .objs/Robo.o
+void IO::IoPrivate::PortWriteIterator<Loki::NullType, Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)0>, Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)1>, Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)2>, Loki::NullType> > > >::SetConfiguration<IO::NativePortBase::Configuration, unsigned char>(IO::NativePortBase::Configuration, unsigned char) .objs/Robo.o
+void IO::IoPrivate::PortWriteIterator<Loki::Typelist<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, Loki::NullType>, Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)0>, Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)1>, Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)2>, Loki::NullType> > > >::SetConfiguration<IO::NativePortBase::Configuration, unsigned char>(IO::NativePortBase::Configuration, unsigned char) .objs/Robo.o
+void IO::NullPort::Clear<(unsigned char)1>()      .objs/Robo.o
+void IO::NullPort::Set<(unsigned char)1>()        .objs/Robo.o
+void IO::NullPort::SetPinConfiguration<0u, IO::GpioBase::GenericConfiguration>(IO::GpioBase::GenericConfiguration) .objs/Robo.o
+void IO::PinSet<Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)0>, Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)1>, Loki::Typelist<IO::IoPrivate::PinPositionHolder<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, (unsigned char)2>, Loki::NullType> > > >::SetConfiguration<IO::NativePortBase::Configuration>(IO::NativePortBase::Configuration, unsigned char) .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::Clear<(unsigned char)128>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::Clear<(unsigned char)2>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::Clear<(unsigned char)32>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::Clear<(unsigned char)4>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::Clear<(unsigned char)64>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::Clear<(unsigned char)8>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)128, (unsigned char)0>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)128, (unsigned char)128>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)128, (unsigned char)16>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)128, (unsigned char)1>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)128, (unsigned char)2>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)128, (unsigned char)32>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)128, (unsigned char)4>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)128, (unsigned char)64>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)128, (unsigned char)8>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)2, (unsigned char)0>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)2, (unsigned char)128>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)2, (unsigned char)16>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)2, (unsigned char)1>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)2, (unsigned char)2>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)2, (unsigned char)32>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)2, (unsigned char)4>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)2, (unsigned char)64>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)2, (unsigned char)8>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)32, (unsigned char)0>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)32, (unsigned char)128>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)32, (unsigned char)16>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)32, (unsigned char)1>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)32, (unsigned char)2>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)32, (unsigned char)32>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)32, (unsigned char)4>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)32, (unsigned char)64>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)32, (unsigned char)8>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)4, (unsigned char)0>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)4, (unsigned char)128>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)4, (unsigned char)16>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)4, (unsigned char)1>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)4, (unsigned char)2>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)4, (unsigned char)32>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)4, (unsigned char)4>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)4, (unsigned char)64>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)4, (unsigned char)8>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)64, (unsigned char)0>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)64, (unsigned char)128>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)64, (unsigned char)16>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)64, (unsigned char)1>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)64, (unsigned char)2>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)64, (unsigned char)32>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)64, (unsigned char)4>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)64, (unsigned char)64>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)64, (unsigned char)8>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)8, (unsigned char)0>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)8, (unsigned char)128>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)8, (unsigned char)16>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)8, (unsigned char)1>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)8, (unsigned char)2>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)8, (unsigned char)32>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)8, (unsigned char)4>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)8, (unsigned char)64>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::ClearBitWise<(unsigned char)8, (unsigned char)8>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::Set<(unsigned char)128>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::Set<(unsigned char)2>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::Set<(unsigned char)32>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::Set<(unsigned char)4>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::Set<(unsigned char)64>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::Set<(unsigned char)8>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)128, (unsigned char)0>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)128, (unsigned char)128>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)128, (unsigned char)16>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)128, (unsigned char)1>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)128, (unsigned char)2>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)128, (unsigned char)32>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)128, (unsigned char)4>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)128, (unsigned char)64>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)128, (unsigned char)8>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)2, (unsigned char)0>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)2, (unsigned char)128>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)2, (unsigned char)16>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)2, (unsigned char)1>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)2, (unsigned char)2>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)2, (unsigned char)32>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)2, (unsigned char)4>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)2, (unsigned char)64>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)2, (unsigned char)8>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)32, (unsigned char)0>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)32, (unsigned char)128>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)32, (unsigned char)16>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)32, (unsigned char)1>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)32, (unsigned char)2>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)32, (unsigned char)32>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)32, (unsigned char)4>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)32, (unsigned char)64>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)32, (unsigned char)8>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)4, (unsigned char)0>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)4, (unsigned char)128>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)4, (unsigned char)16>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)4, (unsigned char)1>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)4, (unsigned char)2>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)4, (unsigned char)32>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)4, (unsigned char)4>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)4, (unsigned char)64>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)4, (unsigned char)8>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)64, (unsigned char)0>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)64, (unsigned char)128>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)64, (unsigned char)16>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)64, (unsigned char)1>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)64, (unsigned char)2>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)64, (unsigned char)32>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)64, (unsigned char)4>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)64, (unsigned char)64>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)64, (unsigned char)8>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)8, (unsigned char)0>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)8, (unsigned char)128>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)8, (unsigned char)16>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)8, (unsigned char)1>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)8, (unsigned char)2>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)8, (unsigned char)32>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)8, (unsigned char)4>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)8, (unsigned char)64>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetBitWise<(unsigned char)8, (unsigned char)8>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetPinConfiguration<1u>(IO::NativePortBase::Configuration) .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetPinConfiguration<2u>(IO::NativePortBase::Configuration) .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetPinConfiguration<4u>(IO::NativePortBase::Configuration) .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetPinConfiguration<6u>(IO::NativePortBase::Configuration) .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>::SetPinConfiguration<7u>(IO::NativePortBase::Configuration) .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::Clear<(unsigned char)32>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::Clear<(unsigned char)64>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)32, (unsigned char)0>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)32, (unsigned char)128>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)32, (unsigned char)16>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)32, (unsigned char)1>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)32, (unsigned char)2>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)32, (unsigned char)32>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)32, (unsigned char)4>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)32, (unsigned char)64>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)32, (unsigned char)8>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)64, (unsigned char)0>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)64, (unsigned char)128>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)64, (unsigned char)16>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)64, (unsigned char)1>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)64, (unsigned char)2>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)64, (unsigned char)32>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)64, (unsigned char)4>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)64, (unsigned char)64>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::ClearBitWise<(unsigned char)64, (unsigned char)8>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::Set<(unsigned char)32>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::Set<(unsigned char)64>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)32, (unsigned char)0>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)32, (unsigned char)128>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)32, (unsigned char)16>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)32, (unsigned char)1>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)32, (unsigned char)2>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)32, (unsigned char)32>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)32, (unsigned char)4>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)32, (unsigned char)64>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)32, (unsigned char)8>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)64, (unsigned char)0>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)64, (unsigned char)128>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)64, (unsigned char)16>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)64, (unsigned char)1>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)64, (unsigned char)2>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)64, (unsigned char)32>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)64, (unsigned char)4>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)64, (unsigned char)64>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetBitWise<(unsigned char)64, (unsigned char)8>() .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetPinConfiguration<5u>(IO::NativePortBase::Configuration) .objs/Robo.o
+void IO::PortImplimentation<IO::Private::OutD, IO::Private::DirD, IO::Private::InD, 3>::SetPinConfiguration<6u>(IO::NativePortBase::Configuration) .objs/Robo.o
+void Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::DumpRegs<TextFormater<WaitAdapter<Usart<8, 8, Usart0Traits> >, 16, (unsigned char)8> >(TextFormater<WaitAdapter<Usart<8, 8, Usart0Traits> >, 16, (unsigned char)8>&) .objs/Robo.o
+void Rfm70<SoftSpi<IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)3, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)4, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)5, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> > >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)2, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1>, (unsigned char)1, IO::PortImplimentation<IO::Private::OutB, IO::Private::DirB, IO::Private::InB, 1> >, IO::TPin<IO::NullPort, (unsigned char)0, IO::NullPort>, Rfm70Defaults>::SetRxAddress<0>(unsigned long, unsigned char) .objs/Robo.o
+void Util::delay_ms<1ul, 1000000ul>()             .objs/Robo.o
+void Util::delay_ms<50ul, 1000000ul>()            .objs/Robo.o
+void Util::delay_us<1000ul, 1000000ul>()          .objs/Robo.o
+void Util::delay_us<50000ul, 1000000ul>()         .objs/Robo.o

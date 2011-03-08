@@ -8,7 +8,7 @@ class SimpleDriver
 	static void Forward()
 	{
 		O1::SetConfiguration(O1::Port::Out);
-		O2::SetConfiguration(O1::Port::Out);
+		O2::SetConfiguration(O2::Port::Out);
 		O1::Set();
 		O2::Clear();
 	}
@@ -16,7 +16,7 @@ class SimpleDriver
 	static void Back()
 	{
 		O1::SetConfiguration(O1::Port::Out);
-		O2::SetConfiguration(O1::Port::Out);
+		O2::SetConfiguration(O2::Port::Out);
 		O2::Set();
 		O1::Clear();
 	}
@@ -24,7 +24,7 @@ class SimpleDriver
 	static void Break()
 	{
 		O1::SetConfiguration(O1::Port::Out);
-		O2::SetConfiguration(O1::Port::Out);
+		O2::SetConfiguration(O2::Port::Out);
 		O1::Clear();
 		O2::Clear();
 	}
