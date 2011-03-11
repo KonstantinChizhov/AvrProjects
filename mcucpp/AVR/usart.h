@@ -136,7 +136,7 @@ public:
 		Traits::EnableTxRx();
 	}
 
-	static uint8_t Putch(uint8_t c)__attribute__ ((noinline))
+	static uint8_t Putch(uint8_t c)
 	{
 		if(_tx.IsEmpty())
 		{
@@ -148,7 +148,7 @@ public:
 		return _tx.Write(c);
 	}
 
-	static uint8_t Getch(uint8_t &c)__attribute__ ((noinline))
+	static uint8_t Getch(uint8_t &c)
 	{
 		return _rx.Read(c);
 	}
