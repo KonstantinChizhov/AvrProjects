@@ -80,9 +80,10 @@ namespace IO
 		static void Clear()
 		{}
 
-		template<unsigned pin>
-		static void SetPinConfiguration(Configuration configuration)
+		template<unsigned pin, class Config>
+		static void SetPinConfiguration(Config configuration)
 		{}
+		template<class Config>
 		static void SetConfiguration(DataT mask, Configuration configuration)
 		{}
 		

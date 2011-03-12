@@ -99,28 +99,6 @@ public:
 		}
 	}
 
-	void WriteP(const void *data, uint16_t size)
-	{
-		uint8_t *ptr=(uint8_t*)data;
-		for(uint16_t i=0; i<size; ++i)
-		{
-			uint8_t c = pgm_read_byte(ptr);
-			DATA_SOURCE::Putch(c);
-			ptr++;
-		}
-	}
-
-	void WriteF(const void *data, uint16_t size)
-	{
-		uint8_t *ptr=(uint8_t*)data;
-		for(uint16_t i=0; i<size; ++i)
-		{
-			uint8_t c = eeprom_read_byte(ptr);
-			DATA_SOURCE::Putch(c);
-			ptr++;
-		}
-	}
-
 	void Puts(const char *str)
 	{
 		while(*str)
@@ -134,15 +112,6 @@ public:
 	{
 		uint8_t c;
 		while((c = pgm_read_byte(str++)))
-		{
-			DATA_SOURCE::Putch(c);
-		}
-	}
-
-	void PutsF(const char *str)
-	{
-		uint8_t c;
-		while((c = eeprom_read_byte((uint8_t*)str++)))
 		{
 			DATA_SOURCE::Putch(c);
 		}

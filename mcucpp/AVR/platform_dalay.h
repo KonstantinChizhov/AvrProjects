@@ -9,27 +9,9 @@ enum
 	PlatformCyslesPerDelayLoop8 = 3
 };
 
-inline void PlatformDelayCycle32(uint32_t delayLoops)
-{	
-	union
-	{
-		struct
-		{
-			uint16_t word0;
-			uint8_t byte2;
-			uint8_t byte3;
-		} value;
-		uint32_t dword;	
-	};	
-	dword = delayLoops;	
-	__asm volatile (		
-		"1: sbiw %0,1" "\n\t"		
-		"sbc %1,r1" "\n\t"		
-		"sbc %2,r1" "\n\t"		
-		"brne 1b"		
-		: "=w" (value.word0), "=r" (value.byte2), "=r" (value.byte3)		
-		: "0" (delayLoops)	
-	);
+inline void PlatformDelayCycle32(volatile uint32_t delayLoops)
+{		
+do{}while(--delayLoops);
 }
 
 inline void PlatformDelayCycle16(uint16_t delayLoops)

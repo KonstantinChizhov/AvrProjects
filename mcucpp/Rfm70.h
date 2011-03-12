@@ -2,13 +2,8 @@
 
 #include <iopins.h>
 #include <static_assert.h>
+#include <delay.h>
 
-
-static inline void delay(volatile unsigned long count)
-{
-  do{
-  }while(--count);
-}
 
 enum Command
 {
@@ -51,7 +46,16 @@ enum Registers
 	RxDataLength3		= 0x14,
 	RxDataLength4		= 0x15,
 	RxDataLength5		= 0x16,
-	FifoStatusReg  		= 0x17
+	FifoStatusReg  		= 0x17,
+	DynamicPayload		= 0x1c,
+	Feature				= 0x1d
+};
+
+enum FeatureFlags
+{
+	EnableDynamicPayloadFlag= 1 << 2,
+	EnableAckPayloadFlag	= 1 << 1,
+	EnableDynamicAckFlag	= 1 << 0
 };
 
 
@@ -299,7 +303,7 @@ public:
 		IrqPin::SetDirRead();
 		IrqPin::Clear();
 		
-		delay(50*1000u);
+		Util::delay_ms<50, F_CPU>();
 		Activate();
 
 		InitBank1Regs();
@@ -312,7 +316,14 @@ public:
 		SetRfChannel(Defaults::RfChannel);
 		RfSetup(Defaults::RfSetup);
 		WriteReg(SetupRetryReg, Defaults::RetrySetrup);
-		WriteReg(RxDataLength0, 32);
+		EnableDinamicPayload();
+		//WriteReg(RxDataLength0, 32);
+	}
+
+	static void EnableDinamicPayload()
+	{
+		WriteReg(Feature, EnableDynamicPayloadFlag);
+		WriteReg(DynamicPayload, 0x3f);
 	}
 
 	static void PowerUp()
