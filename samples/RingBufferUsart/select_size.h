@@ -14,3 +14,17 @@
 				typename StaticIf<LessOrEq16, uint16_t, uint32_t>::Result>
 				::Result Result;
 	};
+
+
+	template<unsigned size>
+	struct SelectSizeForLength
+	{
+		static const bool LessOrEq8 = size <= 0xff;
+		static const bool LessOrEq16 = size <= 0xffff;
+
+		typedef typename StaticIf<
+				LessOrEq8,
+				uint8_t,
+				typename StaticIf<LessOrEq16, uint16_t, uint32_t>::Result>
+				::Result Result;
+	};

@@ -5,19 +5,17 @@
 // 8 bytes tx fifo buffer, 
 // 16 bytes rx fifo buffer
 // interrupt driven USART
-typedef Usart<8, 16> usart;
+typedef Usart<16, 16> usart;
 
 ISR(USART_UDRE_vect)
 {	
 	usart::TxHandler();
 }
 
-
 ISR(USART_RXC_vect)
 {
 	usart::RxHandler();
 }
-
 
 int main()
 {
@@ -30,3 +28,4 @@ int main()
 			usart::Putch(c);
 	}
 }
+

@@ -1,12 +1,14 @@
 #pragma once
 
 #include "static_assert.h"
+#include "select_size.h"
 
 template<int SIZE, class DATA_T=unsigned char>
 class RingBuffer
 {
 public:
-	typedef uint8_t INDEX_T;
+	typedef typename SelectSizeForLength<SIZE>::Result INDEX_T;
+
 private:
 	BOOST_STATIC_ASSERT((SIZE&(SIZE-1))==0);//SIZE must be a power of 2
 	DATA_T _data[SIZE];
@@ -15,7 +17,7 @@ private:
 	static const INDEX_T _mask = SIZE - 1;
 public:
 
-	inline uint8_t Write(DATA_T value)
+	inline bool Write(DATA_T value)
 	{
 		if(IsFull())
 			return 0;
@@ -23,12 +25,12 @@ public:
 		return true;
 	}
 
-	inline uint8_t Read(DATA_T &value)
+	inline bool Read(DATA_T &value)
 	{
 		if(IsEmpty())
 			return 0;
 		value = _data[_readCount++ & _mask];
-		return 1;
+		return true;
 	}
 
 	inline DATA_T First()const
@@ -38,31 +40,31 @@ public:
 
 	inline DATA_T Last()const
 	{
-		return operator[](Size());
+		return operator[](Count());
 	}
 
 	inline DATA_T& operator[] (INDEX_T i)
 	{
-		if(IsEmpty())
+		if(IsEmpty() || i > Count())
 			return DATA_T();
 		return _data[(_readCount + i) & _mask];
 	}
 
 	inline const DATA_T operator[] (INDEX_T i)const
 	{
-		if(IsEmpty())
+		if(IsEmpty()|| i > Count())
 			return DATA_T();
 		return _data[(_readCount + i) & _mask];
 	}
 
-	inline uint8_t IsEmpty()const
+	inline bool IsEmpty()const
 	{
 		return _writeCount == _readCount;
 	}
 		
-	inline uint8_t IsFull()const
+	inline bool IsFull()const
 	{
-		return ((INDEX_T)(_writeCount - _readCount) & (INDEX_T)~(_mask)) != 0;
+		return ((_writeCount - _readCount) & (INDEX_T)~(_mask)) != 0;
 	}
 
 	INDEX_T Count()const

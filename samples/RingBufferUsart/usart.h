@@ -92,7 +92,7 @@ public:
 		EnableTxRx();
 	}
 
-	static uint8_t Putch(uint8_t c)
+	static bool Putch(uint8_t c)
 	{
 		if(_tx.IsEmpty())
 		{
@@ -104,7 +104,7 @@ public:
 		return _tx.Write(c);
 	}
 
-	static uint8_t Getch(uint8_t &c)
+	static bool Getch(uint8_t &c)
 	{
 		return _rx.Read(c);
 	}
