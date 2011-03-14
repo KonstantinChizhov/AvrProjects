@@ -22,7 +22,8 @@
 #define LCD_DATA_MSK (_BV(D4)|_BV(D5)|_BV(D6)|_BV(D7))
 #define LCD_CTRL_MSK (_BV(RS)|_BV(E))
 
-#define LCD_BIT1(val, bit) ((val >> (bit))&1)<<(D##bit)
+//#define LCD_BIT1(val, bit) ((val >> (bit))&1)<<(D##bit)
+#define LCD_BIT1(val, bit) ((val & (1 << bit)) ? (1 << D##bit) : 0)
 
 #define LCD_STROBE LCD_PORT_CTRL|=(1<<E); _delay_ms(0.1); LCD_PORT_CTRL&=(unsigned char)~(1<<E); _delay_ms(0.2);
 

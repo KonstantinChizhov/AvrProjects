@@ -5,7 +5,7 @@
 #include <string.h>
 #include "lcd.h"
 
-enum {IrPulseThershold=15};
+static const IrPulseThershold = 15;
 static const uint8_t TimerReloadValue = 150;
 static const uint8_t TimerClock = (1 << CS02) | (1 << CS00);// 8 MHz / 1024
 
@@ -15,7 +15,7 @@ volatile struct ir_t
 	uint16_t code, rx_buffer;
 } ir;
 
-void ir_start_timer()
+static void ir_start_timer()
 {
 	TIMSK = (1 << TOIE0);
 	TCNT0 = 0;

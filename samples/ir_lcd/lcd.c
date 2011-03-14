@@ -1,7 +1,7 @@
 #include "lcd.h"
 
 
-void lcd_write4(uint8_t c) //4 msb
+static void lcd_write4(uint8_t c) //4 msb
 {
 	LCD_PORT_DATA&=~LCD_DATA_MSK;
 	LCD_PORT_DATA |= LCD_BIT1(c, 4)| LCD_BIT1(c, 5)| LCD_BIT1(c, 6) | LCD_BIT1(c, 7); 
