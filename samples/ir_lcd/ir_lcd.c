@@ -5,14 +5,14 @@
 #include <string.h>
 #include "lcd.h"
 
-static const IrPulseThershold = 15;
+static const IrPulseThershold = 9;
 static const uint8_t TimerReloadValue = 150;
 static const uint8_t TimerClock = (1 << CS02) | (1 << CS00);// 8 MHz / 1024
 
 volatile struct ir_t
 {
 	uint8_t rx_started;
-	uint16_t code, rx_buffer;
+	uint32_t code, rx_buffer;
 } ir;
 
 static void ir_start_timer()
@@ -50,8 +50,8 @@ ISR(INT0_vect)
 
 static inline void ir_init()
 {
-	GIMSK|=_BV(INT0);
-	MCUCR|=/*_BV(ISC00)|*/_BV(ISC01);
+	GIMSK |= _BV(INT0);
+	MCUCR |= (1 << ISC00) | (0 <<ISC01);
 	ir_start_timer();
 }
 
@@ -73,7 +73,7 @@ int main()
 	{
 		if(ir.code)
 		{
-			utoa(ir.code, buf, 16);
+			ultoa(ir.code, buf, 16);
 			lcd_clear();
 			lcd_puts((buf));
 		}
